@@ -1,0 +1,349 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.Query6Model
+@{
+    ViewData["Title"] = "檢視區塊鏈資訊";
+    ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
+}
+<section class="menu-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="navbar-collapse collapse ">
+                    <ul id="menu-top" class="nav navbar-nav navbar-right">
+                        <li><a class="menu-top-active" href="./Query">查詢中央公債</a></li>
+                        <li><a href="./Query2">第二銀行資訊</a></li>
+                        <li><a href="./Query3">第四銀行資訊</a></li>
+                        <li><a href="./Query5">第五銀行資訊</a></li>
+                        <li><a href="./Query4">檢視交易歷史</a></li>
+                        <li><a href="./Query6">檢視區塊鏈資訊</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MENU SECTION END-->
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+    <input type="hidden" id="blockNo" value="">
+</div>
+
+<div id="divReadBank2TX">
+    <hr>
+    <div class=col-md-12>
+        <label for="txhash">Transaction ID(TxId)：</label>
+        <input type="text" id="txhash" value="" size="70" placeholder="TxId">
+        <button id="search">查詢</button>
+    </div>
+    <br />
+    @Html.AntiForgeryToken()
+    <br />
+    <br />
+    <div class="panel panel-primary">
+        <div class="panel-heading"><h3>Blockchain Information</h3></div>
+        <div class="panel-body">
+            <div id="divReadBankTX">
+                <table id="tb" class="table table-striped table-bordered table-hover" border="1">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>區塊鏈上的通道代碼</td><td><span id="channel_id"></span></td></tr>
+                        <tr><td>區塊鏈上的智能合約代號</td><td><span id="chaincode_id"></span></td></tr>
+                        <tr><td>區塊鏈上的智能合約版本</td><td><span id="chaincode_version"></span></td></tr>
+                        <tr><td>區塊鏈上的區塊總數</td><td><span id="blockNumber"></span></td></tr>
+                        <tr><td>提交到帳本的區塊編號</td><td><span id="block_number"></span></td></tr>
+                        <tr><td>提交到帳本的時間戳</td><td><span id="timestamp"></span></td></tr>
+                        <tr><td>前一個Block Header的Hash值</td><td><span id="previous_hash"></span></td></tr>
+                        <tr><td>Block Data的Hash值</td><td><span id="data_hash"></span></td></tr>
+                        <tr><td>Transaction Proposal的Hash值</td><td><span id="proposal_hash"></span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading"><h3>Endorser Transaction</h3></div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <label>Transaction proposal readset：</label>
+                <!--Table Striped-->
+                <table id="tb1" class="table table-striped table-bordered table-hover" border="1">
+                    <thead>
+                        <tr>
+                            <th>Keys</th>
+                            <th>BlockNumber</th>
+                            <th>Version</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reads"></tbody>
+                </table>
+                <label>Transaction proposal writeset：</label>
+                <table id="tb2" class="table table-striped table-bordered table-hover" border="1">
+                    <thead>
+                        <tr>
+                            <th>Keys</th>
+                            <th>Is Delete</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="writes"></tbody>
+                </table>
+                <label>PEM-encoded X509 enrollment certificate：</label>
+                <table id="tb3" class="table table-striped table-bordered table-hover" border="1">
+                    <thead>
+                        <tr>
+                            <th>Creator</th>
+                            <th>Certificate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="x509"></tbody>
+                </table>
+                <!--End Table Striped-->
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="panel panel-default">
+        <div class="panel-heading"><h3>JSON Formatter Tool</h3></div>
+        <div class="panel-body">
+            <h3><p class="bg-default">Intput</p></h3>
+            <textarea class="form-control" id="json-input" rows="5" id="comment"></textarea>
+            <div><br /><button id="execute" class="btn btn-warning">執行</button></div>
+            <p class="error hidden">There was a problem with the provided JSON. Please check that the JSON is valid.</p>
+            <div id="output-container" class="hidden">
+                <h3> <p class="bg-default">Output</p></h3>
+                <div id="json-container"></div>
+                <div class="demo-options">
+                    <button id="expand-all" class="btn btn-primary">全部展開</button>
+                    <button id="collapse-all" class="btn btn-success">全部收合</button>
+                    <button id="expand-levels" class="btn btn-danger">展開階層</button>
+                    Levels: <input type="text" id="levels" value="2" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function () {
+            //var site = "http://192.168.0.111" + ":4000"
+            //var site = "http://172.20.10.5" + ":4000"
+            //var site = "http://192.168.0.104" + ":4000"
+            var site = "http://192.168.0.107" + ":4000"
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+            $("#search").click(function () {
+
+                $('#reads').html("");
+                $('#writes').html("");
+                $('#x509').html("");
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel?peer=peer0.org1.example.com",
+                    dataType: "html",
+                    success: function (data) {
+                        console.log(data);
+                        var json = JSON.parse(data);
+                        console.log(json);
+                        $("#dvPostResult").html("BlockNumber # " + json.height.low + " of ChainInfo loaded successfully.");
+                        $("#blockNumber").html(json.height.low);
+                        var txhash = $("#txhash").val()
+                        var blockNumber = 0;
+                        $.ajax({
+                            type: "GET",
+                            url: site + "/channels/mychannel/transactions/" + txhash + "?peer=peer0.org1.example.com",
+                            dataType: "html",
+                            success: function (data) {
+                                //console.log(site + "/channels/mychannel/transactions/" + $("#txhash").val + "?peer=peer0.org1.example.com");
+                                console.log(data);
+                                var json = JSON.parse(data);
+                                console.log(json);
+
+                                var rwset_reads = json.transactionEnvelope.payload.data.actions[0].payload.action.proposal_response_payload.extension.results.ns_rwset[1].rwset.reads;
+                                var rwset_writes = json.transactionEnvelope.payload.data.actions[0].payload.action.proposal_response_payload.extension.results.ns_rwset[1].rwset.writes;
+                                console.log(rwset_reads)
+                                console.log(rwset_writes)
+
+                                for (i = 0; i < rwset_reads.length; i++) {
+                                    var htmlCode =
+                                        "<tr>"
+                                        + "<td>" + rwset_reads[i].key + "</td>"
+                                        + "<td>" + rwset_reads[i].version.block_num + "</td>"
+                                        + "<td>" + rwset_reads[i].version.tx_num + "</td>"
+                                        + "</tr>"
+                                    $('#reads').append(htmlCode);
+
+                                    if (parseInt(rwset_reads[i].version.block_num) > parseInt(blockNumber)) {
+                                        blockNumber = rwset_reads[i].version.block_num
+                                    }
+                                }
+
+                                blockNumber = parseInt(blockNumber) + 1
+
+                                for (j = 0; j < rwset_writes.length; j++) {
+                                    console.log(rwset_writes[j].key)
+                                    console.log(rwset_writes[j].value)
+                                    var htmlCode =
+                                        "<tr>"
+                                        + "<td>" + rwset_writes[j].key + "</td>"
+                                        + "<td>" + rwset_writes[j].is_delete + "</td>"
+                                        + "<td>" + rwset_writes[j].value + "</td>"
+                                        + "</tr>"
+                                    $('#writes').append(htmlCode);
+                                }
+
+                                //僅取得proposal的區塊編號，實際編號應於提交後將區塊編號加1
+                                $("#blockNo").val(blockNumber)
+                                console.log($("#blockNo").val())
+                                $("#dvPostResult").html("Block Number：#" + blockNumber + " transaction loaded successfully.");
+
+
+                                var chaincode_id = json.transactionEnvelope.payload.data.actions[0].payload.action.proposal_response_payload.extension.chaincode_id.name;
+                                var chaincode_version = json.transactionEnvelope.payload.data.actions[0].payload.action.proposal_response_payload.extension.chaincode_id.version;
+                                var timestamp = json.transactionEnvelope.payload.header.channel_header.timestamp;
+                                var channel_id = json.transactionEnvelope.payload.header.channel_header.channel_id;
+                                var tx_id = json.transactionEnvelope.payload.header.channel_header.tx_id;
+                                var msp_id = json.transactionEnvelope.payload.header.signature_header.creator.Mspid;
+                                var IdBytes = json.transactionEnvelope.payload.header.signature_header.creator.IdBytes;
+                                $("#chaincode_id").html(chaincode_id);
+                                $("#chaincode_version").html(chaincode_version);
+                                $("#timestamp").html(timestamp);
+                                $("#channel_id").html(channel_id);
+
+                                $("#block_number").html(blockNumber);
+
+                                var htmlCode =
+                                    "<tr>"
+                                    + "<td>" + msp_id + "</td>"
+                                    + "<td>" + IdBytes + "</td>"
+                                    + "</tr>"
+                                $('#x509').append(htmlCode);
+
+
+                                $.ajax({
+                                    type: "GET",
+                                    url: site + "/channels/mychannel/blocks/" + $("#blockNo").val() + "?peer=peer0.org1.example.com",
+                                    dataType: "html",
+                                    success: function (data) {
+                                        console.log(data);
+                                        var json = JSON.parse(data);
+                                        console.log(json);
+                                        console.log(json.header.previous_hash);
+                                        console.log(json.header.data_hash);
+                                        previous_hash = json.header.previous_hash
+                                        data_hash = json.header.data_hash
+                                        proposal_hash = json.data.data[0].payload.data.actions[0].payload.action.proposal_response_payload.proposal_hash
+                                        var tx_id2 = json.data.data[0].payload.header.channel_header.tx_id
+                                        var order_mspid = json.metadata.metadata[0].signatures[0].signature_header.creator.Mspid
+                                        var IdBytes = json.metadata.metadata[0].signatures[0].signature_header.creator.IdBytes
+                                        console.log(tx_id)
+                                        console.log(tx_id2)
+                                        //$("#tx_id").html("Transaction ID(TxId)：" + tx_id2);
+                                        $("#previous_hash").html(previous_hash);
+                                        $("#data_hash").html(data_hash);
+                                        $("#proposal_hash").html(proposal_hash);
+                                        var htmlCode =
+                                            "<tr>"
+                                            + "<td>" + order_mspid + "</td>"
+                                            + "<td>" + IdBytes + "</td>"
+                                            + "</tr>"
+                                        $('#x509').append(htmlCode);
+                                    },
+                                    error: function (jqXHR) {
+                                        alert("發生錯誤: " + jqXHR.status);
+                                        console.log(jqXHR);
+                                    },
+                                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                                })
+
+                            },
+                            error: function (jqXHR) {
+                                alert("發生錯誤: " + jqXHR.status);
+                                console.log(jqXHR);
+                            },
+                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                            beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                        })
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+            })
+
+            var jsonContainer = $('#json-container');
+
+            $('#execute').on('click', function () {
+                var error = false;
+                try {
+                    var json = JSON.parse($('#json-input').val());
+                }
+                catch (e) {
+                    error = true;
+                }
+
+                $('.error').toggleClass('hidden', !error);
+                $('#output-container').toggleClass('hidden', error);
+
+                jsonContainer
+                    .jsonPresenter('destroy') // Clear any previous JSON being presented through this plugin for this container
+                    .jsonPresenter({ // Use the jquery.jsonPresenter plugin using the input from the textarea above
+                        json: json
+                    })
+                    .jsonPresenter('expand', 0); // Expand all JSON properties so that none of them are collapsed
+            });
+
+            $('#expand-all').on('click', function () {
+                jsonContainer.jsonPresenter('expandAll');
+            });
+
+            $('#collapse-all').on('click', function () {
+                jsonContainer.jsonPresenter('collapseAll');
+            });
+
+            $('#expand-levels').on('click', function () {
+                var levels = parseInt($('#levels').val());
+                jsonContainer.jsonPresenter('expand', levels);
+            });
+
+
+        });
+    </script>
+}
+
+
+

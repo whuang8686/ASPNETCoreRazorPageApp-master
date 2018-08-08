@@ -1,0 +1,444 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.Query4Model
+@{
+    ViewData["Title"] = "檢視交易歷史";
+    ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
+}
+
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+
+<div id="divReadBankTX">
+    <div class=col-md-12>
+        <label for="txday">交易日期：</label>
+        <input type="text" id="txday" size="10" value='@ViewData["TODAY"]' placeholder="交易日">&nbsp;&nbsp;&nbsp;&nbsp;
+        <label for="txstatus">交易狀態：</label>
+        <select id="txstatus">
+            <option value="All">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Waiting4Payment">Waiting4Payment</option>
+            <option value="PaymentError">PaymentError</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Finished">Finished</option>
+        </select>&nbsp;&nbsp;&nbsp;&nbsp;
+        <label for="bankid">清算銀行：</label>
+        <select id="bankid">
+            <option value="All">All</option>
+            <option value="BK002">BANK002</option>
+            <option value="BK004">BANK004</option>
+            <option value="BK005">BANK005</option>
+        </select>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="search">查詢交易明細</button>
+    </div>
+    <br />
+    <br />
+    <div id="reportTableDiv">
+        <table id="reportTable"></table>
+    </div>
+    <!--
+        <div id="result2" class="container">
+            <div class="table-responsive">
+                <table id="tb1" class="table table-striped table-bordered table-hover sortable" border="1">
+                    <thead>
+                        <tr>
+                            <th>交易<br />序號</th>
+                            <th>交易<br />型態</th>
+                            <th>轉出方<br />銀行</th>
+                            <th>轉出方<br />帳號</th>
+                            <th>轉入方<br />銀行</th>
+                            <th>轉入方<br />帳號</th>
+                            <th>交易<br />面額</th>
+                            <th>交易<br />金額</th>
+                            <th>公債<br />代號</th>
+                            <th>交易<br />狀態</th>
+                            <th>交易<br />說明</th>
+                            <th>原交易<br />序號</th>
+                            <th>比對<br />序號</th>
+                            <th>建立<br />時間</th>
+                            <th>更新<br />時間</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bonds" class="table table-striped"></tbody>
+                </table>
+            </div>
+        </div>
+        -->
+</div>
+<br />
+<div id="divReadBankTX2">
+    <hr>
+    <div class=col-md-12>
+        <label for="txid">交易序號：</label>
+        <input type="text" id="txid" value="" size="40" placeholder="交易序號">&nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="search2">查詢交易明細</button>
+    </div>
+    <br />
+    <br />
+    <div id="reportTableDiv2">
+        <table id="reportTable2"></table>
+    </div>
+    <!--
+        <div id="resulttx2" class="container-fluid">
+            <div class="table-responsive">
+                <table id="tb2" class="table table-striped table-bordered table-hover sortable" border="1">
+                    <thead>
+                        <tr>
+                            <th>TxId</th>
+                            <th>交易<br />時間</th>
+                            <th>交易<br />序號</th>
+                            <th>交易<br />型態</th>
+                            <th>轉出<br />銀行</th>
+                            <th>轉出<br />帳號</th>
+                            <th>轉入<br />銀行</th>
+                            <th>轉入<br />帳號</th>
+                            <th>交易<br />面額</th>
+                            <th>交易<br />金額</th>
+                            <th>公債<br />代號</th>
+                            <th>交易<br />狀態</th>
+                            <th>交易<br />說明</th>
+                            <th>錯誤<br />訊息</th>
+                            <th>原交易<br />序號</th>
+                            <th>比對<br />序號</th>
+                            <th>建立<br />時間</th>
+                            <th>更新<br />時間</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history" class="table table-striped"></tbody>
+                </table>
+            </div>
+        </div>
+        -->
+</div>
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+
+<div id="dvPostResult" style="font-size:16pt">
+</div>
+<h5>@Model.Message</h5>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+            var site = gSite;
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+
+
+            $("#search").click(function () {
+                //alert($('#txday').val());
+
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryQueuedTransactionStatus&args=%5B%22" + $('#txday').val() + "%22%2C%22" + $('#txstatus').val() + "%22%2C%22" + $('#bankid').val() + "%22%5D",
+                    dataType: "html",
+                    success: function (data) {
+                        console.log(data);
+                        var data1 = data.replace(' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+                        //$('#bonds').html("")
+                        var datas = [];
+
+                        var json = JSON.parse(data2);
+                        console.log(json);
+                        $("#dvPostResult").html("Transactions loaded successfully.");
+                        for (i = 0; i < json.length; i++) {
+
+                            for (j = 0; j < json[i].Transactions.length; j++) {
+                                var TXTYPE = json[i].Transactions[j].TXType
+                                var BANKFROM, BANKTO, TXFROM, TXTO, TXKIND, TXAMT, newTXStatus, newAmountStyle, newBalanceStyle;
+                                var TXStatus = json[i].Transactions[j].TXStatus
+                                newTXStatus = formatTXStatus(TXStatus)
+                                var TXMemo = json[i].Transactions[j].TXMemo
+                                newAmountStyle = formatAmount(TXMemo)
+                                newBalanceStyle = formatBalance(TXMemo)
+
+
+
+                                if (TXTYPE == "S") {
+                                    BANKFROM = json[i].Transactions[j].BankFrom
+                                    BANKTO = json[i].Transactions[j].BankTo
+                                    TXFROM = json[i].Transactions[j].TXFrom
+                                    TXTO = json[i].Transactions[j].TXTo
+                                    TXKIND = "轉出"
+                                }
+                                if (TXTYPE == "B") {
+                                    BANKFROM = json[i].Transactions[j].BankTo
+                                    BANKTO = json[i].Transactions[j].BankFrom
+                                    TXFROM = json[i].Transactions[j].TXTo
+                                    TXTO = json[i].Transactions[j].TXFrom
+                                    TXKIND = "轉入"
+                                }
+                                if (BANKFROM == BANKTO) {
+                                    TXKIND = "自行<br/>" + TXKIND
+                                }
+                                else {
+                                    TXKIND = "跨行<br/>" + TXKIND
+                                }
+
+                                //    var htmlCode =
+                                //        "<tr>"
+                                //        + "<td>" + json[i].Transactions[j].TXID + "</td>"
+                                //        + "<td>" + TXKIND + "</td>"
+                                //        + "<td>" + BANKFROM + "</td>"
+                                //        + "<td>" + TXFROM + "</td>"
+                                //        + "<td>" + BANKTO + "</td>"
+                                //        + "<td>" + TXTO + "</td>"
+                                //        + "<td align=right" + newBalanceStyle + ">" + numberWithCommas(json[i].Transactions[j].Payment) + "</td>"
+                                //        + "<td align=right" + newAmountStyle + ">" + numberWithCommas(json[i].Transactions[j].SecurityAmount) + "</td>"
+                                //        + "<td>" + json[i].Transactions[j].SecurityID + "</td>"
+                                //        + "<td>" + newTXStatus + "</td>"
+                                //        + "<td>" + json[i].Transactions[j].TXMemo + "</td>"
+                                //        + "<td>" + json[i].Transactions[j].TXHcode + "</td>"
+                                //        + "<td>" + json[i].Transactions[j].MatchedTXID + "</td>"
+                                //        + "<td>" + json[i].Transactions[j].CreateTime + "</td>"
+                                //        + "<td>" + json[i].Transactions[j].UpdateTime + "</td>"
+                                //        + "</tr>"
+                                //    $('#bonds').append(htmlCode);
+
+                                datas[j] = {
+                                    "TXID": json[i].Transactions[j].TXID,
+                                    "TXType": TXKIND,
+                                    "BankFrom": BANKFROM,
+                                    "TXFrom": TXFROM,
+                                    "BankTo": BANKTO,
+                                    "TXTo": TXTO,
+                                    "Payment": "<font " + newBalanceStyle + ">" + numberWithCommas(json[i].Transactions[j].Payment) + "</font>",
+                                    "SecurityAmount": "<font " + newAmountStyle + ">" + numberWithCommas(json[i].Transactions[j].SecurityAmount) + "</font>",
+                                    "SecurityID": json[i].Transactions[j].SecurityID,
+                                    "TXStatus": newTXStatus,
+                                    "TXMemo": json[i].Transactions[j].TXMemo,
+                                    "TXHcode": json[i].Transactions[j].TXHcode,
+                                    "MatchedTXID": json[i].Transactions[j].MatchedTXID,
+                                    "createTime": json[i].Transactions[j].CreateTime,
+                                    "updateTime": json[i].Transactions[j].UpdateTime
+                                }
+
+                            }
+
+                        }
+                        $('#reportTable').html("");
+                        $('#reportTable').bootstrapTable('destroy');
+                        $('#reportTable').bootstrapTable({
+                            method: 'get',
+                            cache: false,
+                            striped: true,
+                            pagination: true,
+                            pageSize: 5,
+                            pageNumber: 1,
+                            pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
+                            search: true,
+                            showColumns: true,
+                            showRefresh: false,
+                            showExport: false,
+                            exportTypes: ['csv', 'txt', 'xml'],
+                            search: true,
+                            clickToSelect: true,
+                            columns:
+                                [
+                                    { field: "TXID", title: "交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXType", title: "交易<br/>型態", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "BankFrom", title: "轉出<br/>銀行", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXFrom", title: "轉出<br/>帳號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "BankTo", title: "轉入<br/>銀行", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXTo", title: "轉入<br/>帳號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "Payment", title: "交易<br/>面額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "SecurityAmount", title: "交易<br/>金額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "SecurityID", title: "公債<br/>代號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "MatchedTXID", title: "比對<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
+
+                                ],
+                            data: datas,
+                        });
+
+
+
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+            })
+
+            $("#search2").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=getHistoryForTransaction&args=%5B%22" + $('#txid').val() + "%22%5D",
+                    dataType: "html",
+                    success: function (data) {
+                        console.log(data);
+                        var data1 = data.replace(' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+                        //$('#history').html("")
+                        var datas2 = [];
+
+
+                        var json = JSON.parse(data2);
+                        console.log(json);
+                        $("#dvPostResult").html("Transactions loaded successfully.");
+                        console.log(json.length);
+                        for (i = 0; i < json.length; i++) {
+
+
+                            var TXTYPE = json[i].Value.TXType
+                            var BANKFROM, BANKTO, TXFROM, TXTO, TXKIND, TXAMT;
+                            var BANKFROM, BANKTO, TXFROM, TXTO, TXKIND, TXAMT, newTXStatus, newAmountStyle, newBalanceStyle;
+                            var TXStatus = json[i].Value.TXStatus
+                            newTXStatus = formatTXStatus(TXStatus)
+                            var TXMemo = json[i].Value.TXMemo
+                            newAmountStyle = formatAmount(TXMemo)
+                            newBalanceStyle = formatBalance(TXMemo)
+
+                            if (TXTYPE == "S") {
+                                BANKFROM = json[i].Value.BankFrom
+                                BANKTO = json[i].Value.BankTo
+                                TXFROM = json[i].Value.TXFrom
+                                TXTO = json[i].Value.TXTo
+                                TXKIND = "轉出"
+                            }
+                            if (TXTYPE == "B") {
+                                BANKFROM = json[i].Value.BankTo
+                                BANKTO = json[i].Value.BankFrom
+                                TXFROM = json[i].Value.TXTo
+                                TXTO = json[i].Value.TXFrom
+                                TXKIND = "轉入"
+                            }
+                            if (BANKFROM == BANKTO) {
+                                TXKIND = "自行<br/>" + TXKIND
+                            }
+                            else {
+                                TXKIND = "跨行<br/>" + TXKIND
+                            }
+
+                            //   var htmlCode =
+                            //       "<tr>"
+                            //       + "<td>" + json[i].TxId + "</td>"
+                            //       + "<td>" + json[i].Timestamp + "</td>"
+                            //       + "<td>" + json[i].Value.TXID + "</td>"
+                            //       + "<td>" + TXKIND + "</td>"
+                            //       + "<td>" + BANKFROM + "</td>"
+                            //       + "<td>" + TXFROM + "</td>"
+                            //       + "<td>" + BANKTO + "</td>"
+                            //       + "<td>" + TXTO + "</td>"
+                            //       + "<td align=right" + newBalanceStyle + ">" + numberWithCommas(json[i].Value.Payment) + "</td>"
+                            //       + "<td align=right" + newAmountStyle + ">" + numberWithCommas(json[i].Value.SecurityAmount) + "</td>"
+                            //       + "<td>" + json[i].Value.SecurityID + "</td>"
+                            //       + "<td>" + newTXStatus + "</td>"
+                            //       + "<td>" + json[i].Value.TXMemo + "</td>"
+                            //       + "<td>" + json[i].Value.TXErrMsg + "</td>"
+                            //       + "<td>" + json[i].Value.TXHcode + "</td>"
+                            //       + "<td>" + json[i].Value.MatchedTXID + "</td>"
+                            //       + "<td>" + json[i].Value.createTime + "</td>"
+                            //       + "<td>" + json[i].Value.updateTime + "</td>"
+                            //       + "</tr>"
+
+                            //   $('#history').append(htmlCode);
+
+                            datas2[i] = {
+                                "TxId": json[i].TxId,
+                                "TXID": json[i].Value.TXID,
+                                "TXType": TXKIND,
+                                "BankFrom": BANKFROM,
+                                "TXFrom": TXFROM,
+                                "BankTo": BANKTO,
+                                "TXTo": TXTO,
+                                "Payment": "<font " + newBalanceStyle + ">" + numberWithCommas(json[i].Value.Payment) + "</font>",
+                                "SecurityAmount": "<font " + newAmountStyle + ">" + numberWithCommas(json[i].Value.SecurityAmount) + "</font>",
+                                "SecurityID": json[i].Value.SecurityID,
+                                "TXStatus": newTXStatus,
+                                "TXMemo": json[i].Value.TXMemo,
+                                "TXHcode": json[i].Value.TXHcode,
+                                "MatchedTXID": json[i].Value.MatchedTXID,
+                                "Timestamp": json[i].Timestamp,
+                                "createTime": json[i].Value.createTime,
+                                "updateTime": json[i].Value.updateTime
+                            }
+
+                        }
+                        $('#reportTable2').html("");
+                        $('#reportTable2').bootstrapTable('destroy');
+                        $('#reportTable2').bootstrapTable({
+                            method: 'get',
+                            cache: false,
+                            striped: true,
+                            pagination: true,
+                            pageSize: 5,
+                            pageNumber: 1,
+                            pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
+                            search: true,
+                            showColumns: true,
+                            showRefresh: false,
+                            showExport: false,
+                            exportTypes: ['csv', 'txt', 'xml'],
+                            search: true,
+                            clickToSelect: true,
+                            columns:
+                                [
+                                    { field: "TxId", title: "TxId", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXID", title: "交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXType", title: "交易<br/>型態", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "BankFrom", title: "轉出<br/>銀行", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXFrom", title: "轉出<br/>帳號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "BankTo", title: "轉入<br/>銀行", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXTo", title: "轉入<br/>帳號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "Payment", title: "交易<br/>面額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "SecurityAmount", title: "交易<br/>金額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "SecurityID", title: "公債<br/>代號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "MatchedTXID", title: "比對<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "Timestamp", title: "交易<br/>時間", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
+
+                                ],
+                            data: datas2,
+                        });
+
+
+
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+            })
+        });
+    </script>
+}

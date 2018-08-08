@@ -1,0 +1,371 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.Invoke4Model
+@{
+    ViewData["Title"] = "利息計算分配";
+}
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+<div id="divReadBank">
+    <div class="col-md-8">
+        <label for="security_id">公債代號：</label>
+        <input type="text" id="security_id" value="A07106" placeholder="公債代號">&nbsp;&nbsp;&nbsp;&nbsp;
+        <label for="txday">付息日期：</label>
+        <input type="text" id="txday" value="2019/06/02" placeholder="YYYY/MM/DD">&nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="submit">確定</button>
+    </div>
+    <br />
+    <br />
+    <div id="reportTableDiv">
+        <table id="reportTable"></table>
+    </div>
+    <!--
+    <div id="result" class="container">
+        <div class="table-responsive">
+            <table id="tb2" class="table table-striped table-bordered table-hover sortable" border="1">
+                <thead>
+                    <tr>
+                        <th>公債<br />代號</th>
+                        <th>公債<br />名稱</th>
+                        <th>公債<br />年期</th>
+                        <th>票面<br />利率%</th>
+                        <th>公債<br />發行日</th>
+                        <th>公債<br />到期日</th>
+                        <th>清算<br />銀行</th>
+                        <th>客戶<br />帳號</th>
+                        <th>公債<br />餘額</th>
+                        <th>公債<br />總餘額</th>
+                        <th>公債<br />總利息</th>
+                        <th>已付<br />利息</th>
+                        <th>已付<br />總利息</th>
+                        <th>下次<br />付息日</th>
+                    </tr>
+                </thead>
+                <tbody id="bonds" class="table table-striped"></tbody>
+            </table>
+        </div>
+    </div>
+        -->
+</div>
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+
+<div id="dvPostResult" style="font-size:16pt">
+</div>
+<h5>@Model.Message</h5>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript" language="JavaScript">
+    $(document).ready(function () {
+            var site = gSite;
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+
+
+            $("#submit").click(function () {
+
+                swal({
+                    title: "本計息交易須放行",
+                    text: "請輸入管理者密碼：",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                    content: {
+                        element: "input",
+                        attributes: {
+                            placeholder: "管理者密碼",
+                            type: "password",
+                        },
+                    },
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            swal("", {
+                                icon: "success",
+                                title: "放行成功"
+                            });
+                            data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "updateOwnerInterest","args": ["' + $("#security_id").val() + '","' + $("#txday").val() + '"]}'
+                            // 使用 ajax() 來呼叫 REST API
+                            $.ajax({
+                                url: site + "/channels/mychannel/chaincodes/mycc",
+                                type: "POST",
+                                data: data,
+                                contentType: "application/json; charset=utf-8",
+                                complete: function (data, textStatus, jqXHR) {
+                                    console.log(textStatus);
+                                },
+                                success: function (data, textStatus, jqXHR) {
+                                    console.log(data);
+                                    $("#dvPostResult").html($("#security_id").val() + '計息完成，' + '交易TXID:<br/><b>' + data + '</b>');
+
+                                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "changeBankSecurityTotals","args": ["' + $("#security_id").val() + '","002","' + $("#txday").val() + '"]}'
+                                    // 使用 ajax() 來呼叫 REST API
+                                    $.ajax({
+                                        url: site + "/channels/mychannel/chaincodes/mycc",
+                                        type: "POST",
+                                        data: data,
+                                        contentType: "application/json; charset=utf-8",
+                                        complete: function (data, textStatus, jqXHR) {
+                                            console.log(textStatus);
+                                        },
+                                        success: function (data, textStatus, jqXHR) {
+                                            console.log(data);
+                                            $("#dvPostResult").html($("#security_id").val() + ' & BANK002 計息完成，' + '交易TXID:<br/><b>' + data + '</b>');
+
+                                            data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "changeBankSecurityTotals","args": ["' + $("#security_id").val() + '","004","' + $("#txday").val() + '"]}'
+                                            // 使用 ajax() 來呼叫 REST API
+                                            $.ajax({
+                                                url: site + "/channels/mychannel/chaincodes/mycc",
+                                                type: "POST",
+                                                data: data,
+                                                contentType: "application/json; charset=utf-8",
+                                                complete: function (data, textStatus, jqXHR) {
+                                                    console.log(textStatus);
+                                                },
+                                                success: function (data, textStatus, jqXHR) {
+                                                    console.log(data);
+                                                    $("#dvPostResult").html($("#security_id").val() + ' & BANK004 計息完成，' + '交易TXID:<br/><b>' + data + '</b>');
+
+                                                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "changeBankSecurityTotals","args": ["' + $("#security_id").val() + '","005","' + $("#txday").val() + '"]}'
+                                                    $.ajax({
+                                                        url: site + "/channels/mychannel/chaincodes/mycc",
+                                                        type: "POST",
+                                                        data: data,
+                                                        contentType: "application/json; charset=utf-8",
+                                                        complete: function (data, textStatus, jqXHR) {
+                                                            console.log(textStatus);
+                                                        },
+                                                        success: function (data, textStatus, jqXHR) {
+                                                            console.log(data);
+                                                            $("#dvPostResult").html($("#security_id").val() + ' & BANK005 計息完成，' + '交易TXID:<br/><b>' + data + '</b>');
+
+                                                            $.ajax({
+                                                                type: "GET",
+                                                                url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=querySecurity&args=%5B%22" + $("#security_id").val() + "%22%5D",
+                                                                dataType: "html",
+                                                                success: function (data) {
+                                                                    var data1 = data.replace($("#security_id").val() + ' now has', '');
+                                                                    var data2 = data1.replace(' after the move', '');
+                                                                    //$('#bonds').html("")
+                                                                    var datas = [];
+                                                                    $('#reportTable').html("");
+                                                                    $('#reportTable').bootstrapTable('destroy');
+
+                                                                    var json = JSON.parse(data2);
+                                                                    console.log(json);
+                                                                    $("#dvPostResult").html(json.docType + " loaded successfully.");
+
+                                                                    for (i = 0; i < json.Owners.length; i++) {
+                                                                        var BankTotalAmout = 0
+                                                                        if (json.Owners[i].OwnedBankID == "002") {
+                                                                            BankTotalAmout = json.SecurityTotals[0].TotalBalance
+                                                                            BankTotalInterest = json.SecurityTotals[0].TotalInterest
+                                                                            BankPaidDurationInterest = json.SecurityTotals[0].PaidDurationInterest
+                                                                        }
+                                                                        else if (json.Owners[i].OwnedBankID == "004") {
+                                                                            BankTotalAmout = json.SecurityTotals[1].TotalBalance
+                                                                            BankTotalInterest = json.SecurityTotals[1].TotalInterest
+                                                                            BankPaidDurationInterest = json.SecurityTotals[1].PaidDurationInterest
+                                                                        }
+                                                                        else if (json.Owners[i].OwnedBankID == "005") {
+                                                                            BankTotalAmout = json.SecurityTotals[2].TotalBalance
+                                                                            BankTotalInterest = json.SecurityTotals[2].TotalInterest
+                                                                            BankPaidDurationInterest = json.SecurityTotals[2].PaidDurationInterest
+                                                                        }
+                                                                        var Duration = 0;
+                                                                        for (j = 0; j < json.Owners[i].OwnedDurationDate.length; j++) {
+
+                                                                            var txtDateString = $("#txday").val();
+                                                                            var currDate = Date.parse(json.Owners[i].OwnedDurationDate[j]);
+                                                                            var txtDate = Date.parse(txtDateString);
+                                                                            if (currDate == txtDate) {
+                                                                                //alert("The same!");
+                                                                                Duration = j + 1
+                                                                                break;
+                                                                            } else {
+                                                                                //alert("Not the same!");
+                                                                            }
+                                                                        }
+                                                                        var OwnedDurationDate = json.Owners[i].OwnedDurationDate[Duration];
+                                                                        PaidInterestDate = $("#txday").val();
+
+                                                                        //   var htmlCode =
+                                                                        //       "<tr>"
+                                                                        //       + "<td>" + json.SecurityID + "</td>"
+                                                                        //       + "<td>" + json.SecurityName + "</td>"
+                                                                        //       + "<td>" + json.RepayPeriod + "</td>"
+                                                                        //       + "<td>" + json.InterestRate + "</td>"
+                                                                        //       + "<td>" + json.IssueDate + "</td>"
+                                                                        //       + "<td>" + json.MaturityDate + "</td>"
+                                                                        //       + "<td>BANK" + json.Owners[i].OwnedBankID + "</td>"
+                                                                        //       + "<td>" + json.Owners[i].OwnedAccountID + "</td>"
+                                                                        //       + "<td align=right>" + numberWithCommas(json.Owners[i].OwnedBalance) + "</td>"
+                                                                        //       + "<td align=right>" + numberWithCommas(BankTotalAmout) + "</td>"
+                                                                        //       + "<td align=right>" + numberWithCommas(BankTotalInterest) + "</td>"
+                                                                        //       + "<td align=right>" + numberWithCommas(json.Owners[i].OwnedPaidDurationInterest) + "</td>"
+                                                                        //       + "<td align=right>" + numberWithCommas(BankPaidDurationInterest) + "</td>"
+                                                                        //       + "<td>" + OwnedDurationDate + "</td>"
+                                                                        //       + "</tr>"
+                                                                        //   $('#bonds').append(htmlCode);
+
+                                                                        datas[i] = {
+                                                                            "SecurityID": json.SecurityID,
+                                                                            "SecurityName": json.SecurityName,
+                                                                            "RepayPeriod": json.RepayPeriod,
+                                                                            "InterestRate": json.InterestRate + "%",
+                                                                            "IssueDate": json.IssueDate,
+                                                                            "MaturityDate": json.MaturityDate,
+                                                                            "OwnedBankID": "BANK" + json.Owners[i].OwnedBankID,
+                                                                            "OwnedAccountID": json.Owners[i].OwnedAccountID,
+                                                                            "OwnedBalance": numberWithCommas(json.Owners[i].OwnedBalance),
+                                                                            "BankTotalAmout": numberWithCommas(BankTotalAmout),
+                                                                            "BankTotalInterest": numberWithCommas(BankTotalInterest),
+                                                                            "OwnedPaidDurationInterest": numberWithCommas(json.Owners[i].OwnedPaidDurationInterest),
+                                                                            "BankPaidDurationInterest": numberWithCommas(BankPaidDurationInterest),
+                                                                            "OwnedDurationDate": OwnedDurationDate
+                                                                        }
+                                                                    }
+                                                                    $('#reportTable').bootstrapTable({
+                                                                        method: 'get',
+                                                                        cache: false,
+                                                                        striped: true,
+                                                                        pagination: true,
+                                                                        pageSize: 10,
+                                                                        pageNumber: 1,
+                                                                        pageList: [10, 20, 50, 100, 200, 500], sidePagination: 'client',
+                                                                        search: true,
+                                                                        showColumns: true,
+                                                                        showRefresh: false,
+                                                                        showExport: false,
+                                                                        exportTypes: ['csv', 'txt', 'xml'],
+                                                                        search: true,
+                                                                        clickToSelect: true,
+                                                                        columns:
+                                                                            [
+                                                                                { field: "SecurityID", title: "公債<br/>代號", align: "left", valign: "middle", sortable: "true" },
+                                                                                { field: "SecurityName", title: "公債<br/>名稱", align: "left", valign: "middle", sortable: "true" },
+                                                                                { field: "RepayPeriod", title: "公債<br/>年期", align: "left", valign: "middle", sortable: "true" },
+                                                                                { field: "InterestRate", title: "票面<br/>利率", align: "left", valign: "middle", sortable: "true" },
+                                                                                { field: "IssueDate", title: "公　債<br/>發行日", align: "left", valign: "middle", sortable: "true" },
+                                                                                { field: "MaturityDate", title: "公　債<br/>到期日", align: "left", valign: "middle", sortable: "true" },
+                                                                                { field: "OwnedBankID", title: "清算<br/>銀行", align: "left", valign: "middle", sortable: "true" },
+                                                                                { field: "OwnedAccountID", title: "客戶<br/>帳號", align: "left", valign: "middle", sortable: "true" },
+                                                                                { field: "OwnedBalance", title: "公債<br/>餘額", align: "right", valign: "middle", sortable: "true" },
+                                                                                { field: "BankTotalAmout", title: "公　債<br/>總餘額", align: "right", valign: "middle", sortable: "true" },
+                                                                                { field: "BankTotalInterest", title: "公　債<br/>總利息", align: "right", valign: "middle", sortable: "true" },
+                                                                                { field: "OwnedPaidDurationInterest", title: "已付<br/>利息", align: "right", valign: "middle", sortable: "true" },
+                                                                                { field: "BankPaidDurationInterest", title: "已　付<br/>總利息", align: "right", valign: "middle", sortable: "true" },
+                                                                                { field: "OwnedDurationDate", title: "下　次<br/>付息日", align: "left", valign: "middle", sortable: "true" },
+                                                                            ],
+                                                                        data: datas,
+                                                                    });
+
+
+                                                                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "put","args": ["PaidInterestDate","' + $("#txday").val() + '"]}'
+                                                                    // 使用 ajax() 來呼叫 REST API
+                                                                    $.ajax({
+                                                                        url: site + "/channels/mychannel/chaincodes/mycc",
+                                                                        type: "POST",
+                                                                        data: data,
+                                                                        contentType: "application/json; charset=utf-8",
+                                                                        complete: function (data, textStatus, jqXHR) {
+                                                                            console.log(textStatus);
+                                                                        },
+                                                                        success: function (data, textStatus, jqXHR) {
+                                                                            console.log(data);
+                                                                            $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
+
+                                                                            swal({
+                                                                                title: "交易成功!",
+                                                                                text: "",
+                                                                                icon: "success",
+                                                                                button: "確定",
+                                                                            });
+                                                                            $.ajax({
+                                                                                type: "GET",
+                                                                                url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=get&args=%5B%22" + "PaidInterestDate" + "%22%5D",
+                                                                                dataType: "html",
+                                                                                success: function (data) {
+                                                                                    var data1 = data.replace(' now has', '');
+                                                                                    var data2 = data1.replace(' after the move', '');
+                                                                                    //$('#bank').html("")
+                                                                                    var json = JSON.parse(data2);
+                                                                                    console.log(json);
+                                                                                    $("#dvPostResult").html("公債已付息日設定為：" + json)
+
+                                                                                },
+                                                                                error: function (jqXHR) {
+                                                                                    alert("發生錯誤: " + jqXHR.status);
+                                                                                    console.log(jqXHR);
+                                                                                },
+                                                                                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                                                                beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                                                                            })
+                                                                        },
+                                                                        //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                                                        beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                                                                    });
+
+                                                                    //}
+                                                                },
+                                                                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                                                beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                                                            });
+
+                                                        },
+                                                        //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                                        beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                                                    });
+
+
+                                                },
+                                                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                                beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                                            });
+
+                                        },
+                                        //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                        beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                                    });
+
+
+                                },
+                                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                            });
+
+                        } else {
+                            swal("交易取消");
+                        }
+                    });
+
+
+            })
+
+
+
+
+        });</script>
+}

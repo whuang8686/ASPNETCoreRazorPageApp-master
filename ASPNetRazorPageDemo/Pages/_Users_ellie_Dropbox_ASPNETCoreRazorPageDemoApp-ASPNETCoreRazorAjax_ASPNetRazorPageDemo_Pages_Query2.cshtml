@@ -1,0 +1,144 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.Query2Model
+@{
+    ViewData["Title"] = "中央登錄公債(CGS)";
+}
+<div style="color:blueviolet;">
+    <h2></h2>
+</div>
+<section class="menu-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="navbar-collapse collapse ">
+                    <ul id="menu-top" class="nav navbar-nav navbar-right">
+                        <li><a class="menu-top-active" href="./Query">查詢公債資訊</a></li>
+                        <li><a href="index.html">Dashboard</a></li>
+                        <li><a href="ui.html">UI Elements</a></li>
+                        <li><a href="table.html">Data Tables</a></li>
+                        <li><a href="forms.html">Forms</a></li>
+                        <li><a href="login.html">Login Page</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- MENU SECTION END-->
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+<div id="divReadBank">
+    <hr>
+    <h2>查詢公債資訊</h2>
+    <label for="security_id">請輸入公債代號：</label>
+    <input type="text" id="security_id">
+    <button id="searchSecurity">查詢</button>
+    <div id="result" class="container">
+        <div class="col-md-8">
+            <table id="tb1" class="table table-bordered" border="1">
+                <thead>
+                    <tr>
+                        <th>公債代號</th>
+                        <th>公債名稱</th>
+                        <th>公債發行總額</th>
+                        <th>公債年期</th>
+                        <th>票面利率%</th>
+                        <th>公債發行日</th>
+                        <th>公債到期日</th>
+                        <th>清算銀行</th>
+                        <th>客戶帳號</th>
+                        <th>公債餘額</th>
+                        <th>當期利息</th>
+                        <th>下次付息日</th>
+                    </tr>
+                </thead>
+                <tbody id="bonds" class="table table-striped"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+
+
+<div id="dvPostResult" style="font-size:18pt">
+</div>
+<h5>@Model.Message</h5>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript" language="JavaScript">$(document).ready(function() {
+            var site = "http://192.168.0.111" + ":4000"
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function(data) {
+                    if (data.success) {
+                        $("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function(jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+
+
+            $("#searchSecurity").click(function() {
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=querySecurity&args=%5B%22" + $("#security_id").val() + "%22%5D",
+                    dataType: "html",
+                    success: function(data) {
+                        var data1 = data.replace($("#security_id").val() + ' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+
+                        var json = JSON.parse(data2);
+                        console.log(json);
+                        $("#dvPostResult").html(json.docType + " loaded successfully.");
+
+                        for (i = 0; i < json.Owners.length; i++) {
+                            var htmlCode =
+                                "<tr>"
+                                + "<td>" + json.SecurityID + "</td>"
+                                + "<td>" + json.SecurityName + "</td>"
+                                + "<td>" + json.TotalQuantity + "</td>"
+                                + "<td>" + json.RepayPeriod + "</td>"
+                                + "<td>" + json.InterestRate + "</td>"
+                                + "<td>" + json.IssueDate + "</td>"
+                                + "<td>" + json.MaturityDate + "</td>"
+                                + "<td>BANK" + json.Owners[i].OwnedBankID + "</td>"
+                                + "<td>" + json.Owners[i].OwnedAccountID + "</td>"
+                                + "<td>" + json.Owners[i].OwnedAmount + "</td>"
+                                + "<td>" + json.Owners[i].OwnedDurationInterest + "</td>"
+                                + "<td>" + json.Owners[i].OwnedDurationDate[0] + "</td>"
+                                + "</tr>"
+                            $('#bonds').append(htmlCode);
+                        }
+
+
+
+                    },
+                    error: function(jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+            })
+
+});</script>
+}

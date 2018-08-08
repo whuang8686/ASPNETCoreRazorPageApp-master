@@ -1,0 +1,19 @@
+{
+  "total": "100",
+  "rows": [
+    {
+      "uid": "123456789",
+      "name": "alice",
+      "sex": "girl",
+      "age": "28",
+      "area": "TW",
+      "loginWay": "phone",
+      "status": "1",
+      "createTime": "2018-07-04 12:23:35",
+      "orderService": "Travel",
+      "connectorIP": "172.129.1.1",
+      "connectorPort": "9000",
+      "operate": "query"
+    }
+  ]
+}

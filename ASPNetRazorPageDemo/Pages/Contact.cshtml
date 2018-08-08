@@ -1,0 +1,62 @@
+﻿@page
+@model ContactModel
+@{
+    ViewData["Title"] = "Contact";
+}
+<h2>@ViewData["Title"]</h2>
+<h3>@Model.Message</h3>
+<address>
+    One Microsoft Way<br />
+    Redmond, WA 98052-6399<br />
+    <abbr title="Phone">P:</abbr>
+    425.555.0100
+</address>
+<address>
+    <strong>Support:</strong> <a href="mailto:Support@example.com">Support@example.com</a><br />
+    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
+</address>
+<div id="reportTableDiv">
+    <table id="reportTable"></table>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript" language="JavaScript">$(document).ready(function() {
+        var datas = [];
+        for (var i = 0; i < 30; i++) {
+            datas[i] = { "name": "傻逼" + i + "号", "age": "年龄：" + i + "岁", "sex": "男" + i }
+        }
+
+        $(function() {
+            $('#reportTable').bootstrapTable({
+                method: 'get',
+                cache: false,
+                height: 400,
+                striped: true,
+                pagination: true,
+                pageSize: 20,
+                pageNumber: 1,
+                pageList: [10, 20, 50, 100, 200, 500], sidePagination: 'client',
+                search: true,
+                showColumns: true,
+                showRefresh: false,
+                showExport: false,
+                exportTypes: ['csv', 'txt', 'xml'],
+                search: true,
+                clickToSelect: true,
+                columns:
+                    [
+                        { field: "checked", checkbox: true },
+                        { field: "name", title: "测试姓名", align: "center", valign: "middle", sortable: "true" },
+                        { field: "age", title: "年龄", align: "center", valign: "middle", sortable: "true" },
+                        { field: "sex", title: "性别", align: "center", valign: "middle", sortable: "true" },
+                    ],
+                data: datas,
+            });
+        });
+
+
+
+
+});</script>
+}

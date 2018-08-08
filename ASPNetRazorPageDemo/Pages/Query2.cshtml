@@ -1,0 +1,428 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.QueryModel
+@{
+    ViewData["Title"] = "第二銀行資訊";
+}
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+<!--
+<div id="divReadBankT">
+    <hr>
+    <div class="col-md-8">
+        <label for="account_id">銀行代號：BANK002</label>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="searchT">查詢總數</button>
+    </div>
+    <br />
+    <br />
+    <div id="result" class="container">
+        <div class="table-responsive">
+            <table id="tb1" class="table table-striped table-bordered table-hover" border="1">
+                <thead>
+                    <tr>
+                        <th>銀行代號</th>
+                        <th>銀行名稱</th>
+                        <th>銀行簡稱</th>
+                        <th>公債代號</th>
+                        <th>公債總面額</th>
+                        <th>公債總餘額</th>
+                        <th>建立時間</th>
+                        <th>更新時間</th>
+                    </tr>
+                </thead>
+                <tbody id="total" class="table table-striped"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+-->
+<br />
+<div id="divReadBank">
+    <div class="col-md-8">
+        <label for="account_id">銀行代號：BANK002</label>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="search">查詢帳戶明細</button>
+    </div>
+    <br />
+    <br />
+    <div id="result" class="container">
+        <div class="table-responsive">
+            <table id="tb2" class="table table-striped table-bordered table-hover" border="1">
+                <thead>
+                    <tr>
+                        <th>清算銀行</th>
+                        <th>客戶帳號</th>
+                        <th>客戶名稱</th>
+                        <th>存戶類別編號</th>
+                        <th>公債代號</th>
+                        <th>公債面額</th>
+                        <th>可用餘額</th>
+                        <th>存款餘額</th>
+                        <!--<th>尚未比對餘額</th>-->
+                    </tr>
+                </thead>
+                <tbody id="bonds" class="table table-striped"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<br />
+<div id="divReadBank2TX">
+    <hr>
+    <div class="col-md-8">
+        <label for="bank_id">銀行代號：BANK002</label>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="searchtx">查詢銀行交易明細</button>
+    </div>
+    <br />
+    <br />
+    <div id="reportTableDiv">
+        <table id="reportTable"></table>
+    </div>
+    <!--
+    <div id="result2" class="container">
+        <div class="table-responsive">
+            <table id="tb3" class="table table-striped table-bordered table-hover sortable" border="1">
+                <thead>
+                    <tr>
+                        <th>交易<br />序號</th>
+                        <th>交易<br />型態</th>
+                        <th>轉出<br />銀行</th>
+                        <th>轉出<br />帳號</th>
+                        <th>轉入<br />銀行</th>
+                        <th>轉入<br />帳號</th>
+                        <th>交易<br />面額</th>
+                        <th>交易<br />金額</th>
+                        <th>公債<br />代號</th>
+                        <th>交易<br />狀態</th>
+                        <th>交易<br />說明</th>
+                        <th>原交易<br />序號</th>
+                        <th>比對<br />序號</th>
+                        <th>建立<br />時間</th>
+                        <th>更新<br />時間</th>
+                    </tr>
+                </thead>
+                <tbody id="bank" class="table table-striped"></tbody>
+            </table>
+        </div>
+    </div>
+        -->
+</div>
+
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+
+<div id="dvPostResult" style="font-size:16pt">
+</div>
+<h5>@Model.Message</h5>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript" language="JavaScript">
+    $(document).ready(function () {
+            var site = gSite;
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+            $("#searchT").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryAllBanks&args=%5B%22BANK002%22%2C%22BANK003%22%5D",
+                    dataType: "html",
+                    success: function (data) {
+                        var data1 = data.replace(' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+                        $('#total').html("")
+                        var json = JSON.parse(data2);
+                        console.log(json);
+                        $("#dvPostResult").html("BANK002 " + json[0].Record.docType + " loaded successfully.");
+
+                        for (i = 0; i < json.length; i++) {
+
+                            for (j = 0; j < json[i].Record.BankTotals.length; j++) {
+                                var htmlCode =
+                                    "<tr>"
+                                    + "<td>" + json[i].Record.BankID + "</td>"
+                                    + "<td>" + json[i].Record.BankName + "</td>"
+                                    + "<td>" + json[i].Record.BankCode + "</td>"
+                                    + "<td>" + json[i].Record.BankTotals[j].SecurityID + "</td>"
+                                    + "<td align=right>" + numberWithCommas(json[i].Record.BankTotals[j].TotalBalance) + "</td>"
+                                    + "<td align=right>" + numberWithCommas(json[i].Record.BankTotals[j].TotalAmount) + "</td>"
+                                    + "<td>" + json[i].Record.BankTotals[j].CreateTime + "</td>"
+                                    + "<td>" + json[i].Record.BankTotals[j].UpdateTime + "</td>"
+                                    + "</tr>"
+                                $('#total').append(htmlCode);
+                            }
+                        }
+
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+            })
+
+
+            $("#search").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryAllAccounts&args=%5B%22002%22%2C%22003%22%5D",
+                    dataType: "html",
+                    success: function (data) {
+                        var data1 = data.replace(' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+                        $('#bonds').html("")
+                        var json = JSON.parse(data2);
+                        console.log(json);
+                        $("#dvPostResult").html("BANK002 " + json[0].Record.docType + " loaded successfully.");
+                        var TotalBalance = 0;
+                        var TotalPosition = 0;
+                        var TotalAmount = 0;
+                        var TotalPendingBalance = 0;
+                        for (i = 0; i < json.length; i++) {
+
+                            for (j = 0; j < json[i].Record.Assets.length; j++) {
+                                var htmlCode =
+                                    "<tr>"
+                                    + "<td>BANK" + json[i].Record.BankID + "</td>"
+                                    + "<td>" + json[i].Key + "</td>"
+                                    + "<td>" + json[i].Record.CustName + "</td>"
+                                    + "<td>" + json[i].Record.CustType + "</td>"
+                                    + "<td>" + json[i].Record.Assets[j].SecurityID + "</td>"
+                                    + "<td align=right>" + numberWithCommas(json[i].Record.Assets[j].Balance) + "</td>"
+                                    + "<td align=right>" + numberWithCommas(json[i].Record.Assets[j].Position) + "</td>"
+                                    + "<td align=right>" + numberWithCommas(json[i].Record.Assets[j].SecurityAmount) + "</td>"
+                                    //+ "<td align=right>" + numberWithCommas(json[i].Record.Assets[j].PendingBalance) + "</td>"
+                                    + "</tr>"
+                                $('#bonds').append(htmlCode);
+                                TotalBalance = TotalBalance + json[i].Record.Assets[j].Balance;
+                                TotalPosition = TotalPosition + json[i].Record.Assets[j].Position;
+                                TotalAmount = TotalAmount + json[i].Record.Assets[j].SecurityAmount;
+                                TotalPendingBalance = TotalPendingBalance + json[i].Record.Assets[j].PendingBalance;
+                            }
+                        }
+                        var htmlCode =
+                            "<tr>"
+                            + "<td><b>總計</b></td>"
+                            + "<td></td>"
+                            + "<td>&nbsp;</td>"
+                            + "<td>&nbsp;</td>"
+                            + "<td>&nbsp;</td>"
+                            + "<td align=right><b>" + numberWithCommas(TotalBalance) + "</b></td>"
+                            + "<td align=right><b>" + numberWithCommas(TotalPosition) + "</b></td>"
+                            + "<td align=right><b>" + numberWithCommas(TotalAmount) + "</b></td>"
+                            //+ "<td align=right>" + numberWithCommas(TotalPendingBalance) + "</td>"
+                            + "</tr>"
+                        $('#bonds').append(htmlCode);
+                        // Second ajax call
+                        //$.ajax({
+                        // Options for 2nd ajax call
+                        //    success: function(data) {
+                        //    },
+                        //    failure: function(response) {
+                        //    }
+
+                        //});
+                        data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "changeBankSecurityTotals","args": ["A07106","002","20190602"]}'
+                        // 使用 ajax() 來呼叫 REST API
+                        $.ajax({
+                            url: site + "/channels/mychannel/chaincodes/mycc",
+                            type: "POST",
+                            data: data,
+                            contentType: "application/json; charset=utf-8",
+                            complete: function (data, textStatus, jqXHR) {
+                                console.log(textStatus);
+                            },
+                            success: function (data, textStatus, jqXHR) {
+                                console.log(data);
+                                $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
+
+                            },
+                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                            beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                        });
+
+
+
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+            })
+
+
+            $("#searchtx").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryAllTransactions&args=%5B%22BK002%22%2C%22BK003%22%5D",
+                    dataType: "html",
+                    success: function (data) {
+                        var data1 = data.replace(' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+                        //$('#bank').html("")
+                        var datas = [];
+                        $('#reportTable').html("");
+                        $('#reportTable').bootstrapTable('destroy');
+
+                        var json = JSON.parse(data2);
+                        console.log(json);
+                        $("#dvPostResult").html("BANK002 " + json[0].Record.docType + " loaded successfully.");
+
+
+
+
+                        for (i = 0; i < json.length; i++) {
+
+
+                            var TXTYPE = json[i].Record.TXType
+                            var BANKFROM, BANKTO, TXFROM, TXTO, TXKIND, TXAMT, newTXStatus, newAmountStle, newBalanceStyle;
+                            var TXStatus = json[i].Record.TXStatus
+                            newTXStatus = formatTXStatus(TXStatus)
+                            var TXMemo = json[i].Record.TXMemo
+                            newAmountStyle = formatAmount(TXMemo)
+                            newBalanceStyle = formatBalance(TXMemo)
+
+                            if (TXTYPE == "S") {
+                                BANKFROM = json[i].Record.BankFrom
+                                BANKTO = json[i].Record.BankTo
+                                TXFROM = json[i].Record.TXFrom
+                                TXTO = json[i].Record.TXTo
+                                TXKIND = "轉出"
+                            }
+                            if (TXTYPE == "B") {
+                                BANKFROM = json[i].Record.BankTo
+                                BANKTO = json[i].Record.BankFrom
+                                TXFROM = json[i].Record.TXTo
+                                TXTO = json[i].Record.TXFrom
+                                TXKIND = "轉入"
+                            }
+                            if (BANKFROM == BANKTO) {
+                                TXKIND = "自行<br/>" + TXKIND
+                            }
+                            else {
+                                TXKIND = "跨行<br/>" + TXKIND
+                            }
+
+                            // var htmlCode =
+                            //     "<tr>"
+                            //     + "<td>" + json[i].Record.TXID + "</td>"
+                            //     + "<td>" + TXKIND + "</td>"
+                            //     + "<td>" + BANKFROM + "</td>"
+                            //     + "<td>" + TXFROM + "</td>"
+                            //     + "<td>" + BANKTO + "</td>"
+                            //     + "<td>" + TXTO + "</td>"
+                            //     + "<td align=right" + newBalanceStyle + ">" + numberWithCommas(json[i].Record.Payment) + "</td>"
+                            //     + "<td align=right" + newAmountStyle + ">" + numberWithCommas(json[i].Record.SecurityAmount) + "</td>"
+                            //     + "<td>" + json[i].Record.SecurityID + "</td>"
+                            //     + "<td>" + newTXStatus + "</td>"
+                            //     + "<td>" + json[i].Record.TXMemo + "</td>"
+                            //     + "<td>" + json[i].Record.TXHcode + "</td>"
+                            //     + "<td>" + json[i].Record.MatchedTXID + "</td>"
+                            //     + "<td>" + json[i].Record.createTime + "</td>"
+                            //     + "<td>" + json[i].Record.updateTime + "</td>"
+                            //     + "</tr>"
+                            // $('#bank').append(htmlCode);
+
+                            datas[i] = {
+                                "TXID": json[i].Record.TXID,
+                                "TXType": TXKIND,
+                                "BankFrom": BANKFROM,
+                                "TXFrom": TXFROM,
+                                "BankTo": BANKTO,
+                                "TXTo": TXTO,
+                                "Payment": "<font " + newBalanceStyle + ">" + numberWithCommas(json[i].Record.Payment) + "</font>",
+                                "SecurityAmount": "<font " + newAmountStyle + ">" + numberWithCommas(json[i].Record.SecurityAmount) + "</font>",
+                                "SecurityID": json[i].Record.SecurityID,
+                                "TXStatus": newTXStatus,
+                                "TXMemo": json[i].Record.TXMemo,
+                                "TXHcode": json[i].Record.TXHcode,
+                                "MatchedTXID": json[i].Record.MatchedTXID,
+                                "createTime": json[i].Record.createTime,
+                                "updateTime": json[i].Record.updateTime
+                            }
+
+
+
+                        }
+
+                        $('#reportTable').bootstrapTable({
+                            method: 'get',
+                            cache: false,
+                            striped: true,
+                            pagination: true,
+                            pageSize: 5,
+                            pageNumber: 1,
+                            pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
+                            search: true,
+                            showColumns: true,
+                            showRefresh: false,
+                            showExport: false,
+                            exportTypes: ['csv', 'txt', 'xml'],
+                            search: true,
+                            clickToSelect: true,
+                            columns:
+                                [
+                                    { field: "TXID", title: "交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXType", title: "交易<br/>型態", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "BankFrom", title: "轉出<br/>銀行", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXFrom", title: "轉出<br/>帳號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "BankTo", title: "轉入<br/>銀行", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXTo", title: "轉入<br/>帳號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "Payment", title: "交易<br/>面額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "SecurityAmount", title: "交易<br/>金額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "SecurityID", title: "公債<br/>代號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "MatchedTXID", title: "比對<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
+
+                                ],
+                            data: datas,
+                        });
+
+
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+            })
+
+
+
+
+
+
+
+        });</script>
+}
