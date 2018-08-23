@@ -22,6 +22,7 @@
     <Content Remove="Pages\Invoke2 %28copy%29.cshtml" />
     <Content Remove="Pages\Invoke5.cshtml" />
     <Content Remove="Pages\Invoke55.cshtml" />
+    <Content Remove="Pages\login.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Pages\Index.cshtml" />

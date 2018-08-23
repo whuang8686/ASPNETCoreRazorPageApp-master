@@ -255,7 +255,7 @@
                         </li>
                         <li class="divider"></li>
                         <li>
-                            <a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                            <a asp-page="/Login">Loginout</a>
                         </li>
                     </ul>
                     <!-- /.dropdown-user -->
@@ -289,6 +289,16 @@
                                 <li><a asp-page="/Invoke3">日終交易取消</a></li>
                                 <li><a asp-page="/Invoke4">利息計算分配</a></li>
                                 <li><a asp-page="/Invoke5">清算銀行交易更正</a></li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-edit fa-fw"></i>FX交易功能<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li><a asp-page="/CreateFXTrade">新增交易</a></li>
+                                <li><a asp-page="/UpdateFXTrade">修改交易 </a></li>
+                                <li><a asp-page="/DeleteFXTrade">刪除交易</a></li>
+                                <li><a asp-page="/QueryFXTrade">查詢交易</a></li>
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>

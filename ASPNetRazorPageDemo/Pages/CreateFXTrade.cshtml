@@ -1,0 +1,154 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.CreateFXTradeModel
+@{
+    ViewData["Title"] = "新增FX交易";
+}
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+<div id="divCreateFXTrade">
+    <div class="col-md-8">
+        <label for="Cpty">交易對手：</label>
+        <select id="Cpty">
+            <option value="CptyA">CptyA</option>
+            <option value="CptyB">CptyB</option>
+            <option value="CptyC">CptyC</option>
+        </select>
+        <br />
+    </div>
+    <div class="col-md-8">
+        <label for="TradeDate">TradeDate：</label>
+        <input type="text" id="TradeDate" value="" size="10" placeholder="交易日">
+        <br />
+    </div>
+    <div class="col-md-8">
+        <label for="MaturityDate">MaturityDate：</label>
+        <input type="text" id="MaturityDate" value="" size="10" placeholder="到期日">
+        <br />
+    </div>
+    <div class="col-md-8">
+        <label for="Contract">Contract：</label>
+        <select id="Contract">
+            <option value="USD/TWD">USD/TWD</option>
+            <option value="USD/CNH">USD/CNH</option>
+            <option value="USD/ZAR">USD/ZAR</option>
+        </select>
+        <br />
+    </div>
+    <div class="col-md-8">
+        <label for="BuyCurr">Buy：</label>
+        <select id="BuyCurr">
+            <option value="USD">USD</option>
+            <option value="CNH">CNH</option>
+            <option value="ZAR">ZAR</option>
+        </select>
+        <input type="text" id="BuyCurrAmt" value="" size="10" placeholder="BuyCurrAmt">
+        <br />
+    </div>
+    <div class="col-md-8">
+        <label for="SellCurr">Sell：</label>
+        <select id="SellCurr">
+            <option value="USD">USD</option>
+            <option value="CNH">CNH</option>
+            <option value="ZAR">ZAR</option>
+        </select>
+        <input type="text" id="SellCurrAmt" value="" size="10" placeholder="SellCurrAmt">
+        <br />
+    </div>
+    <div class="col-md-8">
+        <label for="NetPrice">NetPrice：</label>
+        <input type="text" id="NetPrice" value="" size="10" placeholder="合約價">
+        <button id="sure">確定</button>
+        <br />
+    </div>
+    <br />
+    <br />
+</div>
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+<div id="dvPostResult" style="font-size:16pt"></div>
+<h5>@Model.Message</h5>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+        $(document).ready(function () {
+            //var site = gSite;
+            var site = "http://192.168.2.104" + ":4000"
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+            $("#sure").click(function () {
+                // peer chaincode invoke -n mycc -c '{"Args":["createFXTrade", "000001","CptyA","CptyB","2018/01/01","2018/12/31","USD/TWD","USD","31206192","TWD","9310367.3832","29.835"]}' -C myc/
+                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createCpty","args": ["0005" , "CptyCD" , "false"]}'
+                // 使用 ajax() 來呼叫 REST API
+                $.ajax({
+                    url: site + "/channels/mychannel/chaincodes/mycc",
+                    type: "POST",
+                    data: data,
+                    contentType: "application/json; charset=utf-8",
+                    complete: function (data, textStatus, jqXHR) {
+                        console.log(textStatus);
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
+
+                        swal({
+                            title: "交易成功!",
+                            text: "",
+                            icon: "success",
+                            button: "確定",
+                        });
+
+                        $.ajax({
+                            type: "GET",
+                            url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=createFXTrade&args=%5B%22" + "approveflag" + "%22%5D",
+                            dataType: "html",
+                            success: function (data) {
+                                var data1 = data.replace(' now has', '');
+                                var data2 = data1.replace(' after the move', '');
+                                //$('#bank').html("")
+                                var json = JSON.parse(data2);
+                                console.log(json);
+                                $("#dvPostResult").html("同資旗標已設定為：" + formatApproveFlag(json))
+
+                            },
+                            error: function (jqXHR) {
+                                alert("發生錯誤: " + jqXHR.status);
+                                console.log(jqXHR);
+                            },
+                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                            beforeSend: function (xhr, settings) {
+                                xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                            }
+                        })
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                    }
+                });
+            })
+        });
+</script>
+}
