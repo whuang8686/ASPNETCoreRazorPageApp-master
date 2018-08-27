@@ -77,7 +77,7 @@
 <script>
         $(document).ready(function () {
             //var site = gSite;
-            var site = "http://192.168.2.102" + ":4000"
+            var site = "http://172.20.10.13" + ":4000"
             $.ajax({
                 type: "POST",
                 url: site + "/users",
@@ -102,7 +102,7 @@
             $("#sure").click(function () {
                 // peer chaincode invoke -n mycc -c '{"Args":["createFXTrade", "000001","CptyA","CptyB","2018/01/01","2018/12/31","USD/TWD","USD","31206192","TWD","9310367.3832","29.835"]}' -C myc/
                 // data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createCpty","args": ["0005" , "CptyCD" , "false"]}'
-                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createFXTrade","args": ["000001","CptyA","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + $("#BuyCurr").val() + '","' + $("#BuyCurrAmt").val() + '","' + $("#SellCurr").val() + '","' + $("#SellCurrAmt").val() + '","' + $("#NetPrice").val() + '"]}'
+                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createFXTrade","args": ["000002","CptyA","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + $("#BuyCurr").val() + '","' + $("#BuyCurrAmt").val() + '","' + $("#SellCurr").val() + '","' + $("#SellCurrAmt").val() + '","' + $("#NetPrice").val() + '"]}'
                 // 使用 ajax() 來呼叫 REST API
                 $.ajax({
                     url: site + "/channels/mychannel/chaincodes/mycc",

@@ -95,7 +95,7 @@
 <script type="text/javascript" language="JavaScript">
     $(document).ready(function () {
             //var site = gSite;
-            var site = "http://192.168.168.19" + ":4000"
+            var site = "http://172.20.10.13" + ":4000"
             $.ajax({
                 type: "POST",
                 url: site + "/users",
@@ -593,11 +593,11 @@
             })
 
      $("#search").click(function () {
-                //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCpty&args=%5B%22" + $("#txid").val() + "%22%5D")
+                //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryFXTradey&args=%5B%22" + $("#txid").val() + "%22%5D")
                 $.ajax({
                     type: "GET",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCpty&args=%5B%22" + $("#txid").val() + "%22%5D",
-                    dataType: "json",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryFXTrade&args=%5B%22" + $("#txid").val() + "%22%5D",
+                    dataType: "html",
                     success: function (data) {
                         console.log(data)
                         var data1 = data.replace(' now has', '');
@@ -607,15 +607,15 @@
                         console.log(json);
                         $("#dvPostResult").html(json.docType + " loaded successfully.");
 
-                        $("#OwnCpty").val(json.OwnCpty);
-                        $("#Cpty").val(json.Cpty);
+                        $("#OwnCpty").val(json.OwnCptyID);
+                        $("#Cpty").val(json.CptyID);
                         $("#TradeDate").val(json.TradeDate);
                         $("#MaturityDate").val(json.MaturityDate);
                         $("#Contract").val(json.Contract);
-                        $("#BuyCurr").val(json.BuyCurr);
-                        $("#BuyCurrAmt").val(json.BuyCurrAmt);
-                        $("#SellCurr").val(json.SellCurr);
-                        $("#SellCurrAmt").val(json.SellCurrAmt);
+                        $("#BuyCurr").val(json.Curr1);
+                        $("#BuyCurrAmt").val(json.Amount1);
+                        $("#SellCurr").val(json.Curr2);
+                        $("#SellCurrAmt").val(json.Amount2);
                         $("#NetPrice").val(json.NetPrice);
                         },
                     error: function (jqXHR) {
