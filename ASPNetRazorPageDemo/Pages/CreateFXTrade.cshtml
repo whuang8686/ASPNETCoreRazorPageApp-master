@@ -7,27 +7,31 @@
     <input type="hidden" id="token" value="">
 </div>
 <div id="divCreateFXTrade">
-    <div class="col-sm">
-        <label for="Cpty">交易對手：</label>
+    <div class="form-group">
+        <label for="Cpty" class="col-sm-2">交易對手：</label>
         <select id="Cpty">
-            <option value="CptyA">CptyA</option>
-            <option value="CptyB">CptyB</option>
-            <option value="CptyC">CptyC</option>
+           <option value="CptyA">CptyA</option>
+           <option value="CptyB">CptyB</option>
+           <option value="CptyC">CptyC</option>
         </select>
         <br />
     </div>
-    <div class="col-sm">
-        <label for="TradeDate">TradeDate：</label>
-        <input type="text" id="TradeDate" value="" size="10" placeholder="交易日">
-        <br />
+    <div class="form-group">
+        <label for="TradeDate" class="col-sm-2">TradeDate：</label>
+        <div class="input-group date form_date col-sm-2" id='datetimepicker1'>
+            <input class="form-control input-small" size="16" type="text" value="" readonly>
+            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+        </div>
     </div>
-    <div class="col-sm">
-        <label for="MaturityDate">MaturityDate：</label>
-        <input type="text" id="MaturityDate" value="" size="10" placeholder="到期日">
-        <br />
+    <div class="form-group">
+        <label for="MaturityDate" class="col-sm-2">MaturityDate：</label>
+        <div class="input-group date form_date col-sm-2" id='datetimepicker2'>
+            <input class="form-control input-small" size="16" type="text" value="" readonly>
+            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+        </div>
     </div>
-    <div class="col-sm">
-        <label for="Contract">Contract：</label>
+    <div class="form-group">
+        <label for="Contract" class="col-sm-2">Contract：</label>
         <select id="Contract">
             <option value="USD/TWD">USD/TWD</option>
             <option value="USD/CNH">USD/CNH</option>
@@ -35,8 +39,8 @@
         </select>
         <br />
     </div>
-    <div class="col-sm">
-        <label for="BuyCurr">Buy：</label>
+    <div class="form-group">
+        <label for="BuyCurr" class="col-sm-2">Buy：</label>
         <select id="BuyCurr">
             <option value="USD">USD</option>
             <option value="CNH">CNH</option>
@@ -45,8 +49,8 @@
         <input type="text" id="BuyCurrAmt" value="" size="10" placeholder="BuyCurrAmt">
         <br />
     </div>
-    <div class="col-sm">
-        <label for="SellCurr">Sell：</label>
+    <div class="form-group">
+        <label for="SellCurr" class="col-sm-2">Sell：</label>
         <select id="SellCurr">
             <option value="USD">USD</option>
             <option value="CNH">CNH</option>
@@ -55,12 +59,9 @@
         <input type="text" id="SellCurrAmt" value="" size="10" placeholder="SellCurrAmt">
         <br />
     </div>
-    <div class="col-sm">
-        <label for="NetPrice">NetPrice：</label>
+    <div class="form-group">
+        <label for="NetPrice" class="col-sm-2">NetPrice：</label>
         <input type="text" id="NetPrice" value="" size="10" placeholder="合約價">
-        <br />
-    </div>
-    <div class="col-sm">
         <button id="sure">確定</button>
         <br />
     </div>
@@ -76,8 +77,8 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script>
         $(document).ready(function () {
-            //var site = gSite;
-            var site = "http://172.20.10.13" + ":4000"
+            var site = gSite;
+
             $.ajax({
                 type: "POST",
                 url: site + "/users",
@@ -98,6 +99,32 @@
                     alert("發生錯誤: " + jqXHR.status);
                 }
             })
+
+            $('#datetimepicker1').datetimepicker({
+                format: 'yyyy/mm/dd',
+                autoclose: true,
+                todayBtn: true,
+                minView: 2,
+                viewSelect: 'year',
+                startView: 2,
+                autoclose: true,
+                bootcssVer: 3,
+                keepOpen: false,
+                defaultDate:new Date()
+            });
+
+            $('#datetimepicker2').datetimepicker({
+                format: 'yyyy/mm/dd',
+                autoclose: true,
+                todayBtn: true,
+                minView: 2,
+                viewSelect: 'year',
+                startView: 2,
+                autoclose: true,
+                bootcssVer: 3,
+                keepOpen: false,
+                defaultDate:new Date()
+            });
 
             $("#sure").click(function () {
                 // peer chaincode invoke -n mycc -c '{"Args":["createFXTrade", "000001","CptyA","CptyB","2018/01/01","2018/12/31","USD/TWD","USD","31206192","TWD","9310367.3832","29.835"]}' -C myc/

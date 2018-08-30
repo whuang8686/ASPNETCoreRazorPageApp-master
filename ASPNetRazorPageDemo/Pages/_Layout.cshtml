@@ -17,6 +17,9 @@
     <link href="~/vendor/morrisjs/morris.css" rel="stylesheet">
     <!-- Custom Fonts -->
     <link href="~/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- datetimepicker CSS -->
+    <link href="~/vendor/bootstrap/css/bootstrap-datetimepicker.css" rel="stylesheet">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -355,15 +358,15 @@
         </nav>
         <div id="page-wrapper">
             @{
-                if (ViewData.ContainsKey("Title"))
-                {
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <h3 class="page-header">外匯/擔保品系統 - @ViewData["Title"]</h3>
-                        </div>
-                        <!-- /.col-lg-12 -->
+            if (ViewData.ContainsKey("Title"))
+            {
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h3 class="page-header">外匯/擔保品系統 - @ViewData["Title"]</h3>
                     </div>
-                }
+                    <!-- /.col-lg-12 -->
+                </div>
+        }
             }
 
             <div class="row">
@@ -383,6 +386,8 @@
         <script src="~/vendor/morrisjs/morris.min.js"></script>
         <!-- Custom Theme JavaScript -->
         <script src="~/vendor/sb-admin-2/sb-admin-2.js"></script>
+        <!-- datetimepicker JavaScript -->
+        <script src="~/vendor/bootstrap/js/bootstrap-datetimepicker.min.js"></script>
 
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.30.5/js/jquery.tablesorter.min.js"></script>
