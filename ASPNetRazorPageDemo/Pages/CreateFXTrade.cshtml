@@ -158,8 +158,8 @@
                     Curr2 = $("#BuyCurr").val();
                     Amount2 = $("#BuyCurrAmt").val();
                 }
-                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createFXTrade","args": ["' + TXType + '","0001","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + Curr1 + '","' + Amount1 + '","' + Curr2 + '","' + Amount2 + '","' + $("#NetPrice").val() + '"]}'
-                //alert(data);
+                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeTransfer","args": ["' + TXType + '","0001","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + Curr1 + '","' + Amount1 + '","' + Curr2 + '","' + Amount2 + '","' + $("#NetPrice").val() + '" , "true"]}'
+                alert(data);
                 // 使用 ajax() 來呼叫 REST API
                 $.ajax({
                     url: site + "/channels/mychannel/chaincodes/mycc",
