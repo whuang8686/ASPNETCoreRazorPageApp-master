@@ -10,23 +10,25 @@
     <div class="form-group">
         <label for="Cpty" class="col-sm-2">交易對手：</label>
         <select id="Cpty">
-           <option value="CptyA">CptyA</option>
-           <option value="CptyB">CptyB</option>
-           <option value="CptyC">CptyC</option>
+           <option value="0001">CptyA</option>
+           <option value="0002">CptyB</option>
+           <option value="0003">CptyC</option>
+           <option value="0004">CptyD</option>
+           <option value="0005">CptyE</option>
         </select>
         <br />
     </div>
     <div class="form-group">
         <label for="TradeDate" class="col-sm-2">TradeDate：</label>
         <div class="input-group date form_date col-sm-2" id='datetimepicker1'>
-            <input class="form-control input-small" size="16" type="text" value="" readonly>
+            <input class="form-control input-small" id="TradeDate" size="16" type="text" value="" readonly>
             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
         </div>
     </div>
     <div class="form-group">
         <label for="MaturityDate" class="col-sm-2">MaturityDate：</label>
         <div class="input-group date form_date col-sm-2" id='datetimepicker2'>
-            <input class="form-control input-small" size="16" type="text" value="" readonly>
+            <input class="form-control input-small" id="MaturityDate" size="16" type="text" value="" readonly>
             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
         </div>
     </div>
@@ -36,6 +38,7 @@
             <option value="USD/TWD">USD/TWD</option>
             <option value="USD/CNH">USD/CNH</option>
             <option value="USD/ZAR">USD/ZAR</option>
+            <option value="EUR/NZD">EUR/NZD</option>
         </select>
         <br />
     </div>
@@ -45,6 +48,8 @@
             <option value="USD">USD</option>
             <option value="CNH">CNH</option>
             <option value="ZAR">ZAR</option>
+            <option value="EUR">EUR</option>
+            <option value="NZD">NZD</option>
         </select>
         <input type="text" id="BuyCurrAmt" value="" size="10" placeholder="BuyCurrAmt">
         <br />
@@ -55,6 +60,8 @@
             <option value="USD">USD</option>
             <option value="CNH">CNH</option>
             <option value="ZAR">ZAR</option>
+            <option value="EUR">EUR</option>
+            <option value="NZD">NZD</option>
         </select>
         <input type="text" id="SellCurrAmt" value="" size="10" placeholder="SellCurrAmt">
         <br />
@@ -100,6 +107,14 @@
                 }
             })
 
+            var selectmenu=document.getElementById("Contract")
+            selectmenu.onchange=function(){
+                 var chosenoption=this.options[this.selectedIndex].value;
+                 document.getElementById("BuyCurr").value = chosenoption.substring(0,3);
+                 document.getElementById("SellCurr").value = chosenoption.substring(4,7);
+            }
+
+
             $('#datetimepicker1').datetimepicker({
                 format: 'yyyy/mm/dd',
                 autoclose: true,
@@ -127,9 +142,24 @@
             });
 
             $("#sure").click(function () {
-                // peer chaincode invoke -n mycc -c '{"Args":["createFXTrade", "000001","CptyA","CptyB","2018/01/01","2018/12/31","USD/TWD","USD","31206192","TWD","9310367.3832","29.835"]}' -C myc/
-                // data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createCpty","args": ["0005" , "CptyCD" , "false"]}'
-                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createFXTrade","args": ["000002","CptyA","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + $("#BuyCurr").val() + '","' + $("#BuyCurrAmt").val() + '","' + $("#SellCurr").val() + '","' + $("#SellCurrAmt").val() + '","' + $("#NetPrice").val() + '"]}'
+                //peer chaincode invoke -n mycc -c '{"Args":["FXTradeTransfer", "B","0001","0002","2018/01/01","2018/12/31","USD/TWD","USD","1000000","true"]}' -C myc
+                var TXType;
+                if ($("#Contract").val().substring(0,3) == $("#BuyCurr").val()) {
+                    TXType = "B";
+                    Curr1 = $("#BuyCurr").val();
+                    Amount1 = $("#BuyCurrAmt").val();
+                    Curr2 = $("#SellCurr").val();
+                    Amount2 = $("#SellCurrAmt").val();
+                }
+                else {
+                    TXType = "S";
+                    Curr1 = $("#SellCurr").val();
+                    Amount1 = $("#SellCurrAmt").val();
+                    Curr2 = $("#BuyCurr").val();
+                    Amount2 = $("#BuyCurrAmt").val();
+                }
+                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createFXTrade","args": ["' + TXType + '","0001","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + Curr1 + '","' + Amount1 + '","' + Curr2 + '","' + Amount2 + '","' + $("#NetPrice").val() + '"]}'
+                //alert(data);
                 // 使用 ajax() 來呼叫 REST API
                 $.ajax({
                     url: site + "/channels/mychannel/chaincodes/mycc",
