@@ -28,7 +28,7 @@
             <option value="0001">CptyA</option>
             <option value="0002">CptyB</option>
             <option value="0003">CptyC</option>
-        </select>&nbsp;&nbsp;&nbsp;&nbsp;
+        </select>
         <button id="search">查詢交易明細</button>
     </div>
     <br />
@@ -42,7 +42,7 @@
     <hr>
     <div class=col-md-12>
         <label for="txid">交易序號：</label>
-        <input type="text" id="txid" value="" size="40" placeholder="交易序號">
+        <input type="text" id="txid" value="" size="40" placeholder="交易序號0002S20180903060425">
         <button id="search2">查詢交易明細</button>
     </div>
     <br />
@@ -110,68 +110,34 @@
                         for (i = 0; i < json.length; i++) {
 
                             for (j = 0; j < json[i].Transactions.length; j++) {
-                                var TXTYPE = json[i].Transactions[j].TXType
-                                var BANKFROM, BANKTO, TXFROM, TXTO, TXKIND, TXAMT, newTXStatus, newAmountStyle, newBalanceStyle;
-                                var TXStatus = json[i].Transactions[j].TXStatus
-                                newTXStatus = formatTXStatus(TXStatus)
-                                var TXMemo = json[i].Transactions[j].TXMemo
-                                newAmountStyle = formatAmount(TXMemo)
-                                newBalanceStyle = formatBalance(TXMemo)
+                                var BuyCurr, BuyAmount, SellCurr, SellAmount;
 
-
-
-                                if (TXTYPE == "S") {
-                                    BANKFROM = json[i].Transactions[j].BankFrom
-                                    BANKTO = json[i].Transactions[j].BankTo
-                                    TXFROM = json[i].Transactions[j].TXFrom
-                                    TXTO = json[i].Transactions[j].TXTo
-                                    TXKIND = "轉出"
+                                if (json[i].Transactions[j].TXType == "B") {
+                                    BuyCurr = json[i].Transactions[j].Curr1
+                                    BuyAmount = json[i].Transactions[j].Amount1
+                                    SellCurr = json[i].Transactions[j].Curr2
+                                    SellAmount = json[i].Transactions[j].Amount2
                                 }
-                                if (TXTYPE == "B") {
-                                    BANKFROM = json[i].Transactions[j].BankTo
-                                    BANKTO = json[i].Transactions[j].BankFrom
-                                    TXFROM = json[i].Transactions[j].TXTo
-                                    TXTO = json[i].Transactions[j].TXFrom
-                                    TXKIND = "轉入"
+                                if (json[i].Transactions[j].TXType == "S") {
+                                    SellCurr = json[i].Transactions[j].Curr1
+                                    SellAmount = json[i].Transactions[j].Amount1
+                                    BuyCurr = json[i].Transactions[j].Curr2
+                                    BuyAmount = json[i].Transactions[j].Amount2
                                 }
-                                if (BANKFROM == BANKTO) {
-                                    TXKIND = "自行<br/>" + TXKIND
-                                }
-                                else {
-                                    TXKIND = "跨行<br/>" + TXKIND
-                                }
-
-                                //    var htmlCode =
-                                //        "<tr>"
-                                //        + "<td>" + json[i].Transactions[j].TXID + "</td>"
-                                //        + "<td>" + TXKIND + "</td>"
-                                //        + "<td>" + BANKFROM + "</td>"
-                                //        + "<td>" + TXFROM + "</td>"
-                                //        + "<td>" + BANKTO + "</td>"
-                                //        + "<td>" + TXTO + "</td>"
-                                //        + "<td align=right" + newBalanceStyle + ">" + numberWithCommas(json[i].Transactions[j].Payment) + "</td>"
-                                //        + "<td align=right" + newAmountStyle + ">" + numberWithCommas(json[i].Transactions[j].SecurityAmount) + "</td>"
-                                //        + "<td>" + json[i].Transactions[j].SecurityID + "</td>"
-                                //        + "<td>" + newTXStatus + "</td>"
-                                //        + "<td>" + json[i].Transactions[j].TXMemo + "</td>"
-                                //        + "<td>" + json[i].Transactions[j].TXHcode + "</td>"
-                                //        + "<td>" + json[i].Transactions[j].MatchedTXID + "</td>"
-                                //        + "<td>" + json[i].Transactions[j].CreateTime + "</td>"
-                                //        + "<td>" + json[i].Transactions[j].UpdateTime + "</td>"
-                                //        + "</tr>"
-                                //    $('#bonds').append(htmlCode);
-
                                 datas[j] = {
                                     "TXID": json[i].Transactions[j].TXID,
-                                    "TXType": TXKIND,
-                                    "BankFrom": BANKFROM,
-                                    "TXFrom": TXFROM,
-                                    "BankTo": BANKTO,
-                                    "TXTo": TXTO,
-                                    "Payment": "<font " + newBalanceStyle + ">" + numberWithCommas(json[i].Transactions[j].Payment) + "</font>",
-                                    "SecurityAmount": "<font " + newAmountStyle + ">" + numberWithCommas(json[i].Transactions[j].SecurityAmount) + "</font>",
-                                    "SecurityID": json[i].Transactions[j].SecurityID,
-                                    "TXStatus": newTXStatus,
+                                    "OwnCptyID": json[i].Transactions[j].OwnCptyID,
+                                    "CptyID": json[i].Transactions[j].CptyID,
+                                    "TradeDate": json[i].Transactions[j].TradeDate,
+                                    "MaturityDate": json[i].Transactions[j].MaturityDate,
+                                    "Contract": json[i].Transactions[j].Contract,
+                                    "TXType": json[i].Transactions[j].TXType,
+                                    "BuyCurr": BuyCurr,
+                                    "BuyAmount": BuyAmount,
+                                    "SellCurr": SellCurr,
+                                    "SellAmount": SellAmount,
+                                    "NetPrice": json[i].Transactions[j].NetPrice,
+                                    "TXStatus": formatTXStatus(json[i].Transactions[j].TXStatus),
                                     "TXMemo": json[i].Transactions[j].TXMemo,
                                     "TXHcode": json[i].Transactions[j].TXHcode,
                                     "MatchedTXID": json[i].Transactions[j].MatchedTXID,
@@ -202,14 +168,17 @@
                             columns:
                                 [
                                     { field: "TXID", title: "交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "TXType", title: "交易<br/>型態", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "BankFrom", title: "轉出<br/>銀行", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "TXFrom", title: "轉出<br/>帳號", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "BankTo", title: "轉入<br/>銀行", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "TXTo", title: "轉入<br/>帳號", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "Payment", title: "交易<br/>面額", align: "right", valign: "middle", sortable: "true" },
-                                    { field: "SecurityAmount", title: "交易<br/>金額", align: "right", valign: "middle", sortable: "true" },
-                                    { field: "SecurityID", title: "公債<br/>代號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "OwnCptyID", title: "OwnCptyID<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "CptyID", title: "交易對手 <br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TradeDate", title: "交易日<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "SellAmount", title: "SellAmount", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "NetPrice", title: "NetPrice", align: "left", valign: "middle", sortable: "true" },
                                     { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
                                     { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
                                     { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
@@ -251,37 +220,43 @@
                         $("#dvPostResult").html("Transactions loaded successfully.");
                         console.log(json.length);
                         for (i = 0; i < json.length; i++) {
+                            var BuyCurr, BuyAmount, SellCurr, SellAmount;
 
+                            if (json[i].Value.TXType == "B") {
+                                BuyCurr = json[i].Value.Curr1
+                                BuyAmount = json[i].Value.Amount1
+                                SellCurr = json[i].Value.Curr2
+                                SellAmount = json[i].Value.Amount2
+                            }
+                            if (json[i].Value.TXType == "S") {
+                                SellCurr = json[i].Value.Curr1
+                                SellAmount = json[i].Value.Amount1
+                                BuyCurr = json[i].Value.Curr2
+                                BuyAmount = json[i].Value.Amount2
+                            }
 
-                            var TXTYPE = json[i].Value.Transactions[0].TXType
-                            var BANKFROM, BANKTO, TXFROM, TXTO,  TXAMT;
-                            var BANKFROM, BANKTO, TXFROM, TXTO,  TXAMT, newTXStatus, newAmountStyle, newBalanceStyle;
-                            var TXStatus = json[i].Value.Transactions[0].TXStatus
-                            newTXStatus = formatTXStatus(TXStatus)
-                            var TXMemo = json[i].Value.TXMemo
-                            //newAmountStyle = formatAmount(TXMemo)
 
                             datas2[i] = {
                                 "TxId": json[i].TxId,
-                                "TXID": json[i].Value.TXIDs,
-                                "OwnCptyID": json[i].Value.Transactions[0].OwnCptyID,
-                                "CptyID": json[i].Value.Transactions[0].CptyID,
-                                "TradeDate": json[i].Value.Transactions[0].TradeDate,
-                                "MaturityDate": json[i].Value.Transactions[0].MaturityDate,
-                                "Contract": json[i].Value.Transactions[0].Contract,
-                                "TXType": json[i].Value.Transactions[0].TXType,
-                                "Curr1": json[i].Value.Transactions[0].Curr1,
-                                "Amount1": json[i].Value.Transactions[0].Amount1,
-                                "Curr2": json[i].Value.Transactions[0].Curr2,
-                                "Amount2": json[i].Value.Transactions[0].Amount2,
-                                "NetPrice": json[i].Value.Transactions[0].NetPrice,
-                                "TXStatus": newTXStatus,
-                                "TXMemo": json[i].Value.Transactions[0].TXMemo,
-                                "TXHcode": json[i].Value.Transactions[0].TXHcode,
-                                "MatchedTXID": json[i].Value.Transactions[0].MatchedTXID,
+                                "TXID": json[i].Value.TXID,
+                                "OwnCptyID": json[i].Value.OwnCptyID,
+                                "CptyID": json[i].Value.CptyID,
+                                "TradeDate": json[i].Value.TradeDate,
+                                "MaturityDate": json[i].Value.MaturityDate,
+                                "Contract": json[i].Value.Contract,
+                                "TXType": json[i].Value.TXType,
+                                "BuyCurr": BuyCurr,
+                                "BuyAmount": BuyAmount,
+                                "SellCurr": SellCurr,
+                                "SellAmount": SellAmount,
+                                "NetPrice": json[i].Value.NetPrice,
+                                "TXStatus": formatTXStatus(json[i].Value.TXStatus),
+                                "TXMemo": json[i].Value.TXMemo,
+                                "TXHcode": json[i].Value.TXHcode,
+                                "MatchedTXID": json[i].Value.MatchedTXID,
                                 "Timestamp": json[i].Timestamp,
-                                "createTime": json[i].Value.Transactions[0].createTime,
-                                "updateTime": json[i].Value.Transactions[0].updateTime
+                                "createTime": json[i].Value.createTime,
+                                "updateTime": json[i].Value.updateTime
                             }
 
                         }
@@ -311,11 +286,11 @@
                                     { field: "TradeDate", title: "交易日<br/>", align: "left", valign: "middle", sortable: "true" },
                                     { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
                                     { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "TXType", title: "B/S", align: "right", valign: "middle", sortable: "true" },
-                                    { field: "Curr1", title: "Curr1", align: "right", valign: "middle", sortable: "true" },
-                                    { field: "Amount1", title: "Amount1", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "Curr2", title: "Curr2", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "Amount2", title: "Amount2", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "SellAmount", title: "SellAmount", align: "left", valign: "middle", sortable: "true" },
                                     { field: "NetPrice", title: "NetPrice", align: "left", valign: "middle", sortable: "true" },
                                     { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
                                     { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },

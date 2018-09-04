@@ -122,7 +122,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-    <script>
+<script>
         $(document).ready(function () {
             var site = gSite;
 
@@ -316,7 +316,7 @@
                             var BANKFROM, BANKTO, TXFROM, TXTO, TXKIND, TXAMT;
                             var BANKFROM, BANKTO, TXFROM, TXTO, TXKIND, TXAMT, newTXStatus, newAmountStyle, newBalanceStyle;
                             var TXStatus = json[i].Value.TXStatus
-                            newTXStatus = formatTXStatus(TXStatus)
+                            newTXStatus = formatTXStatus(json[i].Value.TXStatus)
                             var TXMemo = json[i].Value.TXMemo
                             newAmountStyle = formatAmount(TXMemo)
                             newBalanceStyle = formatBalance(TXMemo)
@@ -440,5 +440,5 @@
                 })
             })
         });
-    </script>
+</script>
 }

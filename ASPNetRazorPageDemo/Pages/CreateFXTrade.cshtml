@@ -8,6 +8,17 @@
 </div>
 <div id="divCreateFXTrade">
     <div class="form-group">
+        <label for="OwnCpty" class="col-sm-2">Cpty：</label>
+        <select id="OwnCpty">
+            <option value="0001">CptyA</option>
+            <option value="0002">CptyB</option>
+            <option value="0003">CptyC</option>
+            <option value="0004">CptyD</option>
+            <option value="0005">CptyE</option>
+        </select>
+        <br />
+    </div>
+    <div class="form-group">
         <label for="Cpty" class="col-sm-2">交易對手：</label>
         <select id="Cpty">
            <option value="0001">CptyA</option>
@@ -46,6 +57,7 @@
         <label for="BuyCurr" class="col-sm-2">Buy：</label>
         <select id="BuyCurr">
             <option value="USD">USD</option>
+            <option value="TWD">TWD</option>
             <option value="CNH">CNH</option>
             <option value="ZAR">ZAR</option>
             <option value="EUR">EUR</option>
@@ -58,6 +70,7 @@
         <label for="SellCurr" class="col-sm-2">Sell：</label>
         <select id="SellCurr">
             <option value="USD">USD</option>
+            <option value="TWD">TWD</option>
             <option value="CNH">CNH</option>
             <option value="ZAR">ZAR</option>
             <option value="EUR">EUR</option>
@@ -158,8 +171,8 @@
                     Curr2 = $("#BuyCurr").val();
                     Amount2 = $("#BuyCurrAmt").val();
                 }
-                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeTransfer","args": ["' + TXType + '","0001","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + Curr1 + '","' + Amount1 + '","' + Curr2 + '","' + Amount2 + '","' + $("#NetPrice").val() + '" , "true"]}'
-                alert(data);
+                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeTransfer","args": ["' + TXType + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + Curr1 + '","' + Amount1 + '","' + Curr2 + '","' + Amount2 + '","' + $("#NetPrice").val() + '" , "true"]}'
+                //alert(data);
                 // 使用 ajax() 來呼叫 REST API
                 $.ajax({
                     url: site + "/channels/mychannel/chaincodes/mycc",
@@ -179,29 +192,10 @@
                             icon: "success",
                             button: "確定",
                         });
-
-                        $.ajax({
-                            type: "GET",
-                            url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=createFXTrade&args=%5B%22" + "approveflag" + "%22%5D",
-                            dataType: "html",
-                            success: function (data) {
-                                var data1 = data.replace(' now has', '');
-                                var data2 = data1.replace(' after the move', '');
-                                //$('#bank').html("")
-                                var json = JSON.parse(data2);
-                                console.log(json);
-                                $("#dvPostResult").html("同資旗標已設定為：" + formatApproveFlag(json))
-
-                            },
-                            error: function (jqXHR) {
-                                alert("發生錯誤: " + jqXHR.status);
-                                console.log(jqXHR);
-                            },
-                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                            beforeSend: function (xhr, settings) {
-                                xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
-                            }
-                        })
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
                     },
                     //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
                     beforeSend: function (xhr, settings) {
