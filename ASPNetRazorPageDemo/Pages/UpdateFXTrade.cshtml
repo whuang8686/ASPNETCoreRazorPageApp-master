@@ -10,6 +10,11 @@
     <div class="form-group">
         <label for="txid">交易序號：</label>
         <input type="text" id="txid" value="" size="47" placeholder="交易序號0002S20180903060425">
+        <br />
+    </div>
+    <div class="form-group">
+        <label for="txday">交易日期：</label>
+        <input type="text" id="txday" size="16" placeholder="YYYYMMDD"/>
         <button id="search">交易查詢</button>
         <br />
     </div>
@@ -133,6 +138,32 @@
                     alert("發生錯誤: " + jqXHR.status);
                 }
             })
+
+            $('#datetimepicker1').datetimepicker({
+                format: 'yyyy/mm/dd',
+                autoclose: true,
+                todayBtn: true,
+                minView: 2,
+                viewSelect: 'year',
+                startView: 2,
+                autoclose: true,
+                bootcssVer: 3,
+                keepOpen: false,
+                defaultDate:new Date()
+            });
+
+            $('#datetimepicker2').datetimepicker({
+                format: 'yyyy/mm/dd',
+                autoclose: true,
+                todayBtn: true,
+                minView: 2,
+                viewSelect: 'year',
+                startView: 2,
+                autoclose: true,
+                bootcssVer: 3,
+                keepOpen: false,
+                defaultDate:new Date()
+            });
 
 
             //peer chaincode invoke -n mycc -c '{"Args":["CorrectFXTradeTransfer", "B","0001","0002","2018/09/01","2018/11/30","USD/TWD","USD","1000000","ZAR","1000000","30","true","0001B20180906123212"]}' -C myc
@@ -519,7 +550,7 @@
             })
 
      $("#search").click(function () {
-                //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryFXTradey&args=%5B%22" + $("#txid").val() + "%22%5D")
+                //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + $("#txid").val() + "%22%5D")
                 $.ajax({
                     type: "GET",
                     url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + $("#txid").val() + "%22%5D",
@@ -533,6 +564,7 @@
                         console.log(json);
                         $("#dvPostResult").html(json.docType + " loaded successfully.");
 
+                        $("#txday").val(json.TXID.substr(5, 8));
                         $("#OwnCpty").val(json.OwnCptyID);
                         $("#Cpty").val(json.CptyID);
                         $("#TradeDate").val(json.TradeDate);
