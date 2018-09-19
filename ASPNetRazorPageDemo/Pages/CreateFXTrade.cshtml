@@ -127,6 +127,17 @@
                  document.getElementById("SellCurr").value = chosenoption.substring(4,7);
             }
 
+            $("#BuyCurrAmt").change(function ()
+            {
+                var value = $('#BuyCurrAmt').val();
+                if (value.indexOf('m') >= 0) {
+                    $('#BuyCurrAmt').val(value.substring(0,value.indexOf('m')) + '000000') ;
+                }
+                if (value.indexOf('M') >= 0) {
+                    $('#BuyCurrAmt').val(value.substring(0,value.indexOf('M')) + '000000') ;
+                }
+
+            });
 
             $('#datetimepicker1').datetimepicker({
                 format: 'yyyy/mm/dd',
