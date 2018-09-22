@@ -1,0 +1,126 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.CreateFXTradeMTMModel
+@{
+    ViewData["Title"] = "計算FX交易市價評估";
+}
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+<div id="divReadBankTX">
+    <div class="form-group">
+        <label for="txday" class="col-sm-2">交易日期：</label>
+        <div class="input-group date form_date col-sm-2" id='datetimepicker1'>
+            <input class="form-control input-small" id="txday" size="16" type="text" readonly>
+            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+        </div>
+        <button id="create">計算MTM</button>
+    </div>
+    <br />
+    <br />
+    <div id="reportTableDiv">
+        <table id="reportTable"></table>
+    </div>
+</div>
+<br />
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+<div id="dvPostResult" style="font-size:16pt"></div>
+<h5>@Model.Message</h5>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+        $(document).ready(function () {
+            var site = gSite;
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+            $('#datetimepicker1').datetimepicker({
+                format: 'yyyy/mm/dd',
+                autoclose: true,
+                todayBtn: true,
+                minView: 2,
+                viewSelect: 'year',
+                startView: 2,
+                autoclose: true,
+                bootcssVer: 3,
+                keepOpen: false,
+                viewDate: new Date(),
+                defaultDate:new Date()
+            });
+            var now = new Date();
+            var today = now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + now.getDate();
+            $('#txday').val(today);
+
+            $("#create").click(function () {
+                //peer chaincode invoke -n mycc -c '{"Args":["FXTradeTransfer", "B","0001","0002","2018/01/01","2018/12/31","USD/TWD","USD","1000000","true"]}' -C myc
+                var TXType;
+                if ($("#Contract").val().substring(0,3) == $("#BuyCurr").val()) {
+                    TXType = "B";
+                    Curr1 = $("#BuyCurr").val();
+                    Amount1 = $("#BuyCurrAmt").val();
+                    Curr2 = $("#SellCurr").val();
+                    Amount2 = $("#SellCurrAmt").val();
+                }
+                else {
+                    TXType = "S";
+                    Curr1 = $("#SellCurr").val();
+                    Amount1 = $("#SellCurrAmt").val();
+                    Curr2 = $("#BuyCurr").val();
+                    Amount2 = $("#BuyCurrAmt").val();
+                }
+                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeTransfer","args": ["' + TXType + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + Curr1 + '","' + Amount1 + '","' + Curr2 + '","' + Amount2 + '","' + $("#NetPrice").val() + '" , "true"]}'
+                //alert(data);
+                // 使用 ajax() 來呼叫 REST API
+                $.ajax({
+                    url: site + "/channels/mychannel/chaincodes/mycc",
+                    type: "POST",
+                    data: data,
+                    contentType: "application/json; charset=utf-8",
+                    complete: function (data, textStatus, jqXHR) {
+                        console.log(textStatus);
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
+
+                        swal({
+                            title: "交易成功!",
+                            text: "",
+                            icon: "success",
+                            button: "確定",
+                        });
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                    }
+                });
+            })
+        });
+</script>
+}
