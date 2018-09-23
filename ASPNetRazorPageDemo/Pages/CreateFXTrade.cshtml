@@ -21,11 +21,11 @@
     <div class="form-group">
         <label for="Cpty" class="col-sm-2">交易對手：</label>
         <select id="Cpty">
-           <option value="0001">CptyA</option>
-           <option value="0002">CptyB</option>
-           <option value="0003">CptyC</option>
-           <option value="0004">CptyD</option>
-           <option value="0005">CptyE</option>
+            <option value="0001">CptyA</option>
+            <option value="0002">CptyB</option>
+            <option value="0003">CptyC</option>
+            <option value="0004">CptyD</option>
+            <option value="0005">CptyE</option>
         </select>
         <br />
     </div>
@@ -136,7 +136,17 @@
                 if (value.indexOf('M') >= 0) {
                     $('#BuyCurrAmt').val(value.substring(0,value.indexOf('M')) + '000000') ;
                 }
+            });
 
+           $("#SellCurrAmt").change(function ()
+            {
+                var value = $('#SellCurrAmt').val();
+                if (value.indexOf('m') >= 0) {
+                    $('#SellCurrAmt').val(value.substring(0,value.indexOf('m')) + '000000') ;
+                }
+                if (value.indexOf('M') >= 0) {
+                    $('#SellCurrAmt').val(value.substring(0,value.indexOf('M')) + '000000') ;
+                }
             });
 
             $('#datetimepicker1').datetimepicker({
@@ -166,6 +176,18 @@
             });
 
             $("#sure").click(function () {
+                var regex=/^[a-zA-Z]+$/;
+                if (!$('#BuyCurrAmt').val().match(regex))
+                {
+                   alert("BuyCurrAmt must input string");
+                   return false;
+                }
+                if (!$('#SellCurrAmt').val().match(regex))
+                {
+                   alert("SellCurrAmt must input string");
+                   return false;
+                }
+
                 //peer chaincode invoke -n mycc -c '{"Args":["FXTradeTransfer", "B","0001","0002","2018/01/01","2018/12/31","USD/TWD","USD","1000000","true"]}' -C myc
                 var TXType;
                 if ($("#Contract").val().substring(0,3) == $("#BuyCurr").val()) {

@@ -69,27 +69,13 @@
                 defaultDate:new Date()
             });
             var now = new Date();
-            var today = now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + now.getDate();
+            var today = now.getFullYear() + '/' + ((now.getMonth() + 1)<10 ? '0' : '')+((now.getMonth() + 1)) + '/' +  (now.getDate()<10 ? '0' : '')+now.getDate();
             $('#txday').val(today);
 
             $("#create").click(function () {
-                //peer chaincode invoke -n mycc -c '{"Args":["FXTradeTransfer", "B","0001","0002","2018/01/01","2018/12/31","USD/TWD","USD","1000000","true"]}' -C myc
-                var TXType;
-                if ($("#Contract").val().substring(0,3) == $("#BuyCurr").val()) {
-                    TXType = "B";
-                    Curr1 = $("#BuyCurr").val();
-                    Amount1 = $("#BuyCurrAmt").val();
-                    Curr2 = $("#SellCurr").val();
-                    Amount2 = $("#SellCurrAmt").val();
-                }
-                else {
-                    TXType = "S";
-                    Curr1 = $("#SellCurr").val();
-                    Amount1 = $("#SellCurrAmt").val();
-                    Curr2 = $("#BuyCurr").val();
-                    Amount2 = $("#BuyCurrAmt").val();
-                }
-                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeTransfer","args": ["' + TXType + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + Curr1 + '","' + Amount1 + '","' + Curr2 + '","' + Amount2 + '","' + $("#NetPrice").val() + '" , "true"]}'
+                //peer chaincode invoke -n mycc -c '{"Args":["FXTradeMTM", "2018/12/01"]}' -C myc
+
+                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeMTM","args": ["' + $("#txday").val() + '"]}'
                 //alert(data);
                 // 使用 ajax() 來呼叫 REST API
                 $.ajax({

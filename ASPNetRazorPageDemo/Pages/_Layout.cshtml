@@ -283,18 +283,6 @@
                         <li>
                             <a asp-page="/Index"><i class="fa fa-dashboard fa-fw"></i> Home</a>
                         </li>
-
-                        <li>
-                            <a href="#"><i class="fa fa-edit fa-fw"></i> Invoke<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li><a asp-page="/Invoke">同資旗標設定</a></li>
-                                <li><a asp-page="/Invoke2">跨行交易放行</a></li>
-                                <li><a asp-page="/Invoke3">日終交易取消</a></li>
-                                <li><a asp-page="/Invoke4">利息計算分配</a></li>
-                                <li><a asp-page="/Invoke5">清算銀行交易更正</a></li>
-                            </ul>
-                            <!-- /.nav-second-level -->
-                        </li>
                         <li>
                             <a href="#"><i class="fa fa-edit fa-fw"></i>FX交易功能<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
@@ -304,18 +292,34 @@
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
+
                         <li>
-                            <a href="#"><i class="fa fa-table fa-fw"></i> Query<span class="fa arrow"></span></a>
+                            <a href="#"><i class="fa fa-table fa-fw"></i>MTM市值功能<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
-                                <li><a asp-page="/Query">查詢中央公債</a></li>
-                                <li><a asp-page="/Query2">第二銀行資訊</a></li>
-                                <li><a asp-page="/Query3">第四銀行資訊</a></li>
-                                <li><a asp-page="/Query4">第五銀行資訊</a></li>
-                                <li><a asp-page="/Query5">檢視交易歷史</a></li>
-                                <li><a asp-page="/Query6">檢視區塊鏈資訊</a></li>
+                                <li><a asp-page="/CreateFXTradeMTM">MTM市價計算</a></li>
+                                <li><a asp-page="/QueryFXTradeMTM">MTM市價查詢</a></li>
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
+
+                        <li>
+                            <a href="#"><i class="fa fa-table fa-fw"></i>CptyISDA合約功能<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li><a asp-page="/CreateCptyISDA">新增CptyISDA</a></li>
+                                <li><a asp-page="/UpdateCptyISDA">修改CptyISDA</a></li>
+                                <li><a asp-page="/QueryCptyISDA">查詢CptyISDA</a></li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+
+                        <li>
+                            <a href="#"><i class="fa fa-table fa-fw"></i>Cpty資產功能<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li><a asp-page="/QueryCptyISDA">查詢Cpty資產功能</a></li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+
                         <li>
                             <a asp-page="/About"><i class="fa fa-info fa-fw"></i> About</a>
                         </li>
