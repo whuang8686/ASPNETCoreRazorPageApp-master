@@ -3,7 +3,7 @@
 //var gSite = "http://192.168.0.111" + ":4000"
 //var gSite = "http://172.20.10.5" + ":4000"
 //var gSite = "http://192.168.0.104" + ":4000"
-var gSite = "http://192.168.2.104" + ":4000"
+var gSite = "http://192.168.2.100" + ":4000"
 
 var waiting4payment = '<span class="label label-primary">Waiting4Payment</span>'
 var matched = '<span class="label label-success">Matched</span>'
@@ -13,24 +13,8 @@ var cancelled = '<span class="label label-danger">Cancelled</span>'
 var fontRed = ' style="color:red"'
 var fontDefault = ' style=""'
 var PaidInterestDate="";
-function formatAmount(TXMemo) {
-        var newAmountStyle="";
-        if (TXMemo == "交易金額疑輸錯") {
-            newAmountStyle = fontRed
-        } else {
-            newAmountStyle = fontDefault
-        }
-        return newAmountStyle;
-}
-function formatBalance(TXMemo) {
-        var newBalanceStyle="";
-        if (TXMemo == "交易面額疑輸錯") {
-            newBalanceStyle = fontRed
-        } else {
-            newBalanceStyle = fontDefault
-        }
-        return newBalanceStyle;
-}
+
+
 function formatTXStatus(status) {
         var status_label="";
 
@@ -82,4 +66,5 @@ function numberWithCommas(number) {
          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
          return parts.join(".");
 }
+
 

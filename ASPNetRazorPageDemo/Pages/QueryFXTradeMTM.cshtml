@@ -13,15 +13,6 @@
     <div class=col-md-12>
         <label for="txday">交易日期：</label>
         <input type="text" id="txday" size="10" value='@ViewData["TODAY"]' placeholder="交易日">
-        <label for="txstatus">交易狀態：</label>
-        <select id="txstatus">
-            <option value="All">All</option>
-            <option value="Pending">Pending</option>
-            <option value="Matched">Matched</option>
-            <option value="PaymentError">PaymentError</option>
-            <option value="Cancelled">Cancelled</option>
-            <option value="Finished">Finished</option>
-        </select>
         <label for="bankid">Cpty：</label>
         <select id="bankid">
             <option value="All">All</option>
@@ -38,21 +29,6 @@
     </div>
 </div>
 <br />
-<!--
-<div id="divReadBankTX2">
-    <hr>
-    <div class=col-md-12>
-        <label for="txid">交易序號：</label>
-        <input type="text" id="txid" value="" size="40" placeholder="交易序號0002S20180903060425">
-        <button id="search2">查詢交易明細</button>
-    </div>
-    <br />
-    <br />
-    <div id="reportTableDiv2">
-        <table id="reportTable2"></table>
-    </div>
-</div>
--->
 <br />
 @Html.AntiForgeryToken()
 <h2 style="color:brown;">執行結果</h2>
@@ -90,14 +66,12 @@
                 }
             })
 
-
-
             $("#search").click(function () {
                 //alert($('#txday').val());
 
                 $.ajax({
                     type: "GET",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryQueuedTransactionStatus&args=%5B%22" + $('#txday').val() + "%22%2C%22" + $('#txstatus').val() + "%22%2C%22" + $('#bankid').val() + "%22%5D",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMTransactionStatus&args=%5B%22" + $('#txday').val() + "%22%2C%22" + $('#txstatus').val() + "%22%2C%22" + $('#bankid').val() + "%22%5D",
                     dataType: "html",
                     success: function (data) {
                         console.log(data);

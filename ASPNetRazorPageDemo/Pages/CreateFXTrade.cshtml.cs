@@ -4,17 +4,29 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 
 namespace ASPNetRazorPageDemo.Pages
 {
     public class CreateFXTradeModel : PageModel
     {
+        [BindProperty]
+        //public Book PostBook { get; set; }
+
         public string Message { get; set; }
         public List<string> MessageList { get; set; }
+
+        //public JsonResult IndexModel()
+        //{
+        //    this.PostBook = new Book();
+              //return null;
+        //}
 
         public void OnGet()
         {
             Message = "系統時間："+DateTime.Now.ToString() ;
+            //ReadyDropDownList();
         }
 
         public JsonResult OnGetList()
@@ -60,7 +72,29 @@ namespace ASPNetRazorPageDemo.Pages
             };
             return new JsonResult(lstString);
         }
+
+        //private void ReadyDropDownList()
+        //{
+        //    var list = new List<SelectListItem>();
+        //    list.Add(new SelectListItem { Text = "1-Books", Value = "1" });
+        //    list.Add(new SelectListItem { Text = "2-PChome", Value = "2" });
+        //
+        //    ViewData["dp"] = list;
+        //}
     }
 
-    
+    //public class Book
+    //{
+    //public string Name { get; set; }
+
+    //public SourceType Source { get; set; }
+    //}
+
+    //public enum SourceType
+    //{
+    //Default = 0,
+    //Books = 1,
+    //PCHome = 2
+    //}
+
 }
