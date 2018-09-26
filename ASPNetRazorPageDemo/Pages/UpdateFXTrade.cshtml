@@ -42,6 +42,11 @@
         <br />
     </div>
     <div class="form-group">
+        <label for="TXKinds" class="col-sm-2">交易種類：</label>
+        <input type="text" id="TXKinds" value="" size="10" placeholder="交易種類">
+        <br />
+    </div>
+    <div class="form-group">
         <label for="TradeDate" class="col-sm-2">TradeDate：</label>
         <div class="input-group date form_date col-sm-2" id='datetimepicker1'>
             <input class="form-control input-small" id="TradeDate" size="16" type="text" value="" readonly>
@@ -94,7 +99,6 @@
     <div class="form-group">
         <label for="NetPrice" class="col-sm-2">NetPrice：</label>
         <input type="text" id="NetPrice" value="" size="10" placeholder="合約價">
-
         <br />
     </div>
     <div class="col-sm">
@@ -247,6 +251,7 @@
                                     "MaturityDate": json.MaturityDate,
                                     "Contract": json.Contract,
                                     "TXType": json.TXType,
+                                    "TXKinds": json.TXKinds,
                                     "BuyCurr": BuyCurr,
                                     "BuyAmount": BuyAmount,
                                     "SellCurr": SellCurr,
@@ -284,6 +289,7 @@
                                             { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
                                             { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
                                             { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
+                                            { field: "TXKinds", title: "TXKinds", align: "left", valign: "middle", sortable: "true" },
                                             { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
                                             { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
                                             { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
@@ -353,6 +359,7 @@
                                                            "MaturityDate": json.MaturityDate,
                                                            "Contract": json.Contract,
                                                            "TXType": json.TXType,
+                                                           "TXKinds": json.TXKinds,
                                                            "BuyCurr": BuyCurr,
                                                            "BuyAmount": BuyAmount,
                                                            "SellCurr": SellCurr,
@@ -389,6 +396,7 @@
                                                                     { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
                                                                     { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
                                                                     { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
+                                                                    { field: "TXKinds", title: "TXKinds", align: "left", valign: "middle", sortable: "true" },
                                                                     { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
                                                                     { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
                                                                     { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
@@ -443,6 +451,7 @@
                                                                         "MaturityDate": json.MaturityDate,
                                                                         "Contract": json.Contract,
                                                                         "TXType": json.TXType,
+                                                                        "TXKinds": json.TXKinds,
                                                                         "BuyCurr": BuyCurr,
                                                                         "BuyAmount": BuyAmount,
                                                                         "SellCurr": SellCurr,
@@ -479,6 +488,7 @@
                                                                                 { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
                                                                                 { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
                                                                                 { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
+                                                                                { field: "TXKinds", title: "TXKinds", align: "left", valign: "middle", sortable: "true" },
                                                                                 { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
                                                                                 { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
                                                                                 { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
@@ -569,6 +579,7 @@
                         $("#Cpty").val(json.CptyID);
                         $("#TradeDate").val(json.TradeDate);
                         $("#MaturityDate").val(json.MaturityDate);
+                        $("#TXKinds").val(json.TXKinds);
                         $("#Contract").val(json.Contract);
                         $("#BuyCurr").val(json.Curr1);
                         $("#BuyCurrAmt").val(json.Amount1);

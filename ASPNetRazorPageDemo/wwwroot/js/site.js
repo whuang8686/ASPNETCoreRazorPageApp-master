@@ -3,7 +3,7 @@
 //var gSite = "http://192.168.0.111" + ":4000"
 //var gSite = "http://172.20.10.5" + ":4000"
 //var gSite = "http://192.168.0.104" + ":4000"
-var gSite = "http://192.168.2.100" + ":4000"
+var gSite = "http://192.168.0.32" + ":4000"
 
 var waiting4payment = '<span class="label label-primary">Waiting4Payment</span>'
 var matched = '<span class="label label-success">Matched</span>'

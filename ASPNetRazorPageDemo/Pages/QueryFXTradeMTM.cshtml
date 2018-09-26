@@ -71,7 +71,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMTransactionStatus&args=%5B%22" + $('#txday').val() + "%22%2C%22" + $('#txstatus').val() + "%22%2C%22" + $('#bankid').val() + "%22%5D",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMTransactionStatus&args=%5B%22" + $('#txday').val() + "%22%2C%22" + $('#bankid').val() + "%22%5D",
                     dataType: "html",
                     success: function (data) {
                         console.log(data);
@@ -86,37 +86,25 @@
                         for (i = 0; i < json.length; i++) {
 
                             for (j = 0; j < json[i].Transactions.length; j++) {
-                                var BuyCurr, BuyAmount, SellCurr, SellAmount;
 
-                                if (json[i].Transactions[j].TXType == "B") {
-                                    BuyCurr = json[i].Transactions[j].Curr1
-                                    BuyAmount = json[i].Transactions[j].Amount1
-                                    SellCurr = json[i].Transactions[j].Curr2
-                                    SellAmount = json[i].Transactions[j].Amount2
+                                var MTM,BankID;
+
+                                if (json[i].Transactions[j].OwnCptyID == $('#bankid').val()) {
+                                    BankID = json[i].Transactions[j].OwnCptyID
+                                    MTM = json[i].Transactions[j].MTM
                                 }
-                                if (json[i].Transactions[j].TXType == "S") {
-                                    SellCurr = json[i].Transactions[j].Curr1
-                                    SellAmount = json[i].Transactions[j].Amount1
-                                    BuyCurr = json[i].Transactions[j].Curr2
-                                    BuyAmount = json[i].Transactions[j].Amount2
+                                if (json[i].Transactions[j].CptyID == $('#bankid').val()) {
+                                    BankID = json[i].Transactions[j].CptyID
+                                    MTM = json[i].Transactions[j].MTM * (-1)
                                 }
                                 datas[j] = {
                                     "TXID": json[i].Transactions[j].TXID,
-                                    "OwnCptyID": json[i].Transactions[j].OwnCptyID,
-                                    "CptyID": json[i].Transactions[j].CptyID,
-                                    "TradeDate": json[i].Transactions[j].TradeDate,
-                                    "MaturityDate": json[i].Transactions[j].MaturityDate,
-                                    "Contract": json[i].Transactions[j].Contract,
-                                    "TXType": json[i].Transactions[j].TXType,
-                                    "BuyCurr": BuyCurr,
-                                    "BuyAmount": BuyAmount,
-                                    "SellCurr": SellCurr,
-                                    "SellAmount": SellAmount,
+                                    "FXTXID": json[i].Transactions[j].FXTXID,
+                                    "TXKinds": json[i].Transactions[j].TXKinds,
+                                    "CptyID": BankID,
                                     "NetPrice": json[i].Transactions[j].NetPrice,
-                                    "TXStatus": formatTXStatus(json[i].Transactions[j].TXStatus),
-                                    "TXMemo": json[i].Transactions[j].TXMemo,
-                                    "TXHcode": json[i].Transactions[j].TXHcode,
-                                    "MatchedTXID": json[i].Transactions[j].MatchedTXID,
+                                    "ClosePrice": json[i].Transactions[j].ClosePrice,
+                                    "MTM": MTM,
                                     "createTime": json[i].Transactions[j].CreateTime,
                                     "updateTime": json[i].Transactions[j].UpdateTime
                                 }
@@ -143,22 +131,13 @@
                             clickToSelect: true,
                             columns:
                                 [
-                                    { field: "TXID", title: "交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "OwnCptyID", title: "OwnCptyID<br/>", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "CptyID", title: "交易對手 <br/>", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "TradeDate", title: "交易日<br/>", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "SellAmount", title: "SellAmount", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "NetPrice", title: "NetPrice", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "MatchedTXID", title: "比對<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXID", title: "交易序號<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "FXTXID", title: "交易單號<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "TXKinds", title: "交易種類 <br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "CptyID", title: "Cpty<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "NetPrice", title: "成交價<br/>", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "ClosePrice", title: "收盤價", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "MTM", title: "MTM", align: "left", valign: "middle", sortable: "true" },
                                     { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
                                     { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
 

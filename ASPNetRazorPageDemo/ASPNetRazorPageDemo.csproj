@@ -23,6 +23,9 @@
     <Content Remove="Pages\Invoke5.cshtml" />
     <Content Remove="Pages\Invoke55.cshtml" />
     <Content Remove="Pages\login.cshtml" />
+    <Content Remove="wwwroot\images\fabric-cgs-index2.png" />
+    <Content Remove="wwwroot\images\fabric-index1.png" />
+    <Content Remove="wwwroot\images\fabric-index5.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Pages\Index.cshtml" />
