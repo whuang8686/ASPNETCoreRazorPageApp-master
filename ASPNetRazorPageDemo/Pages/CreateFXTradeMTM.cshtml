@@ -2,17 +2,15 @@
 @model ASPNetRazorPageDemo.Pages.CreateFXTradeMTMModel
 @{
     ViewData["Title"] = "計算FX交易市價評估";
+    ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
 }
 <div id="divEnroll">
     <input type="hidden" id="token" value="">
 </div>
 <div id="divReadBankTX">
     <div class="form-group">
-        <label for="txday" class="col-sm-2">交易日期：</label>
-        <div class="input-group date form_date col-sm-2" id='datetimepicker1'>
-            <input class="form-control input-small" id="txday" size="16" type="text" readonly>
-            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-        </div>
+        <label for="txday">交易日期：</label>
+        <input type="text" id="txday" size="10" value='@ViewData["TODAY"]' placeholder="交易日">
         <button id="create">計算MTM</button>
     </div>
     <br />
@@ -30,7 +28,7 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<script>
+    <script>
         $(document).ready(function () {
             var site = gSite;
 
@@ -55,25 +53,13 @@
                 }
             })
 
-            $('#datetimepicker1').datetimepicker({
-                format: 'yyyy/mm/dd',
-                autoclose: true,
-                todayBtn: true,
-                minView: 2,
-                viewSelect: 'year',
-                startView: 2,
-                autoclose: true,
-                bootcssVer: 3,
-                keepOpen: false,
-                viewDate: new Date(),
-                defaultDate:new Date()
-            });
-            var now = new Date();
-            var today = now.getFullYear() + '/' + ((now.getMonth() + 1)<10 ? '0' : '')+((now.getMonth() + 1)) + '/' +  (now.getDate()<10 ? '0' : '')+now.getDate();
-            $('#txday').val(today);
+
+            //var now = new Date();
+            //var today = now.getFullYear() + '/' + ((now.getMonth() + 1)<10 ? '0' : '')+((now.getMonth() + 1)) + '/' +  (now.getDate()<10 ? '0' : '')+now.getDate();
+            //$('#txday').val(today);
 
             $("#create").click(function () {
-                //peer chaincode invoke -n mycc -c '{"Args":["FXTradeMTM", "2018/12/01"]}' -C myc
+                //peer chaincode invoke -n mycc -c '{"Args":["FXTradeMTM", "20181201"]}' -C myc
 
                 data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeMTM","args": ["' + $("#txday").val() + '"]}'
                 //alert(data);
@@ -108,5 +94,5 @@
                 });
             })
         });
-</script>
+    </script>
 }
