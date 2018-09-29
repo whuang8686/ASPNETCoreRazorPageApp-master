@@ -1,7 +1,7 @@
 ﻿@page
-@model ASPNetRazorPageDemo.Pages.QueryFXTradeMTMModel
+@model ASPNetRazorPageDemo.Pages.QueryCptyAssetModel
 @{
-    ViewData["Title"] = "查詢FX交易市值評估";
+    ViewData["Title"] = "查詢Cpty資產功能";
     ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
 }
 
@@ -11,8 +11,6 @@
 
 <div id="divReadBankTX">
     <div class=col-md-12>
-        <label for="txday">交易日期：</label>
-        <input type="text" id="txday" size="10" value='@ViewData["TODAY"]' placeholder="交易日">
         <label for="bankid">Cpty：</label>
         <select id="bankid">
             <option value="All">All</option>

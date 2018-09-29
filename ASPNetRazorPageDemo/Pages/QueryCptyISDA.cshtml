@@ -1,7 +1,7 @@
 ﻿@page
-@model ASPNetRazorPageDemo.Pages.QueryFXTradeMTMModel
+@model ASPNetRazorPageDemo.Pages.QueryCptyISDAModel
 @{
-    ViewData["Title"] = "查詢FX交易市值評估";
+    ViewData["Title"] = "查詢CptyISDA合約";
     ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
 }
 
@@ -11,8 +11,6 @@
 
 <div id="divReadBankTX">
     <div class=col-md-12>
-        <label for="txday">交易日期：</label>
-        <input type="text" id="txday" size="10" value='@ViewData["TODAY"]' placeholder="交易日">
         <label for="bankid">Cpty：</label>
         <select id="bankid">
             <option value="All">All</option>
@@ -41,7 +39,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-<script>
+    <script>
         $(document).ready(function () {
             var site = gSite;
 
@@ -273,5 +271,5 @@
                 })
             })
         });
-</script>
+    </script>
 }
