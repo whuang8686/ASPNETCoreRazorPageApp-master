@@ -39,7 +39,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-    <script>
+<script>
         $(document).ready(function () {
             var site = gSite;
 
@@ -69,7 +69,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMTransactionStatus&args=%5B%22" + $('#txday').val() + "%22%2C%22" + $('#bankid').val() + "%22%5D",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCptyISDAStatus&args=%5B%22" + $('#bankid').val() + "%22%5D",
                     dataType: "html",
                     success: function (data) {
                         console.log(data);
@@ -83,33 +83,27 @@
                         $("#dvPostResult").html("Transactions loaded successfully.");
                         for (i = 0; i < json.length; i++) {
 
-                            for (j = 0; j < json[i].Transactions.length; j++) {
 
-                                var MTM,BankID;
-
-                                if (json[i].Transactions[j].OwnCptyID == $('#bankid').val())  {
-                                    BankID = json[i].Transactions[j].OwnCptyID
-                                    MTM = json[i].Transactions[j].MTM
-                                } else if ($('#bankid').val() == "All") {
-                                    BankID = json[i].Transactions[j].OwnCptyID
-                                    MTM = json[i].Transactions[j].MTM
-                                } else if (json[i].Transactions[j].CptyID == $('#bankid').val()) {
-                                    BankID = json[i].Transactions[j].CptyID
-                                    MTM = json[i].Transactions[j].MTM * (-1)
+                               datas[i] = {
+                                    "CptyISDAID": json[i].Record.CptyISDAID,
+                                    "OwnCptyID": json[i].Record.OwnCptyID,
+                                    "CptyID": json[i].Record.CptyID,
+                                    "CptyIndependAmt": json[i].Record.CptyIndependAmt,
+                                    "OwnIndependAmt": json[i].Record.OwnIndependAmt,
+                                    "CptyThreshold": json[i].Record.CptyThreshold,
+                                    "OwnThreshold": json[i].Record.OwnThreshold,
+                                    "CptyMTA": json[i].Record.CptyMTA,
+                                    "OwnMTA": json[i].Record.OwnMTA,
+                                    "Rounding": json[i].Record.Rounding,
+                                    "StartDate": json[i].Record.StartDate,
+                                    "EndDate": json[i].Record.EndDate,
+                                    "USDCashPCT": json[i].Record.USDCashPCT,
+                                    "TWDCashPCT": json[i].Record.TWDCashPCT,
+                                    "USDBondPCT": json[i].Record.USDBondPCT,
+                                    "TWDBondPCT": json[i].Record.TWDBondPCT,
+                                    "createTime": json[i].Record.CreateTime,
+                                    "updateTime": json[i].Record.UpdateTime
                                 }
-                                datas[j] = {
-                                    "TXID": json[i].Transactions[j].TXID,
-                                    "FXTXID": json[i].Transactions[j].FXTXID,
-                                    "TXKinds": json[i].Transactions[j].TXKinds,
-                                    "CptyID": BankID,
-                                    "NetPrice": json[i].Transactions[j].NetPrice,
-                                    "ClosePrice": json[i].Transactions[j].ClosePrice,
-                                    "MTM": MTM,
-                                    "createTime": json[i].Transactions[j].CreateTime,
-                                    "updateTime": json[i].Transactions[j].UpdateTime
-                                }
-
-                            }
 
                         }
                         $('#reportTable').html("");
@@ -131,13 +125,22 @@
                             clickToSelect: true,
                             columns:
                                 [
-                                    { field: "TXID", title: "交易序號<br/>", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "FXTXID", title: "交易單號<br/>", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "TXKinds", title: "交易種類 <br/>", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "CptyID", title: "Cpty<br/>", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "NetPrice", title: "成交價<br/>", align: "right", valign: "middle", sortable: "true" },
-                                    { field: "ClosePrice", title: "收盤價", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "MTM", title: "MTM", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "CptyISDAID", title: "交易序號<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "OwnCptyID", title: "CptyID<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "CptyID", title: "交易對手 <br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "CptyIndependAmt", title: "交易對手<br/>獨提列金額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "OwnIndependAmt", title: "本行<br/>獨提列金額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "CptyThreshold", title: "交易對手<br/>門檻金額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "OwnThreshold", title: "本行<br/>門鑑金額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "CptyMTA", title: "交易對手<br/>最低轉讓金額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "OwnMTA", title: "本行<br/>最低轉讓金額", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "Rounding", title: "整數計算", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "StartDate", title: "合約起日", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "EndDate", title: "合約迄日", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "USDCashPCT", title: "美元現金<br/>折現率", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "TWDCashPCT", title: "台幣現金<br/>折現率", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "USDBondPCT", title: "美元債券<br/>折現率", align: "right", valign: "middle", sortable: "true" },
+                                    { field: "TWDBondPCT", title: "台幣債券<br/>折現率", align: "right", valign: "middle", sortable: "true" },
                                     { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
                                     { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
 
@@ -271,5 +274,5 @@
                 })
             })
         });
-    </script>
+</script>
 }
