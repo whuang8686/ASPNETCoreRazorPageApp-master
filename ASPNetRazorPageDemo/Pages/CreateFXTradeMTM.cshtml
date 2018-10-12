@@ -28,7 +28,7 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
+<script>
         $(document).ready(function () {
             var site = gSite;
 
@@ -59,23 +59,26 @@
             //$('#txday').val(today);
 
             $("#create").click(function () {
-                //peer chaincode invoke -n mycc -c '{"Args":["FXTradeMTM", "20181201"]}' -C myc
-
-                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeMTM","args": ["' + $("#txday").val() + '"]}'
-                //alert(data);
                 // 使用 ajax() 來呼叫 REST API
                 $.ajax({
-                    url: site + "/channels/mychannel/chaincodes/mycc",
-                    type: "POST",
-                    data: data,
-                    contentType: "application/json; charset=utf-8",
-                    complete: function (data, textStatus, jqXHR) {
-                        console.log(textStatus);
-                    },
-                    success: function (data, textStatus, jqXHR) {
-                        console.log(data);
-                        $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=QueryFXTradeMTM&args=%5B%22" + $("#txday").val() + "%22%5D",
+                    dataType: "html",
+                    success: function (data) {
+                         console.log(data);
+                         var data1 = data.replace(' now has', '');
+                         var data2 = data1.replace(' after the move', '');
+                         var json = JSON.parse(data2);
+                         console.log(json);
+                         var datas = [];
 
+                        $("#dvPostResult").html("Transactions loaded successfully.");
+                        for (i = 0; i < json.length; i++) {
+
+                               datas[i] = {
+                                    "TXID": json[i].Key
+                                }
+                        }
                         swal({
                             title: "交易成功!",
                             text: "",
@@ -94,5 +97,5 @@
                 });
             })
         });
-    </script>
+</script>
 }
