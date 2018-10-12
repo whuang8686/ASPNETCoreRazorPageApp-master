@@ -1,0 +1,298 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.QuerySpotRateModel
+@{
+    ViewData["Title"] = "SpotRate查詢";
+}
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+<div id="divUpdateFXTrade">
+    <div class="form-group">
+        <label for="txday">報價日期：</label>
+        <input type="text" id="txday" size="16" placeholder="YYYYMMDD"/>
+        <button id="search">交易查詢</button>
+        <br />
+    </div>
+    <br />
+    <div id="result" class="form-group">
+        <div class="table-responsive">
+            <table id="tb1" class="table table-striped table-bordered table-hover" border="1">
+                <thead>
+                    <tr>
+                        <td>AUD/HKD</td>
+                        <td><input type="text" id="AUDHKD" disabled /></td>
+                        <td>AUD/TWD</td>
+                        <td><input type="text" id="AUDTWD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>AUD/USD</td>
+                        <td><input type="text" id="AUDUSD" disabled /></td>
+                        <td>CAD/HKD</td>
+                        <td><input type="text" id="CADHKD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>CAD/TWD</td>
+                        <td><input type="text" id="CADTWD" disabled /></td>
+                        <td>CHF/HKD</td>
+                        <td><input type="text" id="CHFHKD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>CHF/TWD</td>
+                        <td><input type="text" id="CHFTWD" disabled /></td>
+                        <td>CNY/HKD</td>
+                        <td><input type="text" id="CNYHKD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>CNY/TWD</td>
+                        <td><input type="text" id="CNYTWD" disabled /></td>
+                        <td>EUR/AUD</td>
+                        <td><input type="text" id="EURAUD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>EUR/CNY</td>
+                        <td><input type="text" id="EURCNY" disabled /></td>
+                        <td>EUR/GBP</td>
+                        <td><input type="text" id="EURGBP" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>EUR/HKD</td>
+                        <td><input type="text" id="EURHKD" disabled /></td>
+                        <td>EUR/JPY</td>
+                        <td><input type="text" id="EURJPY" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>EUR/TWD</td>
+                        <td><input type="text" id="EURTWD" disabled /></td>
+                        <td>EUR/USD</td>
+                        <td><input type="text" id="EURUSD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>EUR/ZAR</td>
+                        <td><input type="text" id="EURZAR" disabled /></td>
+                        <td>GBP/HKD</td>
+                        <td><input type="text" id="GBPHKD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>GBP/JPY</td>
+                        <td><input type="text" id="GBPJPY" disabled /></td>
+                        <td>GBP/TWD</td>
+                        <td><input type="text" id="GBPTWD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>GBP/USD</td>
+                        <td><input type="text" id="GBPUSD" disabled /></td>
+                        <td>HKD/JPY</td>
+                        <td><input type="text" id="HKDJPY" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>HKD/TWD</td>
+                        <td><input type="text" id="HKDTWD" disabled /></td>
+                        <td>JPY/TWD</td>
+                        <td><input type="text" id="JPYTWD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>MYR/HKD</td>
+                        <td><input type="text" id="MYRHKD" disabled /></td>
+                        <td>MYR/TWD</td>
+                        <td><input type="text" id="MYRTWD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>NZD/HKD</td>
+                        <td><input type="text" id="NZDHKD" disabled /></td>
+                        <td>NZD/TWD</td>
+                        <td><input type="text" id="NZDTWD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>NZD/USD</td>
+                        <td><input type="text" id="NZDUSD" disabled /></td>
+                        <td>PHP/TWD</td>
+                        <td><input type="text" id="PHPTWD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>SEK/TWD</td>
+                        <td><input type="text" id="SEKTWD" disabled /></td>
+                        <td>SGD/HKD</td>
+                        <td><input type="text" id="SGDHKD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>SGD/TWD</td>
+                        <td><input type="text" id="SGDTWD" disabled /></td>
+                        <td>THB/HKD</td>
+                        <td><input type="text" id="THBHKD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>USD/BRL</td>
+                        <td><input type="text" id="USDBRL" disabled /></td>
+                        <td>USD/CAD</td>
+                        <td><input type="text" id="USDCAD" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>USD/CHF</td>
+                        <td><input type="text" id="USDCHF" disabled /></td>
+                        <td>USD/CNY</td>
+                        <td><input type="text" id="USDCNY" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>USD/HKD</td>
+                        <td><input type="text" id="USDHKD" disabled /></td>
+                        <td>USD/INR</td>
+                        <td><input type="text" id="USDINR" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>USD/JPY</td>
+                        <td><input type="text" id="USDJPY" disabled /></td>
+                        <td>USD/KRW</td>
+                        <td><input type="text" id="USDKRW" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>USD/MOP</td>
+                        <td><input type="text" id="USDMOP" disabled /></td>
+                        <td>USD/MYR</td>
+                        <td><input type="text" id="USDMYR" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>USD/PHP</td>
+                        <td><input type="text" id="USDPHP" disabled /></td>
+                        <td>USD/SEK</td>
+                        <td><input type="text" id="USDSEK" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>USD/SGD</td>
+                        <td><input type="text" id="USDSGD" disabled /></td>
+                        <td>USD/THB</td>
+                        <td><input type="text" id="USDTHB" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>USD/TWD</td>
+                        <td><input type="text" id="USDTWD" disabled /></td>
+                        <td>USD/ZAR</td>
+                        <td><input type="text" id="USDZAR" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>ZAR/HKD</td>
+                        <td><input type="text" id="ZARHKD" disabled /></td>
+                        <td>ZAR/TWD</td>
+                        <td><input type="text" id="ZARTWD" disabled /></td>
+                    </tr>
+                </thead>
+                <tbody id="bonds" class="table table-striped"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+
+<div id="dvPostResult" style="font-size:16pt">
+</div>
+<h5>@Model.Message</h5>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript" language="JavaScript">
+    $(document).ready(function () {
+            var site = gSite;
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+
+
+     $("#search").click(function () {
+                //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMPrice&args=%5B%22" + $("#txday").val() + "%22%5D")
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMPrice&args=%5B%22" + $("#txday").val() + "%22%5D",
+                    dataType: "html",
+                    success: function (data) {
+                        console.log(data)
+                        var data1 = data.replace(' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+                        //$('#bank').html("")
+                        var json = JSON.parse(data2);
+                        console.log(json);
+                        $("#dvPostResult").html(json.docType + " loaded successfully.");
+
+                        $("#AUDHKD").val(json.AUDHKD);
+                        $("#AUDTWD").val(json.AUDTWD);
+                        $("#AUDUSD").val(json.AUDUSD);
+                        $("#CADHKD").val(json.CADHKD);
+                        $("#CADTWD").val(json.CADTWD);
+                        $("#CHFHKD").val(json.CHFHKD);
+                        $("#CHFTWD").val(json.CHFTWD);
+                        $("#CNYHKD").val(json.CNYHKD);
+                        $("#CNYTWD").val(json.CNYTWD);
+                        $("#EURAUD").val(json.EURAUD);
+                        $("#EURCNY").val(json.EURCNY);
+                        $("#EURGBP").val(json.EURGBP);
+                        $("#EURHKD").val(json.EURHKD);
+                        $("#EURJPY").val(json.EURJPY);
+                        $("#EURTWD").val(json.EURTWD);
+                        $("#EURUSD").val(json.EURUSD);
+                        $("#EURZAR").val(json.EURZAR);
+                        $("#GBPHKD").val(json.GBPHKD);
+                        $("#GBPJPY").val(json.GBPJPY);
+                        $("#GBPTWD").val(json.GBPTWD);
+                        $("#GBPUSD").val(json.GBPUSD);
+                        $("#HKDJPY").val(json.HKDJPY);
+                        $("#HKDTWD").val(json.HKDTWD);
+                        $("#JPYTWD").val(json.JPYTWD);
+                        $("#MYRHKD").val(json.MYRHKD);
+                        $("#MYRTWD").val(json.MYRTWD);
+                        $("#NZDHKD").val(json.NZDHKD);
+                        $("#NZDTWD").val(json.NZDTWD);
+                        $("#NZDUSD").val(json.NZDUSD);
+                        $("#PHPTWD").val(json.PHPTWD);
+                        $("#SEKTWD").val(json.SEKTWD);
+                        $("#SGDHKD").val(json.SGDHKD);
+                        $("#SGDTWD").val(json.SGDTWD);
+                        $("#THBHKD").val(json.THBHKD);
+                        $("#USDBRL").val(json.USDBRL);
+                        $("#USDCAD").val(json.USDCAD);
+                        $("#USDCHF").val(json.USDCHF);
+                        $("#USDCNY").val(json.USDCNY);
+                        $("#USDHKD").val(json.USDHKD);
+                        $("#USDINR").val(json.USDINR);
+                        $("#USDJPY").val(json.USDJPY);
+                        $("#USDKRW").val(json.USDKRW);
+                        $("#USDMOP").val(json.USDMOP);
+                        $("#USDMYR").val(json.USDMYR);
+                        $("#USDPHP").val(json.USDPHP);
+                        $("#USDSEK").val(json.USDSEK);
+                        $("#USDSGD").val(json.USDSGD);
+                        $("#USDTHB").val(json.USDTHB);
+                        $("#USDTWD").val(json.USDTWD);
+                        $("#USDZAR").val(json.USDZAR);
+                        $("#ZARHKD").val(json.ZARHKD);
+                        $("#ZARTWD").val(json.ZARTWD);
+                        },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+            })
+        });
+</script>
+}

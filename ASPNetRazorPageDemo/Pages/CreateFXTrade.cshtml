@@ -3,12 +3,14 @@
 @{
     ViewData["Title"] = "新增FX交易";
     var list = ViewData["dp"] as List<SelectListItem>;
+    ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
 }
 <div id="divEnroll">
     <input type="hidden" id="token" value="">
 </div>
 <div id="divCreateFXTrade">
     <div class="form-group">
+        <input type="text" id="txday" size="10" value='@ViewData["TODAY"]' placeholder="交易日" hidden>
         <label for="OwnCpty" class="col-sm-2">Cpty：</label>
         <select id="OwnCpty">
             <option value="0001">CptyA</option>
@@ -202,7 +204,187 @@
                      var chosenoption=this.options[this.selectedIndex].value;
                      document.getElementById("BuyCurr").value = chosenoption.substring(0,3);
                      document.getElementById("SellCurr").value = chosenoption.substring(4,7);
-                     //NetPrice  ******預設抓報價 
+                     //NetPrice  預設抓報價 
+                     $.ajax({
+                               type: "GET",
+                               url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMPrice&args=%5B%22" + $("#txday").val() + "%22%5D",
+                               dataType: "html",
+                               success: function (data) {
+                                    console.log(data)
+                                    var data1 = data.replace(' now has', '');
+                                    var data2 = data1.replace(' after the move', '');
+                                    var json = JSON.parse(data2);
+                                    console.log(json);
+                                    //$("#dvPostResult").html(json.docType + " loaded successfully.");
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "AUDHKD")  {
+                                         $("#NetPrice").val(json.AUDHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "AUDTWD")  {
+                                         $("#NetPrice").val(json.AUDTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "AUDUSD")  {
+                                         $("#NetPrice").val(json.AUDUSD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "CADHKD")  {
+                                         $("#NetPrice").val(json.CADHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "CADTWD")  {
+                                         $("#NetPrice").val(json.CADTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "CHFHKD")  {
+                                         $("#NetPrice").val(json.CHFHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "CHFTWD")  {
+                                         $("#NetPrice").val(json.CHFTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "CNYHKD")  {
+                                         $("#NetPrice").val(json.CNYHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "CNYTWD")  {
+                                         $("#NetPrice").val(json.CNYTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "EURAUD")  {
+                                         $("#NetPrice").val(json.EURAUD);
+                                    } 
+                                    //
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "EURCNY")  {
+                                         $("#NetPrice").val(json.EURCNY);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "EURGBP")  {
+                                         $("#NetPrice").val(json.EURGBP);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "EURHKD")  {
+                                         $("#NetPrice").val(json.EURHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "EURJPY")  {
+                                         $("#NetPrice").val(json.EURJPY);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "EURTWD")  {
+                                         $("#NetPrice").val(json.EURTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "EURUSD")  {
+                                         $("#NetPrice").val(json.EURUSD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "EURZAR")  {
+                                         $("#NetPrice").val(json.EURZAR);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "GBPHKD")  {
+                                         $("#NetPrice").val(json.GBPHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "GBPJPY")  {
+                                         $("#NetPrice").val(json.GBPJPY);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "GBPTWD")  {
+                                         $("#NetPrice").val(json.GBPTWD);
+                                    } 
+                                    //
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "GBPUSD")  {
+                                         $("#NetPrice").val(json.GBPUSD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "HKDJPY")  {
+                                         $("#NetPrice").val(json.HKDJPY);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "HKDTWD")  {
+                                         $("#NetPrice").val(json.HKDTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "JPYTWD")  {
+                                         $("#NetPrice").val(json.JPYTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "MYRHKD")  {
+                                         $("#NetPrice").val(json.MYRHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "MYRTWD")  {
+                                         $("#NetPrice").val(json.MYRTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "NZDHKD")  {
+                                         $("#NetPrice").val(json.NZDHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "NZDTWD")  {
+                                         $("#NetPrice").val(json.NZDTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "NZDUSD")  {
+                                         $("#NetPrice").val(json.NZDUSD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "PHPTWD")  {
+                                         $("#NetPrice").val(json.PHPTWD);
+                                    } 
+                                    //
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "SEKTWD")  {
+                                         $("#NetPrice").val(json.SEKTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "SGDHKD")  {
+                                         $("#NetPrice").val(json.SGDHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "SGDTWD")  {
+                                         $("#NetPrice").val(json.SGDTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "THBHKD")  {
+                                         $("#NetPrice").val(json.THBHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDBRL")  {
+                                         $("#NetPrice").val(json.USDBRL);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDCAD")  {
+                                         $("#NetPrice").val(json.USDCAD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDCHF")  {
+                                         $("#NetPrice").val(json.USDCHF);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDCNY")  {
+                                         $("#NetPrice").val(json.USDCNY);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDHKD")  {
+                                         $("#NetPrice").val(json.USDHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDINR")  {
+                                         $("#NetPrice").val(json.USDINR);
+                                    } 
+                                    //
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDJPY")  {
+                                         $("#NetPrice").val(json.USDJPY);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDKRW")  {
+                                         $("#NetPrice").val(json.USDKRW);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDMOP")  {
+                                         $("#NetPrice").val(json.USDMOP);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDMYR")  {
+                                         $("#NetPrice").val(json.USDMYR);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDPHP")  {
+                                         $("#NetPrice").val(json.USDPHP);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDSEK")  {
+                                         $("#NetPrice").val(json.USDSEK);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDSGD")  {
+                                         $("#NetPrice").val(json.USDSGD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDTHB")  {
+                                         $("#NetPrice").val(json.USDTHB);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDTWD")  {
+                                         $("#NetPrice").val(json.USDTWD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDZAR")  {
+                                         $("#NetPrice").val(json.USDZAR);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "ZARHKD")  {
+                                         $("#NetPrice").val(json.ZARHKD);
+                                    } 
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "ZARTWD")  {
+                                         $("#NetPrice").val(json.ZARTWD);
+                                    } 
+                               },
+                               error: function (jqXHR) {
+                                    alert("發生錯誤: " + jqXHR.status);
+                                    console.log(jqXHR);
+                                },
+                              //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                              beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+  
+                     })
                 }
 
                 $("#BuyCurrAmt").change(function ()
