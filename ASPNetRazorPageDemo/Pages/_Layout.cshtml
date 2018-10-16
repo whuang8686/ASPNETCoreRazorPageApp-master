@@ -297,8 +297,9 @@
                         <li>
                             <a href="#"><i class="fa fa-table fa-fw"></i> MTM市值功能<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
-                                <li><a asp-page="/CreateFXTradeMTM">MTM市價計算</a></li>
-                                <li><a asp-page="/QueryFXTradeMTM">MTM市價查詢</a></li>
+                                <li><a asp-page="/CreateFXTradeMTM">交易MTM市值計算</a></li>
+                                <li><a asp-page="/QueryFXTradeMTM">交易MTM市值查詢</a></li>
+
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
@@ -322,7 +323,8 @@
                         <li>
                             <a href="#"><i class="fa fa-wrench fa-fw"></i> Cpty資產功能<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
-                                <li><a asp-page="/QueryCptyAsset">查詢Cpty資產功能</a></li>
+                                <li><a asp-page="/QueryCptyAsset">查詢Cpty資產</a></li>
+                                <li><a asp-page="/UpdateCptyAsset">修改Cpty資產</a></li>
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
@@ -330,7 +332,7 @@
                         <li>
                             <a href="#"><i class="fa fa-sitemap fa-fw"></i> 擔保品功能<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
-                                <li><a asp-page="/CreateCollateral">擔保品計算</a></li>
+                                <li><a asp-page="/CreateCollateral">計算MarginCall</a></li>
                                 <li><a asp-page="/PaymentCollateral">擔保品支付</a></li>
                                 <li><a asp-page="/QueryCollateral">擔保品查詢</a></li>
                             </ul>

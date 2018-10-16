@@ -2,6 +2,7 @@
 @model ASPNetRazorPageDemo.Pages.QuerySpotRateModel
 @{
     ViewData["Title"] = "SpotRate查詢";
+    ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
 }
 <div id="divEnroll">
     <input type="hidden" id="token" value="">
@@ -9,7 +10,7 @@
 <div id="divUpdateFXTrade">
     <div class="form-group">
         <label for="txday">報價日期：</label>
-        <input type="text" id="txday" size="16" placeholder="YYYYMMDD"/>
+        <input type="text" id="txday" size="16" value='@ViewData["TODAY"]' placeholder="YYYYMMDD" />
         <button id="search">交易查詢</button>
         <br />
     </div>
@@ -190,7 +191,7 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<script type="text/javascript" language="JavaScript">
+    <script type="text/javascript" language="JavaScript">
     $(document).ready(function () {
             var site = gSite;
 
@@ -294,5 +295,5 @@
                 })
             })
         });
-</script>
+    </script>
 }

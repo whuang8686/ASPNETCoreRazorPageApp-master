@@ -3,9 +3,9 @@
 //var gSite = "http://192.168.0.111" + ":4000"
 //var gSite = "http://172.20.10.5" + ":4000"
 //var gSite = "http://192.168.0.104" + ":4000"
-var gSite = "http://192.168.50.9" + ":4000"
+var gSite = "http://10.232.239.203" + ":4000"
 
-var waiting4payment = '<span class="label label-primary">Waiting4Payment</span>'
+var finished = '<span class="label label-primary">Finished</span>'
 var matched = '<span class="label label-success">Matched</span>'
 var pending = '<span class="label label-info">Pending</span>'
 var paymenterror = '<span class="label label-warning">PaymentError</span>'
@@ -27,13 +27,9 @@ function formatTXStatus(status) {
         if (status=="Cancelled") {
             status_label=cancelled
         }
-        if (status=="Waiting4Payment") {
-            status_label=waiting4payment
+        if (status=="Finished") {
+            status_label=finished
         }
-        if (status=="PaymentError") {
-            status_label=paymenterror
-        }
-
 
          return status_label;
 }

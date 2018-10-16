@@ -1,0 +1,54 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.CreateMTMModel
+@{
+    ViewData["Title"] = "MTM市價取得";
+    ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
+}
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+<div id="divReadBankTX">
+    <div class="form-group">
+        <label for="txday">交易日期：</label>
+        <input type="text" id="txday" size="10" value='@ViewData["TODAY"]' placeholder="交易日">
+        <button id="create">計算MTM</button>
+    </div>
+    <br />
+    <br />
+    <div id="reportTableDiv">
+        <table id="reportTable"></table>
+    </div>
+</div>
+<br />
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+<div id="dvPostResult" style="font-size:16pt"></div>
+<h5>@Model.Message</h5>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+        $(document).ready(function () {
+            var site = gWebSite;
+
+            $("#create").click(function () {
+                alert (site +"/?curr1=USD&curr2=TWD")
+                // 使用 ajax() 來呼叫 REST API
+                $.ajax({
+
+                     url: site + "?curr1=USD&curr2=TWD" ,
+                     type: 'POST',
+                     dataType: 'html',
+                     success: function (response) {
+                         console.log(data);
+                     },
+                     error: function (response) {
+                         console.log('Error in Operation');
+                     }
+                });
+
+            })
+        });
+</script>
+}
