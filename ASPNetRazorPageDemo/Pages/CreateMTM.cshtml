@@ -1,7 +1,7 @@
 ﻿@page
 @model ASPNetRazorPageDemo.Pages.CreateMTMModel
 @{
-    ViewData["Title"] = "MTM市價取得";
+    ViewData["Title"] = "報價資料匯入";
     ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
 }
 <div id="divEnroll">
@@ -30,21 +30,36 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script>
         $(document).ready(function () {
-            var site = gWebSite;
+            var site = gSite;
 
             $("#create").click(function () {
-                alert (site +"/?curr1=USD&curr2=TWD")
                 // 使用 ajax() 來呼叫 REST API
+                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createMTMPrice","args": ["' + gWebSite + '","' + $("#txday").val() + '"]}'
+                alert(data)
                 $.ajax({
-
-                     url: site + "?curr1=USD&curr2=TWD" ,
-                     type: 'POST',
-                     dataType: 'html',
-                     success: function (response) {
+                    url: site + "/channels/mychannel/chaincodes/mycc",
+                    type: "POST",
+                    data: data,
+                    contentType: "application/json; charset=utf-8",
+                    complete: function (data, textStatus, jqXHR) {
+                        console.log(textStatus);
+                    },
+                    success: function (data, textStatus, jqXHR) {
                          console.log(data);
+
+                         swal({
+                                title: "交易成功!",
+                                text: "",
+                                icon: "success",
+                                button: "確定",
+                            });
                      },
-                     error: function (response) {
+                     error: function (jqXHR) {
                          console.log('Error in Operation');
+                     },
+                     //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                     beforeSend: function (xhr, settings) {
+                          xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
                      }
                 });
 
