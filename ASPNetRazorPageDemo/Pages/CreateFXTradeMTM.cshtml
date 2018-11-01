@@ -29,6 +29,14 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script>
+        function sleep(milliseconds) {
+            var start = new Date().getTime();
+            for (var i = 0; i < 1e7; i++) {
+               if ((new Date().getTime() - start) > milliseconds){
+                    break;
+                }
+            }
+        }
         $(document).ready(function () {
             var site = gSite;
             var datas = [];
@@ -73,16 +81,15 @@
 
                         $("#dvPostResult").html("1.Delete Transactions loaded successfully.");
 
-                        data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "changeBankSecurityTotals","args": ["A07106","005","20190701"]}'
                         // 使用 ajax() 來呼叫 REST API Step2：取得要計算MTM交易單號
                         $.ajax({
                                 type: "GET",
                                 url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=QueryFXTradeMTM&args=%5B%22" + $("#txday").val() + "%22%5D",
                                 dataType: "html",
-                                success: function (data) {
-                                    console.log(data);
-                                    var data1 = data.replace(' now has', '');
-                                    var data2 = data1.replace(' after the move', '');
+                                success: function (data2) {
+                                    console.log(data2);
+                                    var data1 = data2.replace(' now has', '');
+                                    var data2 = data2.replace(' after the move', '');
                                     var json = JSON.parse(data2);
                                     console.log(json);
 
@@ -93,15 +100,21 @@
                                         //    "TXID": json[i].Key
                                         //}
                                         // 使用 ajax() 來呼叫 REST API Step3： 新增交易MTM
+
+                                        dataMTM = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeMTM","args": ["' + json[i].Key + '","' + $("#txday").val() + '"]}'
+                                        //alert(dataMTM);
+                                        // 使用 ajax() 來呼叫 REST API
+                                        sleep(10000)  // 3 sec
                                         $.ajax({
+                                                url: site + "/channels/mychannel/chaincodes/mycc",
                                                 type: "POST",
-                                                url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=FXTradeMTM&args=%5B%22" + json[i].Key + "%22%2C%22MTM" + $('#txday').val() + "%22%5D",
+                                                data: dataMTM,
                                                 contentType: "application/json; charset=utf-8",
-                                                complete: function (data, textStatus, jqXHR) {
-                                                        console.log(textStatus);
+                                                complete: function (data3, textStatus, jqXHR) {
+                                                      console.log(textStatus);
                                                 },
-                                                success: function (data, textStatus, jqXHR) {
-                                                     console.log(data);
+                                                success: function (data3, textStatus, jqXHR) {
+                                                     console.log(data3);
 
                                                      $("#dvPostResult").html("3.Insert Transactions loaded successfully.");
 
@@ -140,11 +153,6 @@
                         xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
                     }
                 });
-
-                //for (i = 0; i < datas.length ; i++) {
-               //     alert (datas[i].TXID)
-                //}
-
 
 
             })

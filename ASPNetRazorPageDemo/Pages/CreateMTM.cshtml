@@ -37,9 +37,8 @@
                 data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createMTMPrice","args": ["' + gWebSite + '","' + $("#txday").val() + '"]}'
                 alert(data)
                 $.ajax({
-                    url: site + "/channels/mychannel/chaincodes/mycc",
                     type: "POST",
-                    data: data,
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=createMTMPrice&args=%5B%22" + gWebSite + "%22%2C%22" + $("#txday").val() + "%22%5D",
                     contentType: "application/json; charset=utf-8",
                     complete: function (data, textStatus, jqXHR) {
                         console.log(textStatus);

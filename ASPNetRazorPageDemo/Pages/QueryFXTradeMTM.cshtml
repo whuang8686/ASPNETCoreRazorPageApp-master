@@ -71,7 +71,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMTransactionStatus&args=%5B%22" + $('#txday').val() + "%22%2C%22" + $('#bankid').val() + "%22%5D",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMTransactionStatus&args=%5B%22MTM" + $('#txday').val() + "%22%2C%22" + $('#bankid').val() + "%22%5D",
                     dataType: "html",
                     success: function (data) {
                         console.log(data);
@@ -87,28 +87,15 @@
 
                             for (j = 0; j < json[i].Transactions.length; j++) {
 
-                                var MTM,BankID;
-
-                                if (json[i].Transactions[j].OwnCptyID == $('#bankid').val())  {
-                                    BankID = json[i].Transactions[j].OwnCptyID
-                                    MTM = json[i].Transactions[j].MTM
-                                } else if ($('#bankid').val() == "All") {
-                                    BankID = json[i].Transactions[j].OwnCptyID
-                                    MTM = json[i].Transactions[j].MTM
-                                } else if (json[i].Transactions[j].CptyID == $('#bankid').val()) {
-                                    BankID = json[i].Transactions[j].CptyID
-                                    MTM = json[i].Transactions[j].MTM * (-1)
-                                }
                                 datas[j] = {
                                     "TXID": json[i].Transactions[j].TXID,
                                     "FXTXID": json[i].Transactions[j].FXTXID,
                                     "TXKinds": json[i].Transactions[j].TXKinds,
-                                    "CptyID": BankID,
+                                    "CptyID": json[i].Transactions[j].OwnCptyID,
                                     "NetPrice": json[i].Transactions[j].NetPrice,
                                     "ClosePrice": json[i].Transactions[j].ClosePrice,
-                                    "MTM": MTM,
+                                    "MTM": json[i].Transactions[j].MTM,
                                     "createTime": json[i].Transactions[j].CreateTime,
-                                    "updateTime": json[i].Transactions[j].UpdateTime
                                 }
 
                             }
@@ -141,7 +128,6 @@
                                     { field: "ClosePrice", title: "收盤價", align: "left", valign: "middle", sortable: "true" },
                                     { field: "MTM", title: "MTM", align: "left", valign: "middle", sortable: "true" },
                                     { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
 
                                 ],
                             data: datas,

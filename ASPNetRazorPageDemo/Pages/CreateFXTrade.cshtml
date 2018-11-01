@@ -210,6 +210,7 @@
                      //NetPrice  預設抓報價 
                      $.ajax({
                                type: "GET",
+                                 
                                url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMPrice&args=%5B%22" + $("#txday").val() + "%22%5D",
                                dataType: "html",
                                success: function (data) {
@@ -333,8 +334,8 @@
                                     if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDCHF")  {
                                          $("#NetPrice").val(json.USDCHF);
                                     } 
-                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDCNY")  {
-                                         $("#NetPrice").val(json.USDCNY);
+                                    if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDCNH")  {
+                                         $("#NetPrice").val(json.USDCNH);
                                     } 
                                     if   (chosenoption.substring(0,3) + chosenoption.substring(4,7)  == "USDHKD")  {
                                          $("#NetPrice").val(json.USDHKD);
