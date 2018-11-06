@@ -29,14 +29,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script>
-        function sleep(milliseconds) {
-            var start = new Date().getTime();
-            for (var i = 0; i < 1e7; i++) {
-               if ((new Date().getTime() - start) > milliseconds){
-                    break;
-                }
-            }
-        }
+
         $(document).ready(function () {
             var site = gSite;
             var datas = [];
@@ -104,7 +97,7 @@
                                         dataMTM = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeMTM","args": ["' + json[i].Key + '","' + $("#txday").val() + '"]}'
                                         //alert(dataMTM);
                                         // 使用 ajax() 來呼叫 REST API
-                                        sleep(10000)  // 3 sec
+
                                         $.ajax({
                                                 url: site + "/channels/mychannel/chaincodes/mycc",
                                                 type: "POST",
@@ -112,10 +105,12 @@
                                                 contentType: "application/json; charset=utf-8",
                                                 complete: function (data3, textStatus, jqXHR) {
                                                       console.log(textStatus);
+
                                                 },
                                                 success: function (data3, textStatus, jqXHR) {
                                                      console.log(data3);
 
+                                                     setTimeout(function() {}, 20000);
                                                      $("#dvPostResult").html("3.Insert Transactions loaded successfully.");
 
 
