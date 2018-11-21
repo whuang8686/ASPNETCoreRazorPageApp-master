@@ -41,7 +41,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-    <script>
+<script>
         $(document).ready(function () {
             var site = gSite;
 
@@ -91,7 +91,8 @@
                                     "TXID": json[i].Transactions[j].TXID,
                                     "FXTXID": json[i].Transactions[j].FXTXID,
                                     "TXKinds": json[i].Transactions[j].TXKinds,
-                                    "CptyID": json[i].Transactions[j].OwnCptyID,
+                                    "OwnCptyID": json[i].Transactions[j].OwnCptyID,
+                                    "CptyID": json[i].Transactions[j].CptyID,
                                     "NetPrice": json[i].Transactions[j].NetPrice,
                                     "ClosePrice": json[i].Transactions[j].ClosePrice,
                                     "MTM": json[i].Transactions[j].MTM,
@@ -123,7 +124,8 @@
                                     { field: "TXID", title: "交易序號<br/>", align: "left", valign: "middle", sortable: "true" },
                                     { field: "FXTXID", title: "交易單號<br/>", align: "left", valign: "middle", sortable: "true" },
                                     { field: "TXKinds", title: "交易種類 <br/>", align: "left", valign: "middle", sortable: "true" },
-                                    { field: "CptyID", title: "Cpty<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "OwnCptyID", title: "Cpty<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "CptyID", title: "交易對手<br/>", align: "left", valign: "middle", sortable: "true" },
                                     { field: "NetPrice", title: "成交價<br/>", align: "right", valign: "middle", sortable: "true" },
                                     { field: "ClosePrice", title: "收盤價", align: "left", valign: "middle", sortable: "true" },
                                     { field: "MTM", title: "MTM", align: "left", valign: "middle", sortable: "true" },
@@ -259,5 +261,5 @@
                 })
             })
         });
-    </script>
+</script>
 }
