@@ -1,0 +1,394 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.PaymentCollateralModel
+@{
+    ViewData["Title"] = "擔保品支付";
+}
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+<div id="divUpdateFXTrade">
+    <div class="form-group">
+        <label for="txid">交易序號：</label>
+        <input type="text" id="txid" value="" size="47" placeholder="交易序號0001000220181124020917">
+        <button id="search">資料查詢</button>
+        <br />
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="OwnCpty" class="col-sm-2">Cpty：</label>
+        <select id="OwnCpty" class="col-sm-2">
+            <option value="0001">CptyA</option>
+            <option value="0002">CptyB</option>
+            <option value="0003">CptyC</option>
+            <option value="0004">CptyD</option>
+            <option value="0005">CptyE</option>
+        </select>
+        <label for="Cpty" class="col-sm-2">交易對手：</label>
+        <select id="Cpty" class="col-sm-2">
+            <option value="0001">CptyA</option>
+            <option value="0002">CptyB</option>
+            <option value="0003">CptyC</option>
+            <option value="0004">CptyD</option>
+            <option value="0005">CptyE</option>
+        </select>
+        <br />
+    </div>
+    <div class="form-group">
+        <label for="MarginCall" class="col-sm-2">應付MarginCall：</label>
+        <input class="col-sm-2" type="text" id="MarginCall" value="" size="10" placeholder="MarginCall">
+        <label for="UnderMarginCall" class="col-sm-2">尚欠MarginCall：</label>
+        <br />
+    </div>
+    <!-- Editable table -->
+    <div class="card">
+        <h3 class="card-header text-center font-weight-bold text-uppercase py-4">支付擔保品table</h3>
+        <div class="card-body">
+            <div id="table" class="table-editable">
+                <span class="table-add float-right mb-3 mr-2">
+                    <a href="#!" class="text-success">
+                        <i class="fa fa-plus fa-2x"
+                           aria-hidden="true"></i>
+                    </a>
+                </span>
+                <table class="table table-bordered table-responsive-md table-striped text-center">
+                    <tr>
+                        <th class="text-center">幣別</th>
+                        <th class="text-center">擔保品種類</th>
+                        <th class="text-center">擔保品類別</th>
+                        <th class="text-center">擔保品金額</th>
+                        <th class="text-center">Remove</th>
+                    </tr>
+                    <!-- This is our clonable table line -->
+                    <tr class="hide">
+                        <td class="pt-3-half" contenteditable="true">
+                            <select id="Curr">
+                                <option value="USD">USD</option>
+                                <option value="TWD">TWD</option>
+                            </select>
+                        </td>
+                        <td class="pt-3-half" contenteditable="true">
+                            <select id="CollateralType">
+                                <option value="Cash">Cash</option>
+                                <option value="Bond">Bond</option>
+                            </select>
+                        </td>
+                        <td class="pt-3-half" contenteditable="true">
+                            <select id="CollateralDetail">
+                                <option value="USD">USD</option>
+                                <option value="TWD">TWD</option>
+                                <option value="A03108">A03108</option>
+                                <option value="A00104">A00104</option>
+                                <option value="A04102">A04102</option>
+                                <option value="A03107">A03107</option>
+                                <option value="A03114">A03114</option>
+                                <option value="US46625HJZ47">US46625HJZ47</option>
+                                <option value="US71647NAM11">US71647NAM11</option>
+                                <option value="XS11335850562">XS11335850562</option>
+                                <option value="US25152RXA66">US25152RXA66</option>
+                                <option value="BBG00FYBLQH5">BBG00FYBLQH5</option>
+                            </select>
+                        </td>
+                        <td class="pt-3-half" contenteditable="true"></td>
+                        <td>
+                            <span class="table-remove"><button type="button" class="btn btn-danger btn-rounded btn-sm my-0">Remove</button></span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Editable table -->
+    <div class="col-sm">
+        <button id="update">支付</button>
+        <br />
+    </div>
+    <br />
+    <br />
+    <div id="reportTableDiv">
+        <table id="reportTable"></table>
+    </div>
+</div>
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+
+<div id="dvPostResult" style="font-size:16pt">
+</div>
+<h5>@Model.Message</h5>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript" language="JavaScript">
+    $(document).ready(function () {
+            var site = gSite;
+            var USDCashPCT, TWDCashPCT, USDBondPCT, TWDBondPCT;
+
+            ////
+            var $TABLE = $('#table');
+            var $BTN = $('#export-btn');
+            var $EXPORT = $('#export');
+
+            $('.table-add').click(function () {
+                var $clone = $TABLE.find('tr.hide').clone(true).removeClass('hide table-line');
+                $TABLE.find('table').append($clone);
+            });
+
+            $('.table-remove').click(function () {
+                $(this).parents('tr').detach();
+            });
+
+            $('.table-up').click(function () {
+                var $row = $(this).parents('tr');
+                if ($row.index() === 1) return; // Don't go above the header
+                    $row.prev().before($row.get(0));
+            });
+
+            $('.table-down').click(function () {
+                var $row = $(this).parents('tr');
+                $row.next().after($row.get(0));
+            });
+
+            // A few jQuery helpers for exporting only
+            jQuery.fn.pop = [].pop;
+            jQuery.fn.shift = [].shift;
+
+            $BTN.click(function () {
+            var $rows = $TABLE.find('tr:not(:hidden)');
+            var headers = [];
+            var data = [];
+
+            // Get the headers (add special header logic here)
+            $($rows.shift()).find('th:not(:empty)').each(function () {
+                headers.push($(this).text().toLowerCase());
+            });
+
+            // Turn all existing rows into a loopable array
+            $rows.each(function () {
+            var $td = $(this).find('td');
+            var h = {};
+
+            // Use the headers from earlier to name our hash keys
+            headers.forEach(function (header, i) {
+                h[header] = $td.eq(i).text();
+            });
+
+            data.push(h);
+            });
+
+            // Output the result
+            $EXPORT.text(JSON.stringify(data));
+            });
+
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+            //peer chaincode invoke -n mycc -c '{"Args":["0001","0002","0","0","25500000","8000000","3000000","500000","100000","2018/01/01","2020/12/31","1","0.95","0.96","0.89","0001000320180923051259"]}' -C myc
+            $("#update").click(function () {
+
+                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "updateCptyISDA","args": ["' + $("#OwnCpty").val() + '","' + $("#CptyID").val() + '","' + $("#CptyIndependAmt").val() + '","' + $("#OwnIndependAmt").val() + '","' +  $("#CptyThreshold").val() + '","' + $("#OwnThreshold").val() + '","' + $("#CptyMTA").val() + '","' + $("#OwnMTA").val() + '","' + $("#Rounding").val() + '","' +  $("#StartDate").val() + '","' + $("#EndDate").val() + '","' + $("#USDCashPCT").val() + '","' + $("#TWDCashPCT").val() + '","' + $("#USDBondPCT").val() + '" ,"' + $("#TWDBondPCT").val() + $("#txid").val() + '"]}'
+                alert(data);
+
+                // 使用 ajax() 來呼叫 REST API
+                $.ajax({
+                    url: site + "/channels/mychannel/chaincodes/mycc",
+                    type: "POST",
+                    data: data,
+                    contentType: "application/json; charset=utf-8",
+                    complete: function (data, textStatus, jqXHR) {
+                        console.log(textStatus);
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
+
+                        swal({
+                            title: "交易成功!",
+                            text: "",
+                            icon: "success",
+                            button: "確定",
+                        });
+
+                        $.ajax({
+                            type: "GET",
+                            url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCptyISDA&args=%5B%22" + $("#txid").val() + "%22%5D",
+                            dataType: "html",
+                            success: function (data) {
+                                var data1 = data.replace(' now has', '');
+                                var data2 = data1.replace(' after the move', '');
+                                var datas = [];
+
+                                $('#reportTable').html("");
+                                $('#reportTable').bootstrapTable('destroy');
+
+                                var json = JSON.parse(data2);
+
+                                console.log(json);
+                                $("#dvPostResult").html(json.docType + " loaded successfully.");
+
+                                datas[0] = {
+
+                                    "TXID": json.TXID,
+                                    "OwnCptyID": json.OwnCptyID,
+                                    "Cpty": json.Cpty,
+                                    "CptyIndependAmt": json.CptyIndependAmt,
+                                    "OwnIndependAmt": json.OwnIndependAmt,
+                                    "CptyThreshold": json.CptyThreshold,
+                                    "OwnThreshold": json.OwnThreshold,
+                                    "CptyMTA": json.CptyMTA,
+                                    "OwnMTA": json.OwnMTA,
+                                    "Rounding": json.Rounding,
+                                    "StartDate": json.StartDate,
+                                    "EndDate": json.EndDate,
+                                    "USDCashPCT": json.USDCashPCT,
+                                    "TWDCashPCT": json.TWDCashPCT,
+                                    "USDBondPCT": json.USDBondPCT,
+                                    "TWDBondPCT": json.TWDBondPCT,
+                                    "createTime": json.CreateTime,
+                                    "updateTime": json.UpdateTime
+                                }
+
+                                $('#reportTable').bootstrapTable({
+                                    method: 'get',
+                                    cache: false,
+                                    striped: true,
+                                    pagination: true,
+                                    pageSize: 5,
+                                    pageNumber: 1,
+                                    pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
+                                    search: true,
+                                    showColumns: true,
+                                    showRefresh: false,
+                                    showExport: false,
+                                    exportTypes: ['csv', 'txt', 'xml'],
+                                    search: true,
+                                    clickToSelect: true,
+                                    columns:
+                                        [
+                                            { field: "TXID", title: "交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                            { field: "OwnCptyID", title: "OwnCptyID<br/>", align: "left", valign: "middle", sortable: "true" },
+                                            { field: "USDBond", title: "USDBond <br/>", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "TWDBond", title: "TWDBond<br/>", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "AUD", title: "AUD<br/>", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "BRL", title: "BRL", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "CAD", title: "CAD", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "CHF", title: "CHF", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "CNY", title: "CNY", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "EUR", title: "EUR", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "GBP", title: "GBP", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "HKD", title: "HKD", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "INR", title: "INR", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "JPY", title: "JPY", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "KRW", title: "KRW", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "MOP", title: "MOP", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "MYR", title: "MYR", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "NZD", title: "NZD", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "PHP", title: "PHP", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "SEK", title: "SEK", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "SGD", title: "SGD", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "THB", title: "THB", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "TWD", title: "TWD", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "USD", title: "USD", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "ZAR", title: "ZAR", align: "right", valign: "middle", sortable: "true" },
+                                            { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
+                                            { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
+                                        ],
+                                    data: datas,
+                                });
+
+                            },
+                            error: function (jqXHR) {
+                                alert("發生錯誤: " + jqXHR.status);
+                                console.log(jqXHR);
+                            },
+                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                            beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                        })
+
+
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                });
+            })
+
+     $("#search").click(function () {
+                //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDCollateral&args=%5B%22" + $("#txid").val() + "%22%5D")
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDCollateral&args=%5B%22" + $("#txid").val() + "%22%5D",
+                    dataType: "html",
+                    success: function (data) {
+                        console.log(data)
+                        var data1 = data.replace(' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+                        //$('#bank').html("")
+                        var json = JSON.parse(data2);
+                        console.log(json);
+                        $("#dvPostResult").html(json.docType + " loaded successfully.");
+
+                        $("#OwnCpty").val(json.OwnCptyID);
+                        $("#Cpty").val(json.CptyID);
+                        $("#MarginCall").val(json.MarginCall);
+
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCptyISDAByCpty&args=%5B%22" + $('#bankid').val() + "%22%5D",
+                    dataType: "html",
+                    success: function (data) {
+                        console.log(data);
+                        var data1 = data.replace(' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+                        //$('#bonds').html("")
+                        var datas = [];
+
+                        var json = JSON.parse(data2);
+                        console.log(json);
+                        $("#dvPostResult").html("Transactions loaded successfully.");
+                        for (i = 0; i < json.length; i++) {
+                               USDCashPCT = json[i].Record.USDCashPCT;
+                               TWDCashPCT = json[i].Record.TWDCashPCT;
+                               USDBondPCT = json[i].Record.USDBondPCT;
+                               TWDBondPCT = json[i].Record.TWDBondPCT;
+                        }
+
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+
+            })  // $("#search").click(function ()
+        });
+</script>
+}
