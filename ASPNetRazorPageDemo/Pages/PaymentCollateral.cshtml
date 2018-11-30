@@ -39,64 +39,60 @@
         <label for="UnderMarginCall" class="col-sm-2">尚欠MarginCall：</label>
         <br />
     </div>
+    <br />
     <!-- Editable table -->
-    <div class="card">
-        <h3 class="card-header text-center font-weight-bold text-uppercase py-4">支付擔保品table</h3>
-        <div class="card-body">
-            <div id="table" class="table-editable">
-                <span class="table-add float-right mb-3 mr-2">
-                    <a href="#!" class="text-success">
-                        <i class="fa fa-plus fa-2x"
-                           aria-hidden="true"></i>
-                    </a>
-                </span>
-                <table class="table table-bordered table-responsive-md table-striped text-center">
-                    <tr>
-                        <th class="text-center">幣別</th>
-                        <th class="text-center">擔保品種類</th>
-                        <th class="text-center">擔保品類別</th>
-                        <th class="text-center">擔保品金額</th>
-                        <th class="text-center">Remove</th>
-                    </tr>
-                    <!-- This is our clonable table line -->
-                    <tr class="hide">
-                        <td class="pt-3-half" contenteditable="true">
-                            <select id="Curr">
-                                <option value="USD">USD</option>
-                                <option value="TWD">TWD</option>
-                            </select>
-                        </td>
-                        <td class="pt-3-half" contenteditable="true">
-                            <select id="CollateralType">
-                                <option value="Cash">Cash</option>
-                                <option value="Bond">Bond</option>
-                            </select>
-                        </td>
-                        <td class="pt-3-half" contenteditable="true">
-                            <select id="CollateralDetail">
-                                <option value="USD">USD</option>
-                                <option value="TWD">TWD</option>
-                                <option value="A03108">A03108</option>
-                                <option value="A00104">A00104</option>
-                                <option value="A04102">A04102</option>
-                                <option value="A03107">A03107</option>
-                                <option value="A03114">A03114</option>
-                                <option value="US46625HJZ47">US46625HJZ47</option>
-                                <option value="US71647NAM11">US71647NAM11</option>
-                                <option value="XS11335850562">XS11335850562</option>
-                                <option value="US25152RXA66">US25152RXA66</option>
-                                <option value="BBG00FYBLQH5">BBG00FYBLQH5</option>
-                            </select>
-                        </td>
-                        <td class="pt-3-half" contenteditable="true"></td>
-                        <td>
-                            <span class="table-remove"><button type="button" class="btn btn-danger btn-rounded btn-sm my-0">Remove</button></span>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
+    <div class="form-group">
+        <button id="add" class="btn btn-default" title="添加">
+            <i class="glyphicon glyphicon-plus"></i> 添加
+        </button>
+        <button id="del" class="btn btn-default" title="刪除">
+            <i class="glyphicon glyphicon-minus"></i> 刪除
+        </button>
     </div>
+    <div class="form-group">
+        <label for="Curr" class="col-sm-2">幣別：</label>
+        <select id="Curr" class="col-sm-2">
+            <option value="USD">USD</option>
+            <option value="TWD">TWD</option>
+        </select>
+        <label for="CollateralType" class="col-sm-2">擔保品種類：</label>
+        <select id="CollateralType" class="col-sm-2">
+            <option value="Cash">Cash</option>
+            <option value="Bond">Bond</option>
+        </select>
+        <br />
+    </div>
+    <div class="form-group">
+        <label for="CollateralDetail" class="col-sm-2">擔保品類別：</label>
+        <select id="CollateralDetail" class="col-sm-2">
+            <option value="USD">USD</option>
+            <option value="TWD">TWD</option>
+            <option value="A03108">A03108</option>
+            <option value="A00104">A00104</option>
+            <option value="A04102">A04102</option>
+            <option value="A03107">A03107</option>
+            <option value="A03114">A03114</option>
+            <option value="US46625HJZ47">US46625HJZ47</option>
+            <option value="US71647NAM11">US71647NAM11</option>
+            <option value="XS11335850562">XS11335850562</option>
+            <option value="US25152RXA66">US25152RXA66</option>
+            <option value="BBG00FYBLQH5">BBG00FYBLQH5</option>
+        </select>
+    </div>
+    <div>
+        <table id="wareTable" data-toolbar="#toolbar">
+            <thead>
+                <tr>
+                    <th data-field="checkbox" data-checkbox="true"></th>
+                    <th data-field="Curr">幣別</th>
+                    <th data-field="CollateralType">擔保品種類</th>
+                    <th data-field="CollateralDetail">擔保品類別</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <br />
+    <br />
     <!-- Editable table -->
     <div class="col-sm">
         <button id="update">支付</button>
@@ -121,64 +117,82 @@
 <script type="text/javascript" language="JavaScript">
     $(document).ready(function () {
             var site = gSite;
-            var USDCashPCT, TWDCashPCT, USDBondPCT, TWDBondPCT;
+            var USDCashPCT=1, TWDCashPCT=2, USDBondPCT=3, TWDBondPCT=4;
+            var Curr="USD", CollateralType="Cash";
 
-            ////
-            var $TABLE = $('#table');
-            var $BTN = $('#export-btn');
-            var $EXPORT = $('#export');
+            var $add = $('#add');
+            var $remove = $('#del');
+            var $table = $("#wareTable");
 
-            $('.table-add').click(function () {
-                var $clone = $TABLE.find('tr.hide').clone(true).removeClass('hide table-line');
-                $TABLE.find('table').append($clone);
+            $(function () {
+                $table.bootstrapTable({
+                    formatNoMatches: function () {
+                        return '';
+                }
+              });
             });
 
-            $('.table-remove').click(function () {
-                $(this).parents('tr').detach();
+            $remove.click(function () {
+                var ids = $.map($table.bootstrapTable('getSelections'), function (row) {
+                    return row.id;
+                });
+               if (ids.length != 1 ) {
+                    alert("請選擇一筆刪除!");
+                    return;
+               }
+               $table.bootstrapTable('remove', {
+                    field: 'id',
+                    values: ids
+                });
             });
 
-            $('.table-up').click(function () {
-                var $row = $(this).parents('tr');
-                if ($row.index() === 1) return; // Don't go above the header
-                    $row.prev().before($row.get(0));
+
+            $add.click(function () {
+                var index = $table.bootstrapTable('getData').length;
+                $table.bootstrapTable('insertRow', {
+                    index: index,
+                    row: {
+                        id: '',
+                        Curr: $("#Curr").val(),
+                        CollateralType: $("#CollateralType").val(),
+                        CollateralDetail: $("#CollateralDetail").val()
+                     }
+                );
             });
 
-            $('.table-down').click(function () {
-                var $row = $(this).parents('tr');
-                $row.next().after($row.get(0));
-            });
+            var selectCurr=document.getElementById("Curr")
+            selectCurr.onchange=function(){
+                     Curr=this.options[this.selectedIndex].value;
+                     if (Curr == "USD" & CollateralType =="Cash") {
+                         alert("USDCash")
+                     }
+                     if (Curr == "USD" & CollateralType =="Bond") {
+                         alert("USDBond")
+                     }
+                     if (Curr == "TWD" & CollateralType =="Cash") {
+                         alert("TWDCash")
+                     }
+                     if (Curr == "TWD" & CollateralType =="Bond") {
+                         alert("USDBond")
+                     }
+            }
 
-            // A few jQuery helpers for exporting only
-            jQuery.fn.pop = [].pop;
-            jQuery.fn.shift = [].shift;
-
-            $BTN.click(function () {
-            var $rows = $TABLE.find('tr:not(:hidden)');
-            var headers = [];
-            var data = [];
-
-            // Get the headers (add special header logic here)
-            $($rows.shift()).find('th:not(:empty)').each(function () {
-                headers.push($(this).text().toLowerCase());
-            });
-
-            // Turn all existing rows into a loopable array
-            $rows.each(function () {
-            var $td = $(this).find('td');
-            var h = {};
-
-            // Use the headers from earlier to name our hash keys
-            headers.forEach(function (header, i) {
-                h[header] = $td.eq(i).text();
-            });
-
-            data.push(h);
-            });
-
-            // Output the result
-            $EXPORT.text(JSON.stringify(data));
-            });
-
+            var selectCollateralType=document.getElementById("CollateralType")
+            selectCollateralType.onchange=function(){
+                     CollateralType=this.options[this.selectedIndex].value;
+                     if (Curr == "USD" & CollateralType =="Cash") {
+                         alert("USDCash")
+                     }
+                     if (Curr == "USD" & CollateralType =="Bond") {
+                         alert("USDBond")
+                     }
+                     if (Curr == "TWD" & CollateralType =="Cash") {
+                         alert("TWDCash")
+                     }
+                     if (Curr == "TWD" & CollateralType =="Bond") {
+                         alert("USDBond")
+                     }
+            }
 
             $.ajax({
                 type: "POST",
@@ -347,7 +361,37 @@
 
                         $("#OwnCpty").val(json.OwnCptyID);
                         $("#Cpty").val(json.CptyID);
-                        $("#MarginCall").val(json.MarginCall);
+                        $("#MarginCall").val(Math.abs(json.MarginCall));
+
+                        //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCptyISDAByCpty&args=%5B%22" + json.OwnCptyID + "%22%2C%22" + json.CptyID + "%22%5D")
+                        $.ajax({
+                            type: "GET",
+                            url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCptyISDAByCpty&args=%5B%22" + json.OwnCptyID + "%22%2C%22" + json.CptyID + "%22%5D",
+                            dataType: "html",
+                            success: function (data) {
+                                console.log(data);
+                                var data1 = data.replace(' now has', '');
+                                var data2 = data1.replace(' after the move', '');
+                                //$('#bonds').html("")
+                                var datas = [];
+
+                                var json = JSON.parse(data2);
+                                console.log(json);
+                                $("#dvPostResult").html("Transactions loaded successfully.");
+                                for (i = 0; i < json.length; i++) {
+                                    USDCashPCT = json[i].Record.USDCashPCT;
+                                    TWDCashPCT = json[i].Record.TWDCashPCT;
+                                    USDBondPCT = json[i].Record.USDBondPCT;
+                                    TWDBondPCT = json[i].Record.TWDBondPCT;
+                                }
+                         },
+                         error: function (jqXHR) {
+                            alert("發生錯誤: " + jqXHR.status);
+                            console.log(jqXHR);
+                         },
+                         //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                         beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                        })
 
                     },
                     error: function (jqXHR) {
@@ -358,37 +402,12 @@
                     beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
                 })
 
-                $.ajax({
-                    type: "GET",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCptyISDAByCpty&args=%5B%22" + $('#bankid').val() + "%22%5D",
-                    dataType: "html",
-                    success: function (data) {
-                        console.log(data);
-                        var data1 = data.replace(' now has', '');
-                        var data2 = data1.replace(' after the move', '');
-                        //$('#bonds').html("")
-                        var datas = [];
 
-                        var json = JSON.parse(data2);
-                        console.log(json);
-                        $("#dvPostResult").html("Transactions loaded successfully.");
-                        for (i = 0; i < json.length; i++) {
-                               USDCashPCT = json[i].Record.USDCashPCT;
-                               TWDCashPCT = json[i].Record.TWDCashPCT;
-                               USDBondPCT = json[i].Record.USDBondPCT;
-                               TWDBondPCT = json[i].Record.TWDBondPCT;
-                        }
-
-                    },
-                    error: function (jqXHR) {
-                        alert("發生錯誤: " + jqXHR.status);
-                        console.log(jqXHR);
-                    },
-                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
-                })
 
             })  // $("#search").click(function ()
         });
+
+
+
 </script>
 }
