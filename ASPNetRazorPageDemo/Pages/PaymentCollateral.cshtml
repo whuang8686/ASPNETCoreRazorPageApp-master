@@ -119,6 +119,7 @@
             var site = gSite;
             var USDCashPCT=1, TWDCashPCT=2, USDBondPCT=3, TWDBondPCT=4;
             var Curr="USD", CollateralType="Cash";
+            var count=1;
 
             var $add = $('#add');
             var $remove = $('#del');
@@ -133,9 +134,14 @@
             });
 
             $remove.click(function () {
-                var ids = $.map($table.bootstrapTable('getSelections'), function (row) {
-                    return row.id;
-                });
+                //var ids = $.map($table.bootstrapTable('getSelections'), function (row) {
+                //    return row.id;
+                //});
+               var selects = $table.bootstrapTable('getSelections');
+                     var ids = $.map(selects, function (row) {
+                     return row.id;
+               });
+
                if (ids.length != 1 ) {
                     alert("請選擇一筆刪除!");
                     return;
@@ -152,19 +158,23 @@
                 $table.bootstrapTable('insertRow', {
                     index: index,
                     row: {
-                        id: '',
+                        id: count,
                         Curr: $("#Curr").val(),
                         CollateralType: $("#CollateralType").val(),
                         CollateralDetail: $("#CollateralDetail").val()
                      }
-                );
+                });
+                count += 1;
             });
 
             var selectCurr=document.getElementById("Curr")
             selectCurr.onchange=function(){
                      Curr=this.options[this.selectedIndex].value;
                      if (Curr == "USD" & CollateralType =="Cash") {
-                         alert("USDCash")
+                         $('#CollateralDetail').empty();
+                         $("#CollateralDetail").prepend("<option selected="selected" value="USD">USD</option>");
+                         $("<option value="6">Java Script</option>").appendTo("#ddlList");
+
                      }
                      if (Curr == "USD" & CollateralType =="Bond") {
                          alert("USDBond")
@@ -175,6 +185,7 @@
                      if (Curr == "TWD" & CollateralType =="Bond") {
                          alert("USDBond")
                      }
+
             }
 
             var selectCollateralType=document.getElementById("CollateralType")
