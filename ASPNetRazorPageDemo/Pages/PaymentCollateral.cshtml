@@ -65,7 +65,9 @@
     <div class="form-group">
         <label for="CollateralDetail" class="col-sm-2">擔保品類別：</label>
         <select id="CollateralDetail" class="col-sm-2">
+
             <option value="USD">USD</option>
+            <!--
             <option value="TWD">TWD</option>
             <option value="A03108">A03108</option>
             <option value="A00104">A00104</option>
@@ -77,7 +79,10 @@
             <option value="XS11335850562">XS11335850562</option>
             <option value="US25152RXA66">US25152RXA66</option>
             <option value="BBG00FYBLQH5">BBG00FYBLQH5</option>
+                -->
         </select>
+        <label for="CollateralAmount" class="col-sm-2">擔保品金額：</label>
+        <input type="text" id="CollateralAmount" value="" size="10" placeholder="擔保品金額">
     </div>
     <div>
         <table id="wareTable" data-toolbar="#toolbar">
@@ -87,6 +92,9 @@
                     <th data-field="Curr">幣別</th>
                     <th data-field="CollateralType">擔保品種類</th>
                     <th data-field="CollateralDetail">擔保品類別</th>
+                    <th data-field="CollateralAmount">擔保品金額</th>
+                    <th data-field="Discount">折現率</th>
+                    <th data-field="DiscountAmount">折現後擔保品金額</th>
                 </tr>
             </thead>
         </table>
@@ -94,15 +102,15 @@
     <br />
     <br />
     <!-- Editable table -->
-    <div class="col-sm">
-        <button id="update">支付</button>
-        <br />
-    </div>
-    <br />
-    <br />
-    <div id="reportTableDiv">
-        <table id="reportTable"></table>
-    </div>
+            <div class="col-sm">
+                <button id="update">支付</button>
+                <br />
+            </div>
+            <br />
+            <br />
+            <div id="reportTableDiv">
+                <table id="reportTable"></table>
+            </div>
 </div>
 <br />
 @Html.AntiForgeryToken()
@@ -118,6 +126,7 @@
     $(document).ready(function () {
             var site = gSite;
             var USDCashPCT=1, TWDCashPCT=2, USDBondPCT=3, TWDBondPCT=4;
+            var Discount=USDCashPCT, DiscountAmount;
             var Curr="USD", CollateralType="Cash";
             var count=1;
 
@@ -161,7 +170,10 @@
                         id: count,
                         Curr: $("#Curr").val(),
                         CollateralType: $("#CollateralType").val(),
-                        CollateralDetail: $("#CollateralDetail").val()
+                        CollateralDetail: $("#CollateralDetail").val(),
+                        CollateralAmount: $("#CollateralAmount").val(),
+                        Discount: Discount,
+                        DiscountAmount: DiscountAmount
                      }
                 });
                 count += 1;
@@ -172,38 +184,70 @@
                      Curr=this.options[this.selectedIndex].value;
                      if (Curr == "USD" & CollateralType =="Cash") {
                          $('#CollateralDetail').empty();
-                         $("#CollateralDetail").prepend("<option selected="selected" value="USD">USD</option>");
-                         $("<option value="6">Java Script</option>").appendTo("#ddlList");
-
-                     }
-                     if (Curr == "USD" & CollateralType =="Bond") {
-                         alert("USDBond")
+                         $('#CollateralDetail').append('<option value="USD">USD</option>');
+                         Discount = USDCashPCT
                      }
                      if (Curr == "TWD" & CollateralType =="Cash") {
-                         alert("TWDCash")
+                         $('#CollateralDetail').empty();
+                         $('#CollateralDetail').append('<option value="TWD">TWD</option>');
+                         Discount = TWDCashPCT
+                     }
+                     if (Curr == "USD" & CollateralType =="Bond") {
+                         $('#CollateralDetail').empty();
+                         $('#CollateralDetail').append('<option value="US46625HJZ47">US46625HJZ47</option>');
+                         $('#CollateralDetail').append('<option value="US71647NAM11">US71647NAM11</option>');
+                         $('#CollateralDetail').append('<option value="XS11335850562">XS11335850562</option>');
+                         $('#CollateralDetail').append('<option value="US25152RXA66">US25152RXA66</option>');
+                         $('#CollateralDetail').append('<option value="BBG00FYBLQH5">BBG00FYBLQH5</option>');
+                         Discount = USDBondPCT
                      }
                      if (Curr == "TWD" & CollateralType =="Bond") {
-                         alert("USDBond")
+                        $('#CollateralDetail').append('<option value="A03108">A03108</option>');
+                        $('#CollateralDetail').append('<option value="A00104">A00104</option>');
+                        $('#CollateralDetail').append('<option value="A04102">A04102</option>');
+                        $('#CollateralDetail').append('<option value="A03107">A03107</option>');
+                        $('#CollateralDetail').append('<option value="A03114">A03114</option>');
+                        Discount = TWDBondPCT
                      }
-
             }
 
             var selectCollateralType=document.getElementById("CollateralType")
             selectCollateralType.onchange=function(){
                      CollateralType=this.options[this.selectedIndex].value;
                      if (Curr == "USD" & CollateralType =="Cash") {
-                         alert("USDCash")
-                     }
-                     if (Curr == "USD" & CollateralType =="Bond") {
-                         alert("USDBond")
+                         $('#CollateralDetail').empty();
+                         $('#CollateralDetail').append('<option value="USD">USD</option>');
+                         Discount = USDCashPCT
                      }
                      if (Curr == "TWD" & CollateralType =="Cash") {
-                         alert("TWDCash")
+                         $('#CollateralDetail').empty();
+                         $('#CollateralDetail').append('<option value="TWD">TWD</option>');
+                         Discount = TWDCashPCT
+                     }
+                     if (Curr == "USD" & CollateralType =="Bond") {
+                         $('#CollateralDetail').empty();
+                         $('#CollateralDetail').append('<option value="US46625HJZ47">US46625HJZ47</option>');
+                         $('#CollateralDetail').append('<option value="US71647NAM11">US71647NAM11</option>');
+                         $('#CollateralDetail').append('<option value="XS11335850562">XS11335850562</option>');
+                         $('#CollateralDetail').append('<option value="US25152RXA66">US25152RXA66</option>');
+                         $('#CollateralDetail').append('<option value="BBG00FYBLQH5">BBG00FYBLQH5</option>');
+                         Discount = USDBondPCT
                      }
                      if (Curr == "TWD" & CollateralType =="Bond") {
-                         alert("USDBond")
+                        $('#CollateralDetail').append('<option value="A03108">A03108</option>');
+                        $('#CollateralDetail').append('<option value="A00104">A00104</option>');
+                        $('#CollateralDetail').append('<option value="A04102">A04102</option>');
+                        $('#CollateralDetail').append('<option value="A03107">A03107</option>');
+                        $('#CollateralDetail').append('<option value="A03114">A03114</option>');
+                        Discount = TWDBondPCT
                      }
             }
+
+            var inputCollateralAmount=document.getElementById("CollateralAmount")
+            inputCollateralAmount.onchange=function(){
+                 DiscountAmount = $("#CollateralAmount").val() * Discount
+            }
+
 
             $.ajax({
                 type: "POST",
