@@ -273,6 +273,11 @@
             //peer chaincode invoke -n mycc -c '{"Args":["0001","0002","0","0","25500000","8000000","3000000","500000","100000","2018/01/01","2020/12/31","1","0.95","0.96","0.89","0001000320180923051259"]}' -C myc
             $("#update").click(function () {
 
+                var data = $table.bootstrapTable('getData');
+                $.each(data, function(index, value) {
+                     console.info(value.Curr);
+                });
+
                 data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "updateCptyISDA","args": ["' + $("#OwnCpty").val() + '","' + $("#CptyID").val() + '","' + $("#CptyIndependAmt").val() + '","' + $("#OwnIndependAmt").val() + '","' +  $("#CptyThreshold").val() + '","' + $("#OwnThreshold").val() + '","' + $("#CptyMTA").val() + '","' + $("#OwnMTA").val() + '","' + $("#Rounding").val() + '","' +  $("#StartDate").val() + '","' + $("#EndDate").val() + '","' + $("#USDCashPCT").val() + '","' + $("#TWDCashPCT").val() + '","' + $("#USDBondPCT").val() + '" ,"' + $("#TWDBondPCT").val() + $("#txid").val() + '"]}'
                 alert(data);
 

@@ -33,6 +33,7 @@
         $(document).ready(function () {
             var site = gSite;
             var datas = [];
+            var TXIDarr = [];
             $.ajax({
                 type: "POST",
                 url: site + "/users",
@@ -84,55 +85,20 @@
                                     var data1 = data2.replace(' now has', '');
                                     var data2 = data2.replace(' after the move', '');
                                     var json = JSON.parse(data2);
+
+                                    var recordnum = 0;
                                     console.log(json);
 
                                     $("#dvPostResult").html("2.Transactions loaded successfully.");
+
                                     for (i = 0; i < json.length; i++) {
-
-                                        //datas[i] = {
-                                        //    "TXID": json[i].Key
-                                        //}
-                                        // 使用 ajax() 來呼叫 REST API Step3： 新增交易MTM
-
-                                        dataMTM = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeMTM","args": ["' + json[i].Key + '","' + $("#txday").val() + '"]}'
-                                        //alert(dataMTM);
-                                        // 使用 ajax() 來呼叫 REST API
-
-                                        $.ajax({
-                                                url: site + "/channels/mychannel/chaincodes/mycc",
-                                                type: "POST",
-                                                data: dataMTM,
-                                                contentType: "application/json; charset=utf-8",
-                                                complete: function (data3, textStatus, jqXHR) {
-                                                      console.log(textStatus);
-
-                                                },
-                                                success: function (data3, textStatus, jqXHR) {
-                                                     console.log(data3);
-
-                                                     setTimeout(function() {}, 20000);
-                                                     $("#dvPostResult").html("3.Insert Transactions loaded successfully.");
-
-                                                     swal({
-                                                        title: "交易成功!",
-                                                        text: "",
-                                                        icon: "success",
-                                                        button: "確定",
-                                                     });
-                                                },
-                                                error: function (jqXHR) {
-                                                    alert("發生錯誤: " + jqXHR.status);
-                                                    console.log(jqXHR);
-                                                },
-                                                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                                                beforeSend: function (xhr, settings) {
-                                                     xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
-                                                }
-                                        });
-
+                                        TXIDarr.push(json[i].Key);
                                     }
 
+                                    each(0);
+
                                 },
+
                                 error: function (jqXHR) {
                                     alert("發生錯誤: " + jqXHR.status);
                                     console.log(jqXHR);
@@ -156,6 +122,52 @@
 
 
             })
-        });
+
+            //計算每筆MTM
+            function each(recordnum){
+
+                    dataMTM = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeMTM","args": ["' + TXIDarr[recordnum] + '","' + $("#txday").val() + '"]}'
+                    //alert(dataMTM);
+                    // 使用 ajax() 來呼叫 REST API
+
+                    $.ajax({
+                         url: site + "/channels/mychannel/chaincodes/mycc",
+                         type: "POST",
+                         data: dataMTM,
+                         contentType: "application/json; charset=utf-8",
+                         complete: function (data3, textStatus, jqXHR) {
+                                console.log(textStatus);
+                         },
+                         success: function (data3, textStatus, jqXHR) {
+                                console.log(data3);
+
+                                if (recordnum < TXIDarr.length) each(recordnum+1);
+
+                                if (recordnum == TXIDarr.length-1) {
+                                    $("#dvPostResult").html("3.Insert Transactions loaded successfully.");
+
+                                    swal({
+                                         title: "交易成功!",
+                                         text: "",
+                                         icon: "success",
+                                         button: "確定",
+                                    });
+                                }
+                         },
+                         error: function (jqXHR) {
+                               alert("發生錯誤: " + jqXHR.status);
+                               console.log(jqXHR);
+                         },
+                         //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                         beforeSend: function (xhr, settings) {
+                                  xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                         }
+                      });
+
+            } //function
+
+        });  //document
+
+
 </script>
 }
