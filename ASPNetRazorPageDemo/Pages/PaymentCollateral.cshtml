@@ -134,6 +134,13 @@
             var $remove = $('#del');
             var $table = $("#wareTable");
 
+            var Currarr = [];
+            var CollateralTypearr = [];
+            var CollateralDetailarr = [];
+            var Amountarr = [];
+            var Discountarr = [];
+            var DiscountAmountarr  = [];
+            var arrlength = 0;
             $(function () {
                 $table.bootstrapTable({
                     formatNoMatches: function () {
@@ -202,6 +209,7 @@
                          Discount = USDBondPCT
                      }
                      if (Curr == "TWD" & CollateralType =="Bond") {
+                        $('#CollateralDetail').empty();
                         $('#CollateralDetail').append('<option value="A03108">A03108</option>');
                         $('#CollateralDetail').append('<option value="A00104">A00104</option>');
                         $('#CollateralDetail').append('<option value="A04102">A04102</option>');
@@ -234,6 +242,7 @@
                          Discount = USDBondPCT
                      }
                      if (Curr == "TWD" & CollateralType =="Bond") {
+                        $('#CollateralDetail').empty();
                         $('#CollateralDetail').append('<option value="A03108">A03108</option>');
                         $('#CollateralDetail').append('<option value="A00104">A00104</option>');
                         $('#CollateralDetail').append('<option value="A04102">A04102</option>');
@@ -270,141 +279,26 @@
                 }
             })
 
-            //peer chaincode invoke -n mycc -c '{"Args":["0001","0002","0","0","25500000","8000000","3000000","500000","100000","2018/01/01","2020/12/31","1","0.95","0.96","0.89","0001000320180923051259"]}' -C myc
+            //寫入CollateralDetail
             $("#update").click(function () {
 
                 var data = $table.bootstrapTable('getData');
+                var recordnum = 0;
+
                 $.each(data, function(index, value) {
-                     console.info(value.Curr);
+                     Currarr.push(value.Curr);
+                     CollateralTypearr.push(value.CollateralType);
+                     CollateralDetailarr.push(value.CollateralDetail);
+                     Amountarr.push(value.Amount);
+                     Discountarr.push(value.Discount);
+                     DiscountAmountarr.push(value.DiscountAmount);
+                     arrlength = arrlength + 1 ;
                 });
+                echo(0);
 
-                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "updateCptyISDA","args": ["' + $("#OwnCpty").val() + '","' + $("#CptyID").val() + '","' + $("#CptyIndependAmt").val() + '","' + $("#OwnIndependAmt").val() + '","' +  $("#CptyThreshold").val() + '","' + $("#OwnThreshold").val() + '","' + $("#CptyMTA").val() + '","' + $("#OwnMTA").val() + '","' + $("#Rounding").val() + '","' +  $("#StartDate").val() + '","' + $("#EndDate").val() + '","' + $("#USDCashPCT").val() + '","' + $("#TWDCashPCT").val() + '","' + $("#USDBondPCT").val() + '" ,"' + $("#TWDBondPCT").val() + $("#txid").val() + '"]}'
-                alert(data);
-
-                // 使用 ajax() 來呼叫 REST API
-                $.ajax({
-                    url: site + "/channels/mychannel/chaincodes/mycc",
-                    type: "POST",
-                    data: data,
-                    contentType: "application/json; charset=utf-8",
-                    complete: function (data, textStatus, jqXHR) {
-                        console.log(textStatus);
-                    },
-                    success: function (data, textStatus, jqXHR) {
-                        console.log(data);
-                        $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
-
-                        swal({
-                            title: "交易成功!",
-                            text: "",
-                            icon: "success",
-                            button: "確定",
-                        });
-
-                        $.ajax({
-                            type: "GET",
-                            url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCptyISDA&args=%5B%22" + $("#txid").val() + "%22%5D",
-                            dataType: "html",
-                            success: function (data) {
-                                var data1 = data.replace(' now has', '');
-                                var data2 = data1.replace(' after the move', '');
-                                var datas = [];
-
-                                $('#reportTable').html("");
-                                $('#reportTable').bootstrapTable('destroy');
-
-                                var json = JSON.parse(data2);
-
-                                console.log(json);
-                                $("#dvPostResult").html(json.docType + " loaded successfully.");
-
-                                datas[0] = {
-
-                                    "TXID": json.TXID,
-                                    "OwnCptyID": json.OwnCptyID,
-                                    "Cpty": json.Cpty,
-                                    "CptyIndependAmt": json.CptyIndependAmt,
-                                    "OwnIndependAmt": json.OwnIndependAmt,
-                                    "CptyThreshold": json.CptyThreshold,
-                                    "OwnThreshold": json.OwnThreshold,
-                                    "CptyMTA": json.CptyMTA,
-                                    "OwnMTA": json.OwnMTA,
-                                    "Rounding": json.Rounding,
-                                    "StartDate": json.StartDate,
-                                    "EndDate": json.EndDate,
-                                    "USDCashPCT": json.USDCashPCT,
-                                    "TWDCashPCT": json.TWDCashPCT,
-                                    "USDBondPCT": json.USDBondPCT,
-                                    "TWDBondPCT": json.TWDBondPCT,
-                                    "createTime": json.CreateTime,
-                                    "updateTime": json.UpdateTime
-                                }
-
-                                $('#reportTable').bootstrapTable({
-                                    method: 'get',
-                                    cache: false,
-                                    striped: true,
-                                    pagination: true,
-                                    pageSize: 5,
-                                    pageNumber: 1,
-                                    pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
-                                    search: true,
-                                    showColumns: true,
-                                    showRefresh: false,
-                                    showExport: false,
-                                    exportTypes: ['csv', 'txt', 'xml'],
-                                    search: true,
-                                    clickToSelect: true,
-                                    columns:
-                                        [
-                                            { field: "TXID", title: "交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "OwnCptyID", title: "OwnCptyID<br/>", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "USDBond", title: "USDBond <br/>", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "TWDBond", title: "TWDBond<br/>", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "AUD", title: "AUD<br/>", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "BRL", title: "BRL", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "CAD", title: "CAD", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "CHF", title: "CHF", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "CNY", title: "CNY", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "EUR", title: "EUR", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "GBP", title: "GBP", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "HKD", title: "HKD", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "INR", title: "INR", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "JPY", title: "JPY", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "KRW", title: "KRW", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "MOP", title: "MOP", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "MYR", title: "MYR", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "NZD", title: "NZD", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "PHP", title: "PHP", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "SEK", title: "SEK", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "SGD", title: "SGD", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "THB", title: "THB", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "TWD", title: "TWD", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "USD", title: "USD", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "ZAR", title: "ZAR", align: "right", valign: "middle", sortable: "true" },
-                                            { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
-                                        ],
-                                    data: datas,
-                                });
-
-                            },
-                            error: function (jqXHR) {
-                                alert("發生錯誤: " + jqXHR.status);
-                                console.log(jqXHR);
-                            },
-                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                            beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
-                        })
-
-
-                    },
-                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
-                });
             })
 
-     $("#search").click(function () {
+            $("#search").click(function () {
                 //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDCollateral&args=%5B%22" + $("#txid").val() + "%22%5D")
                 $.ajax({
                     type: "GET",
@@ -465,7 +359,51 @@
 
 
             })  // $("#search").click(function ()
-        });
+
+            //每筆寫入CollateralDetail
+            function each(recordnum){
+
+                    dataMTM = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeMTM","args": ["' + TXIDarr[recordnum] + '","' + $("#txday").val() + '"]}'
+                    //alert(dataMTM);
+                    // 使用 ajax() 來呼叫 REST API
+
+                    $.ajax({
+                         url: site + "/channels/mychannel/chaincodes/mycc",
+                         type: "POST",
+                         data: dataMTM,
+                         contentType: "application/json; charset=utf-8",
+                         complete: function (data3, textStatus, jqXHR) {
+                                console.log(textStatus);
+                         },
+                         success: function (data3, textStatus, jqXHR) {
+                                console.log(data3);
+
+                                if (recordnum < TXIDarr.length) each(recordnum+1);
+
+                                $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + TXIDarr.length +" loaded successfully.");
+
+                                if (recordnum == TXIDarr.length-1) {
+                                    swal({
+                                         title: "交易成功!",
+                                         text: "",
+                                         icon: "success",
+                                         button: "確定",
+                                    });
+                                }
+                         },
+                         error: function (jqXHR) {
+                               alert("發生錯誤: " + jqXHR.status);
+                               console.log(jqXHR);
+                         },
+                         //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                         beforeSend: function (xhr, settings) {
+                                  xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                         }
+                      });
+
+            } //function
+
+        }); //document
 
 
 

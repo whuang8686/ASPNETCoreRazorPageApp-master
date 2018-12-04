@@ -143,9 +143,9 @@
 
                                 if (recordnum < TXIDarr.length) each(recordnum+1);
 
-                                if (recordnum == TXIDarr.length-1) {
-                                    $("#dvPostResult").html("3.Insert Transactions loaded successfully.");
+                                $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + TXIDarr.length +" loaded successfully.");
 
+                                if (recordnum == TXIDarr.length-1) {
                                     swal({
                                          title: "交易成功!",
                                          text: "",
