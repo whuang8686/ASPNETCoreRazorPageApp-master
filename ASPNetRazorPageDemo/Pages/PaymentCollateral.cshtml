@@ -15,6 +15,7 @@
     </div>
     <br />
     <div class="form-group">
+        <input type="text" id="txday" size="10" placeholder="交易日" hidden>
         <label for="OwnCpty" class="col-sm-2">Cpty：</label>
         <select id="OwnCpty" class="col-sm-2">
             <option value="0001">CptyA</option>
@@ -34,7 +35,7 @@
         <br />
     </div>
     <div class="form-group">
-        <label for="MarginCall" class="col-sm-2">應付MarginCall：</label>
+        <label for="MarginCall" class="col-sm-2">尚欠MarginCall：</label>
         <input class="col-sm-2" type="text" id="MarginCall" value="" size="10" placeholder="MarginCall">
         <label for="UnderMarginCall" class="col-sm-2">尚欠MarginCall：</label>
         <br />
@@ -141,6 +142,7 @@
             var Discountarr = [];
             var DiscountAmountarr  = [];
             var arrlength = 0;
+            var recordnum = 0;
             $(function () {
                 $table.bootstrapTable({
                     formatNoMatches: function () {
@@ -170,6 +172,10 @@
 
 
             $add.click(function () {
+                if ($('#CollateralAmount').val() ==  "" ) {
+                    alert("擔保品金額要輸入!");
+                    return;
+                }
                 var index = $table.bootstrapTable('getData').length;
                 $table.bootstrapTable('insertRow', {
                     index: index,
@@ -283,18 +289,19 @@
             $("#update").click(function () {
 
                 var data = $table.bootstrapTable('getData');
-                var recordnum = 0;
+
 
                 $.each(data, function(index, value) {
                      Currarr.push(value.Curr);
                      CollateralTypearr.push(value.CollateralType);
                      CollateralDetailarr.push(value.CollateralDetail);
-                     Amountarr.push(value.Amount);
+                     Amountarr.push(value.CollateralAmount);
                      Discountarr.push(value.Discount);
                      DiscountAmountarr.push(value.DiscountAmount);
                      arrlength = arrlength + 1 ;
                 });
-                echo(0);
+
+                each(0);
 
             })
 
@@ -313,6 +320,7 @@
                         console.log(json);
                         $("#dvPostResult").html(json.docType + " loaded successfully.");
 
+                        $("#txday").val(json.TXDATE);
                         $("#OwnCpty").val(json.OwnCptyID);
                         $("#Cpty").val(json.CptyID);
                         $("#MarginCall").val(Math.abs(json.MarginCall));
@@ -363,26 +371,26 @@
             //每筆寫入CollateralDetail
             function each(recordnum){
 
-                    dataMTM = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeMTM","args": ["' + TXIDarr[recordnum] + '","' + $("#txday").val() + '"]}'
+                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "CreateCollateralDetail","args": ["' + $("#txday").val() + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + Currarr[recordnum] + '","' + CollateralTypearr[recordnum] + '","' + CollateralDetailarr[recordnum] + '","' + Amountarr[recordnum] + '","' + Discountarr[recordnum] + '","' + DiscountAmountarr[recordnum] + '","' + $("#txid").val() + '"]}'
                     //alert(dataMTM);
                     // 使用 ajax() 來呼叫 REST API
 
                     $.ajax({
                          url: site + "/channels/mychannel/chaincodes/mycc",
                          type: "POST",
-                         data: dataMTM,
+                         data: data,
                          contentType: "application/json; charset=utf-8",
                          complete: function (data3, textStatus, jqXHR) {
                                 console.log(textStatus);
                          },
-                         success: function (data3, textStatus, jqXHR) {
-                                console.log(data3);
+                         success: function (result) {
+                                //console.log(data3);
 
-                                if (recordnum < TXIDarr.length) each(recordnum+1);
+                                if (recordnum < arrlength.length) each(recordnum+1);
 
-                                $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + TXIDarr.length +" loaded successfully.");
+                                if (recordnum < arrlength.length-1) $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + arrlength.length +" loaded successfully.");
 
-                                if (recordnum == TXIDarr.length-1) {
+                                if (recordnum == arrlength.length-1) {
                                     swal({
                                          title: "交易成功!",
                                          text: "",

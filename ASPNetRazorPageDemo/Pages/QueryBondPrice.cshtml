@@ -1,0 +1,138 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.QueryBondPriceModel
+@{
+    ViewData["Title"] = "債券百元報價查詢";
+    ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
+}
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+<div id="divUpdateFXTrade">
+    <div class="form-group">
+        <label for="txday">報價日期：</label>
+        <input type="text" id="txday" size="16" value='@ViewData["TODAY"]' placeholder="YYYYMMDD" />
+        <button id="search">交易查詢</button>
+        <br />
+    </div>
+    <br />
+    <div id="result" class="form-group">
+        <div class="table-responsive">
+            <table id="tb1" class="table table-striped table-bordered table-hover" border="1">
+                <thead>
+                    <tr>
+                        <td>TWD Bond</td>
+                        <td></td>
+                        <td>USD Bond</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>A03108</td>
+                        <td><input type="text" id="A03108" disabled /></td>
+                        <td>US46625HJZ47</td>
+                        <td><input type="text" id="US46625HJZ47" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>A07110</td>
+                        <td><input type="text" id="A07110" disabled /></td>
+                        <td>US71647NAM11</td>
+                        <td><input type="text" id="US71647NAM11" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>A00104</td>
+                        <td><input type="text" id="A00104" disabled /></td>
+                        <td>XS11335850562</td>
+                        <td><input type="text" id="XS11335850562" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>A03107</td>
+                        <td><input type="text" id="A03107" disabled /></td>
+                        <td>US25152RXA66</td>
+                        <td><input type="text" id="US25152RXA66" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td>A03114</td>
+                        <td><input type="text" id="A03114" disabled /></td>
+                        <td>BBG00FYBLQH5</td>
+                        <td><input type="text" id="BBG00FYBLQH5" disabled /></td>
+                    </tr>
+                </thead>
+                <tbody id="bonds" class="table table-striped"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+
+<div id="dvPostResult" style="font-size:16pt">
+</div>
+<h5>@Model.Message</h5>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript" language="JavaScript">
+    $(document).ready(function () {
+            var site = gSite;
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+
+
+     $("#search").click(function () {
+                //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryMTMPrice&args=%5B%22" + $("#txday").val() + "%22%5D")
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryBondPrice&args=%5B%22" + $("#txday").val() + "%22%5D",
+                    dataType: "html",
+                    success: function (data) {
+                        console.log(data)
+                        var data1 = data.replace(' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+                        //$('#bank').html("")
+                        var json = JSON.parse(data2);
+                        console.log(json);
+
+                        $("#dvPostResult").html(json.docType + " loaded successfully.");
+
+                        $("#A03108").val(json.A03108);
+                        $("#A07110").val(json.A07110);
+                        $("#A00104").val(json.A00104);
+                        $("#A03107").val(json.A03107);
+                        $("#A03114").val(json.A03114);
+                        $("#US46625HJZ47").val(json.US46625HJZ47);
+                        $("#US71647NAM11").val(json.US71647NAM11);
+                        $("#XS11335850562").val(json.XS11335850562);
+                        $("#US25152RXA66").val(json.US25152RXA66);
+                        $("#BBG00FYBLQH5").val(json.BBG00FYBLQH5);
+                        },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+            })
+        });
+</script>
+}

@@ -143,7 +143,7 @@
 
                                 if (recordnum < TXIDarr.length) each(recordnum+1);
 
-                                $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + TXIDarr.length +" loaded successfully.");
+                                if (recordnum < TXIDarr.length) $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + TXIDarr.length +" loaded successfully.");
 
                                 if (recordnum == TXIDarr.length-1) {
                                     swal({

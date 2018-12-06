@@ -142,7 +142,7 @@
 
                                  if (recordnum < Cptyarr.length) each(recordnum+1);
 
-                                 $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + Cptyarr.length +" loaded successfully.");
+                                 if (recordnum < Cptyarr.length) $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + Cptyarr.length +" loaded successfully.");
 
                                  if (recordnum == Cptyarr.length-1) {
                                     swal({
