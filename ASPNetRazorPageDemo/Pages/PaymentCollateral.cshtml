@@ -172,10 +172,15 @@
 
 
             $add.click(function () {
-                if ($('#CollateralAmount').val() ==  "" ) {
+                if ($('#CollateralAmount').val() ==  "") {
+                    alert("要先查詢交易單號才能支付!");
+                    return;
+                }
+                if ($('#CollateralAmount').val() ==  "") {
                     alert("擔保品金額要輸入!");
                     return;
                 }
+
                 var index = $table.bootstrapTable('getData').length;
                 $table.bootstrapTable('insertRow', {
                     index: index,
@@ -223,6 +228,7 @@
                         $('#CollateralDetail').append('<option value="A03114">A03114</option>');
                         Discount = TWDBondPCT
                      }
+                     DiscountAmount = $("#CollateralAmount").val() * Discount
             }
 
             var selectCollateralType=document.getElementById("CollateralType")
@@ -256,6 +262,7 @@
                         $('#CollateralDetail').append('<option value="A03114">A03114</option>');
                         Discount = TWDBondPCT
                      }
+                     DiscountAmount = $("#CollateralAmount").val() * Discount
             }
 
             var inputCollateralAmount=document.getElementById("CollateralAmount")
@@ -301,7 +308,46 @@
                      arrlength = arrlength + 1 ;
                 });
 
-                each(0);
+                var defer = $.Deferred();
+                defer.resolve();
+                $.each(Currarr,function(i,e){
+                defer = defer.then(function () {
+                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "CreateCollateralDetail","args": ["' + $("#txday").val() + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + Currarr[i] + '","' + CollateralTypearr[i] + '","' + CollateralDetailarr[i] + '","' + Amountarr[i] + '","' + Discountarr[i] + '","' + DiscountAmountarr[i] + '","' + $("#txid").val() + '"]}'
+
+                    // 使用 ajax() 來呼叫 REST API
+                    return $.ajax({
+                        url: site + "/channels/mychannel/chaincodes/mycc",
+                        type: "POST",
+                        data: data,
+                        async: false,
+                        contentType: "application/json; charset=utf-8",
+                        complete: function (data, textStatus, jqXHR) {
+                            console.log(textStatus);
+                        },
+                        success: function (data1) {
+                            console.log(data);
+                            $("#dvPostResult").html('交易TXID:<br/><b>' + data1 + '</b>');
+                        },
+                        error: function (jqXHR) {
+                            alert("發生錯誤: " + jqXHR.status);
+                            console.log(jqXHR);
+                        },
+                        //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                        beforeSend: function (xhr, settings) {
+                            xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                        }
+                    }) //ajax
+                 }); //defer
+               }); //each
+               defer.done(function(){
+                    swal({
+                          title: "交易成功!",
+                          text: "",
+                          icon: "success",
+                          button: "確定",
+                    });
+               });
+               //each(0);
 
             })
 
@@ -368,48 +414,6 @@
 
             })  // $("#search").click(function ()
 
-            //每筆寫入CollateralDetail
-            function each(recordnum){
-
-                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "CreateCollateralDetail","args": ["' + $("#txday").val() + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + Currarr[recordnum] + '","' + CollateralTypearr[recordnum] + '","' + CollateralDetailarr[recordnum] + '","' + Amountarr[recordnum] + '","' + Discountarr[recordnum] + '","' + DiscountAmountarr[recordnum] + '","' + $("#txid").val() + '"]}'
-                    //alert(dataMTM);
-                    // 使用 ajax() 來呼叫 REST API
-
-                    $.ajax({
-                         url: site + "/channels/mychannel/chaincodes/mycc",
-                         type: "POST",
-                         data: data,
-                         contentType: "application/json; charset=utf-8",
-                         complete: function (data3, textStatus, jqXHR) {
-                                console.log(textStatus);
-                         },
-                         success: function (result) {
-                                //console.log(data3);
-
-                                if (recordnum < arrlength.length) each(recordnum+1);
-
-                                if (recordnum < arrlength.length-1) $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + arrlength.length +" loaded successfully.");
-
-                                if (recordnum == arrlength.length-1) {
-                                    swal({
-                                         title: "交易成功!",
-                                         text: "",
-                                         icon: "success",
-                                         button: "確定",
-                                    });
-                                }
-                         },
-                         error: function (jqXHR) {
-                               alert("發生錯誤: " + jqXHR.status);
-                               console.log(jqXHR);
-                         },
-                         //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                         beforeSend: function (xhr, settings) {
-                                  xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
-                         }
-                      });
-
-            } //function
 
         }); //document
 
