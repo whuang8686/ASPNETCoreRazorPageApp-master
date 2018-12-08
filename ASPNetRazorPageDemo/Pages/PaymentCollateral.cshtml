@@ -143,6 +143,8 @@
             var DiscountAmountarr  = [];
             var arrlength = 0;
             var recordnum = 0;
+
+            var TXIDarr = [];
             $(function () {
                 $table.bootstrapTable({
                     formatNoMatches: function () {
@@ -340,16 +342,74 @@
                  }); //defer
                }); //each
                defer.done(function(){
-                    swal({
-                          title: "交易成功!",
-                          text: "",
-                          icon: "success",
-                          button: "確定",
-                    });
-               });
-               //each(0);
 
-            })
+               });
+
+               // Update TXStatus = "Finished"
+               data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "UpdateFXTradeCollateral","args": ["' + $("#txid").val() + '","Finished"]}'
+               //alert(data);
+               // 使用 ajax() 來呼叫 REST API
+               $.ajax({
+                    url: site + "/channels/mychannel/chaincodes/mycc",
+                    type: "POST",
+                    data: data,
+                    contentType: "application/json; charset=utf-8",
+                    complete: function (data, textStatus, jqXHR) {
+                        console.log(textStatus);
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
+
+                        // Update CptyAsset & Insert CashFlow
+                        // 使用 ajax() 來呼叫 REST API Step2：取得要計算交易單號
+                        $.ajax({
+                                type: "GET",
+                                url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryFXTradeCollateral&args=%5B%22" + $("#txday").val() + "%22%2C%22" + $("#txid").val() + "%22%5D",
+                                dataType: "html",
+                                success: function (data2) {
+                                    console.log(data2);
+                                    var data1 = data2.replace(' now has', '');
+                                    var data2 = data2.replace(' after the move', '');
+                                    var json = JSON.parse(data2);
+
+                                    var recordnum = 0;
+                                    console.log(json);
+
+                                    $("#dvPostResult").html("2.Transactions loaded successfully.");
+
+                                    for (i = 0; i < json.length; i++) {
+                                        TXIDarr.push(json[i].Key);
+                                    }
+
+                                    each(0);
+
+                                },
+
+                                error: function (jqXHR) {
+                                    alert("發生錯誤: " + jqXHR.status);
+                                    console.log(jqXHR);
+                                },
+                                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                    beforeSend: function (xhr, settings) {
+                                    xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                                }
+                        });   //$.ajax({
+
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                    }
+               });
+
+
+
+            })  //update
 
             $("#search").click(function () {
                 //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDCollateral&args=%5B%22" + $("#txid").val() + "%22%5D")
@@ -414,6 +474,47 @@
 
             })  // $("#search").click(function ()
 
+            //Update CptyAsset & Insert CashFlow
+            function each(recordnum){
+
+                    dataMTM = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "CollateralSettlment","args": ["' + $("#txday").val() + '","' + TXIDarr[recordnum] + '"]}'
+                    // 使用 ajax() 來呼叫 REST API
+
+                    $.ajax({
+                         url: site + "/channels/mychannel/chaincodes/mycc",
+                         type: "POST",
+                         data: dataMTM,
+                         contentType: "application/json; charset=utf-8",
+                         complete: function (data3, textStatus, jqXHR) {
+                                console.log(textStatus);
+                         },
+                         success: function (data3, textStatus, jqXHR) {
+                                console.log(data3);
+
+                                if (recordnum < TXIDarr.length) each(recordnum+1);
+
+                                if (recordnum < TXIDarr.length) $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + TXIDarr.length +" loaded successfully.");
+
+                                if (recordnum == TXIDarr.length-1) {
+                                    swal({
+                                         title: "交易成功!",
+                                         text: "",
+                                         icon: "success",
+                                         button: "確定",
+                                    });
+                                }
+                         },
+                         error: function (jqXHR) {
+                               alert("發生錯誤: " + jqXHR.status);
+                               console.log(jqXHR);
+                         },
+                         //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                         beforeSend: function (xhr, settings) {
+                                  xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                         }
+                      });
+
+            } //function
 
         }); //document
 
