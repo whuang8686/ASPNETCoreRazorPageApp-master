@@ -35,9 +35,10 @@
         <br />
     </div>
     <div class="form-group">
-        <label for="MarginCall" class="col-sm-2">尚欠MarginCall：</label>
+        <label for="MarginCall" class="col-sm-2">MarginCall金額：</label>
         <input class="col-sm-2" type="text" id="MarginCall" value="" size="10" placeholder="MarginCall">
         <label for="UnderMarginCall" class="col-sm-2">尚欠MarginCall：</label>
+        <input class="col-sm-2" type="text" id="UnderMarginCall" value="" size="10"  readonly>
         <br />
     </div>
     <br />
@@ -157,8 +158,10 @@
                 //var ids = $.map($table.bootstrapTable('getSelections'), function (row) {
                 //    return row.id;
                 //});
+               var removeDiscountAmount;
                var selects = $table.bootstrapTable('getSelections');
                      var ids = $.map(selects, function (row) {
+                     removeDiscountAmount = row.DiscountAmount;
                      return row.id;
                });
 
@@ -170,18 +173,21 @@
                     field: 'id',
                     values: ids
                 });
+                $('#UnderMarginCall').val(parseFloat($('#UnderMarginCall').val()) + parseFloat(removeDiscountAmount));
             });
 
 
             $add.click(function () {
-                if ($('#CollateralAmount').val() ==  "") {
+                if ($('#txid').val() ==  "") {
                     alert("要先查詢交易單號才能支付!");
                     return;
                 }
+
                 if ($('#CollateralAmount').val() ==  "") {
                     alert("擔保品金額要輸入!");
                     return;
                 }
+                $('#UnderMarginCall').val($('#UnderMarginCall').val() - DiscountAmount);
 
                 var index = $table.bootstrapTable('getData').length;
                 $table.bootstrapTable('insertRow', {
@@ -296,6 +302,10 @@
 
             //寫入CollateralDetail
             $("#update").click(function () {
+                if ($('#UnderMarginCall').val() != "0") {
+                    alert("MarginCall品金額不足!");
+                    return;
+                }
 
                 var data = $table.bootstrapTable('getData');
 
@@ -314,7 +324,7 @@
                 defer.resolve();
                 $.each(Currarr,function(i,e){
                 defer = defer.then(function () {
-                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "CreateCollateralDetail","args": ["' + $("#txday").val() + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + Currarr[i] + '","' + CollateralTypearr[i] + '","' + CollateralDetailarr[i] + '","' + Amountarr[i] + '","' + Discountarr[i] + '","' + DiscountAmountarr[i] + '","' + $("#txid").val() + '"]}'
+                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "CreateCollateralDetail","args": ["' + $("#txday").val() + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + Currarr[recordnum] + '","' + CollateralTypearr[recordnum] + '","' + CollateralDetailarr[recordnum] + '","' + Amountarr[recordnum] + '","' + Discountarr[recordnum] + '","' + DiscountAmountarr[recordnum] + '","' + $("#txid").val() + '"]}'
 
                     // 使用 ajax() 來呼叫 REST API
                     return $.ajax({
@@ -328,6 +338,7 @@
                         },
                         success: function (data1) {
                             console.log(data);
+                            recordnum = recordnum + 1
                             $("#dvPostResult").html('交易TXID:<br/><b>' + data1 + '</b>');
                         },
                         error: function (jqXHR) {
@@ -430,6 +441,7 @@
                         $("#OwnCpty").val(json.OwnCptyID);
                         $("#Cpty").val(json.CptyID);
                         $("#MarginCall").val(Math.abs(json.MarginCall));
+                        $('#UnderMarginCall').val(Math.abs(json.MarginCall));
 
                         //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCptyISDAByCpty&args=%5B%22" + json.OwnCptyID + "%22%2C%22" + json.CptyID + "%22%5D")
                         $.ajax({

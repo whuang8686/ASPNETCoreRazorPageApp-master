@@ -1,0 +1,136 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.UpdateCollateralModel
+@{
+    ViewData["Title"] = "日終更新狀態";
+    ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
+}
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+<div id="divUpdateFXTrade">
+    <div class="form-group">
+        <label for="txday">交易日期：</label>
+        <input type="text" id="txday" size="10" value='@ViewData["TODAY"]' placeholder="交易日">
+        <button id="update">日終更新狀態</button>
+    </div>
+</div>
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+
+<div id="dvPostResult" style="font-size:16pt">
+</div>
+<h5>@Model.Message</h5>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript" language="JavaScript">
+    $(document).ready(function () {
+            var site = gSite;
+            var recordnum = 0;
+            var TXIDarr = [];
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+            $("#update").click(function () {
+
+                //查詢當天未Settlment的資料
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryDayEndCollateralStatus&args=%5B%22" + $("#txday").val() + "%22%5D",
+                    dataType: "html",
+                    success: function (data2) {
+                          console.log(data2);
+                          var data1 = data2.replace(' now has', '');
+                          var data2 = data2.replace(' after the move', '');
+                          var json = JSON.parse(data2);
+
+                          var recordnum = 0;
+                          console.log(json);
+
+                          $("#dvPostResult").html("Transactions loaded successfully.");
+
+                          for (i = 0; i < json.length; i++) {
+                                 TXIDarr.push(json[i].Key);
+                          }
+
+                          var defer = $.Deferred();
+                          defer.resolve();
+                          $.each(TXIDarr,function(i,e){
+                          defer = defer.then(function () {
+                          data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "UpdateFXTradeCollateral","args": ["' + TXIDarr[recordnum] + '" , "Suspended"]}'
+
+                          // 使用 ajax() 來呼叫 REST API
+                          return $.ajax({
+                            url: site + "/channels/mychannel/chaincodes/mycc",
+                            type: "POST",
+                            data: data,
+                            async: false,
+                            contentType: "application/json; charset=utf-8",
+                            complete: function (data, textStatus, jqXHR) {
+                                console.log(textStatus);
+                            },
+                            success: function (data1) {
+                                recordnum = recordnum+1
+                                console.log(data);
+                                $("#dvPostResult").html('交易TXID:<br/><b>' + data1 + '</b>');
+                            },
+                            error: function (jqXHR) {
+                                alert("發生錯誤: " + jqXHR.status);
+                                console.log(jqXHR);
+                            },
+                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                            beforeSend: function (xhr, settings) {
+                                xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                            }
+                           }) //ajax
+                          }); //defer
+                        }); //each
+                        defer.done(function(){
+                                swal({
+                                   title: "交易成功!",
+                                   text: "",
+                                   icon: "success",
+                                   button: "確定",
+                                });
+                        });
+                     },
+                     error: function (jqXHR) {
+                          alert("發生錯誤: " + jqXHR.status);
+                          console.log(jqXHR);
+                     },
+                     //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                     beforeSend: function (xhr, settings) {
+                          xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                     }
+                 });   //$.ajax
+
+            })  //update
+
+
+
+        }); //document
+
+
+
+</script>
+}
