@@ -29,6 +29,7 @@
             var site = gSite;
             var recordnum = 0;
             var TXIDarr = [];
+            var OwnCptyIDarr = [];
 
             $.ajax({
                 type: "POST",
@@ -71,13 +72,53 @@
 
                           for (i = 0; i < json.length; i++) {
                                  TXIDarr.push(json[i].Key);
+                                 OwnCptyIDarr.push(json[i].Record.OwnCptyID);
                           }
 
+                          //Update TransactionCollateral TXStatus=Suspended
                           var defer = $.Deferred();
                           defer.resolve();
                           $.each(TXIDarr,function(i,e){
                           defer = defer.then(function () {
                           data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "UpdateFXTradeCollateral","args": ["' + TXIDarr[recordnum] + '" , "Suspended"]}'
+
+                          // 使用 ajax() 來呼叫 REST API
+                          return $.ajax({
+                            url: site + "/channels/mychannel/chaincodes/mycc",
+                            type: "POST",
+                            data: data,
+                            async: false,
+                            contentType: "application/json; charset=utf-8",
+                            complete: function (data, textStatus, jqXHR) {
+                                console.log(textStatus);
+                            },
+                            success: function (data1) {
+                                recordnum = recordnum+1
+                                console.log(data);
+                                $("#dvPostResult").html('交易TXID:<br/><b>' + data1 + '</b>');
+                            },
+                            error: function (jqXHR) {
+                                alert("發生錯誤: " + jqXHR.status);
+                                console.log(jqXHR);
+                            },
+                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                            beforeSend: function (xhr, settings) {
+                                xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                            }
+                           }) //ajax
+                          }); //defer
+                        }); //each
+                        defer.done(function(){
+
+                        });
+
+                        //Update Cpty CptyStatus=Suspended
+                        recordnum = 0;
+                        var defer = $.Deferred();
+                          defer.resolve();
+                          $.each(OwnCptyIDarr,function(i,e){
+                          defer = defer.then(function () {
+                          data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "updateCpty","args": ["' + OwnCptyIDarr[recordnum] + '" , "Lock"]}'
 
                           // 使用 ajax() 來呼叫 REST API
                           return $.ajax({

@@ -13,6 +13,13 @@
     <div class=col-md-12>
         <label for="txday">交易日期：</label>
         <input type="text" id="txday" size="10" value='@ViewData["TODAY"]' placeholder="交易日">
+        <label for="txstatus">交易狀態：</label>
+        <select id="txstatus">
+            <option value="All">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Finished">Finished</option>
+            <option value="Suspended">Suspended</option>
+        </select>
         <label for="bankid">Cpty：</label>
         <select id="bankid">
             <option value="All">All</option>
@@ -71,7 +78,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCollateralTransactionStatus&args=%5B%22" + $('#txday').val() + "%22%2C%22" + $('#bankid').val() + "%22%5D",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCollateralTransactionStatus&args=%5B%22" + $('#txday').val() + "%22%2C%22" + $('#txstatus').val() + "%22%2C%22" + $('#bankid').val() + "%22%5D",
                     dataType: "html",
                     success: function (data) {
                         console.log(data);
