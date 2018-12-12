@@ -351,7 +351,7 @@
                }); //each
                defer.done(function(){
 
-               });
+
 
                // Update TXStatus = "Finished"
                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "UpdateFXTradeCollateral","args": ["' + $("#txid").val() + '","Finished"]}'
@@ -413,9 +413,9 @@
                     beforeSend: function (xhr, settings) {
                         xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
                     }
-               });
+                  }); //$.ajax({
 
-
+               }); //defer.done
 
             })  //update
 
