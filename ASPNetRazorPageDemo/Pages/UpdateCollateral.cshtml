@@ -80,7 +80,7 @@
                           defer.resolve();
                           $.each(TXIDarr,function(i,e){
                           defer = defer.then(function () {
-                          data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "UpdateFXTradeCollateral","args": ["' + TXIDarr[recordnum] + '" , "Suspended"]}'
+                          data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "UpdateFXTradeCollateral","args": ["' + TXIDarr[i] + '" , "Suspended"]}'
 
                           // 使用 ajax() 來呼叫 REST API
                           return $.ajax({
@@ -93,7 +93,7 @@
                                 console.log(textStatus);
                             },
                             success: function (data1) {
-                                recordnum = recordnum+1
+                                //recordnum = recordnum+1
                                 console.log(data);
                                 $("#dvPostResult").html('交易TXID:<br/><b>' + data1 + '</b>');
                             },

@@ -1,0 +1,139 @@
+﻿@page
+@model ASPNetRazorPageDemo.Pages.QueryCptyModel
+@{
+    ViewData["Title"] = "查詢Cpty";
+    ViewData["TODAY"] = DateTime.Now.ToString("yyyyMMdd");
+}
+
+<div id="divEnroll">
+    <input type="hidden" id="token" value="">
+</div>
+
+<div id="divReadBankTX">
+    <div class=col-md-12>
+        <label for="bankid">Cpty：</label>
+        <select id="bankid">
+            <option value="All">All</option>
+            <option value="0001">CptyA</option>
+            <option value="0002">CptyB</option>
+            <option value="0003">CptyC</option>
+        </select>
+        <button id="search">查詢明細</button>
+    </div>
+    <br />
+    <br />
+    <div id="reportTableDiv">
+        <table id="reportTable"></table>
+    </div>
+</div>
+<br />
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+
+<div id="dvPostResult" style="font-size:16pt">
+</div>
+<h5>@Model.Message</h5>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+<script>
+        $(document).ready(function () {
+            var site = gSite;
+
+            $.ajax({
+                type: "POST",
+                url: site + "/users",
+                dataType: "json",
+                data: {
+                    username: "Jim",
+                    orgName: "Org1"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$("#dvPostResult").html(data.message);
+                        $("#token").val(data.token);
+                    } else {
+                        $("#dvPostResult").html(data.message);
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                }
+            })
+
+            $("#search").click(function () {
+                //alert($('#txday').val());
+
+                $.ajax({
+                    type: "GET",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCpty&args=%5B%22" + $('#bankid').val() + "%22%5D",
+
+                    dataType: "html",
+                    success: function (data) {
+                        console.log(data);
+                        var data1 = data.replace(' now has', '');
+                        var data2 = data1.replace(' after the move', '');
+                        //$('#bonds').html("")
+                        var datas = [];
+
+                        var json = JSON.parse(data2);
+                        console.log(json);
+                        $("#dvPostResult").html("Transactions loaded successfully.");
+
+                        for (i = 0; i < json.length; i++) {
+
+                               datas[i] = {
+                                    "CptyID": json[i].Record.CptyID,
+                                    "CptyName": json[i].Record.CptyName,
+                                    "CptyStatus": json[i].Record.CptyStatus,
+                                    "UpdateTime": json[i].Record.updateTime
+                               }
+                        }
+
+
+                        $('#reportTable').html("");
+                        $('#reportTable').bootstrapTable('destroy');
+                        $('#reportTable').bootstrapTable({
+                            method: 'get',
+                            cache: false,
+                            striped: true,
+                            pagination: true,
+                            pageSize: 5,
+                            pageNumber: 1,
+                            pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
+                            search: true,
+                            showColumns: true,
+                            showRefresh: false,
+                            showExport: false,
+                            exportTypes: ['csv', 'txt', 'xml'],
+                            search: true,
+                            clickToSelect: true,
+                            columns:
+                                [
+                                    { field: "CptyID", title: "CptyID<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "CptyName", title: "CptyName<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "CptyStatus", title: "Cpty狀態<br/>", align: "left", valign: "middle", sortable: "true" },
+                                    { field: "UpdateTime", title: "修改時間", align: "left", valign: "middle", sortable: "true" },
+
+                                ],
+                            data: datas,
+                        });
+
+
+
+                    },
+                    error: function (jqXHR) {
+                        alert("發生錯誤: " + jqXHR.status);
+                        console.log(jqXHR);
+                    },
+                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                })
+            })
+
+        });
+</script>
+}

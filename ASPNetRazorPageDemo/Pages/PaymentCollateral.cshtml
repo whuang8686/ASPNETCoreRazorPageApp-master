@@ -322,7 +322,7 @@
                 defer.resolve();
                 $.each(Currarr,function(i,e){
                 defer = defer.then(function () {
-                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "CreateCollateralDetail","args": ["' + $("#txday").val() + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + Currarr[recordnum] + '","' + CollateralTypearr[recordnum] + '","' + CollateralDetailarr[recordnum] + '","' + Amountarr[recordnum] + '","' + Discountarr[recordnum] + '","' + DiscountAmountarr[recordnum] + '","' + $("#txid").val() + '"]}'
+                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "CreateCollateralDetail","args": ["' + $("#txday").val() + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + Currarr[i] + '","' + CollateralTypearr[i] + '","' + CollateralDetailarr[i] + '","' + Amountarr[i] + '","' + Discountarr[i] + '","' + DiscountAmountarr[i] + '","' + $("#txid").val() + '"]}'
 
                     // 使用 ajax() 來呼叫 REST API
                     return $.ajax({
@@ -336,7 +336,6 @@
                         },
                         success: function (data1) {
                             console.log(data);
-                            recordnum = recordnum + 1
                             $("#dvPostResult").html('交易TXID:<br/><b>' + data1 + '</b>');
                         },
                         error: function (jqXHR) {
@@ -388,7 +387,7 @@
                                     $("#dvPostResult").html("2.Transactions loaded successfully.");
 
                                     for (i = 0; i < json.length; i++) {
-                                        TXIDarr.push(json[i].Key);
+                                        TXIDarr.push(json[i].Record.TXID);
                                     }
 
                                     each(0);
@@ -444,7 +443,7 @@
                           document.getElementById("update").disabled = true;
                         } else {
                           $('#UnderMarginCall').val(Math.abs(json.MarginCall));
-               
+
                         }
 
 
