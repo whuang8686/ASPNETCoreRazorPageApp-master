@@ -128,7 +128,7 @@
                                 }
                                 datas[j] = {
                                     "TXID": json[i].Transactions[j].TXID,
-                                    "OwnCptyID": json[i].Transactions[j].OwnCptyID,
+                                    "OwnCptyID": formatCpty(json[i].Transactions[j].OwnCptyID),
                                     "CptyID": json[i].Transactions[j].CptyID,
                                     "TradeDate": json[i].Transactions[j].TradeDate,
                                     "MaturityDate": json[i].Transactions[j].MaturityDate,
