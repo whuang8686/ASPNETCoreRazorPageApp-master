@@ -3,8 +3,8 @@
 //var gSite = "http://192.168.0.111" + ":4000"
 //var gSite = "http://172.20.10.5" + ":4000"
 //var gSite = "http://192.168.0.104" + ":4000"
-var gSite = "http://172.20.10.14" + ":4000"
-var gWebSite = "172.20.10.14"
+var gSite = "http://192.168.50.191" + ":4000"
+var gWebSite = "192.168.50.191"
 
 var finished = '<span class="label label-primary">Finished</span>'
 var matched = '<span class="label label-success">Matched</span>'
