@@ -152,8 +152,8 @@
             //peer chaincode invoke -n mycc -c '{"Args":["updateCptyAsset", "B","0001","0002","2018/09/01","2018/11/30","USD/TWD","USD","1000000","ZAR","1000000","30","true","0001B20180906123212"]}' -C myc
             $("#update").click(function () {
 
-                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "updateCptyAsset","args": ["' + $("#OwnCpty").val() + '","' + $("#USDBond").val() + '","' + $("#TWDBond").val() + '","' + $("#AUD").val() + '","' +  $("#BRL").val() + '","' + $("#CAD").val() + '","' + $("#CHF").val() + '","' + $("#CNY").val() + '","' + $("#EUR").val() + '","' +  $("#GBP").val() + '","' + $("#HKD").val() + '","' + $("#INR").val() + '","' + $("#JPY").val() + '","' + $("#KRW").val() + '" ,"' + $("#MOP").val() + '","' + $("#MYR").val() + '","' + $("#NZD").val() + '","' + $("#PHP").val() + '","' + $("#SEK").val() + '","' + $("#SGD").val() + '","' + $("#THB").val() + '" ,"' + $("#TWD").val() + '" ,"' + $("#USD").val() + '" ,"' + $("#ZAR").val() + '" ,"' + $("#txid").val() + '"]}'
-                /alert(data);
+                data = '{"peers": ["peer0.org1.example.com", "peer1.org2.example.com","peer1.org1.example.com","peer0.org2.example.com"],"other_orgs":["org2"],"fcn": "updateCptyAsset","args": ["' + $("#OwnCpty").val() + '","' + $("#USDBond").val() + '","' + $("#TWDBond").val() + '","' + $("#AUD").val() + '","' +  $("#BRL").val() + '","' + $("#CAD").val() + '","' + $("#CHF").val() + '","' + $("#CNY").val() + '","' + $("#EUR").val() + '","' +  $("#GBP").val() + '","' + $("#HKD").val() + '","' + $("#INR").val() + '","' + $("#JPY").val() + '","' + $("#KRW").val() + '" ,"' + $("#MOP").val() + '","' + $("#MYR").val() + '","' + $("#NZD").val() + '","' + $("#PHP").val() + '","' + $("#SEK").val() + '","' + $("#SGD").val() + '","' + $("#THB").val() + '" ,"' + $("#TWD").val() + '" ,"' + $("#USD").val() + '" ,"' + $("#ZAR").val() + '" ,"' + $("#txid").val() + '"]}'
+                //alert(data);
 
                 // 使用 ajax() 來呼叫 REST API
                 $.ajax({
