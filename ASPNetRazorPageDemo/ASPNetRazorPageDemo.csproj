@@ -13,25 +13,6 @@
     <None Remove="Pages\blank.html" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="Pages\Query2.cshtml.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Remove="Pages\Index.cshtml" />
-    <Content Remove="Pages\Index.cshtml" />
-    <Content Remove="Pages\Index %28copy%29.cshtml" />
-    <Content Remove="Pages\Invoke2 %28copy%29.cshtml" />
-    <Content Remove="Pages\Invoke5.cshtml" />
-    <Content Remove="Pages\Invoke55.cshtml" />
-    <Content Remove="Pages\login.cshtml" />
-    <Content Remove="wwwroot\images\fabric-cgs-index2.png" />
-    <Content Remove="wwwroot\images\fabric-index1.png" />
-    <Content Remove="wwwroot\images\fabric-index5.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Pages\Index.cshtml" />
-    <None Include="Pages\Invoke5.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Update="wwwroot\vendor\sb-admin-2\sb-admin-2.js">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>

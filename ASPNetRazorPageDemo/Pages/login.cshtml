@@ -1,5 +1,6 @@
 @page
 @model ASPNetRazorPageDemo.Pages.LoginModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "登入";
     Layout = null;
@@ -10,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+    <title>FX Trade System</title>
     <!-- Bootstrap Core CSS -->
     <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- MetisMenu CSS -->
@@ -26,6 +27,11 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
+<br />
+<br />
+<br />
+<br />
+<br />
 <body>
     <div class="container">
         <div class="row">
@@ -35,21 +41,26 @@
                         <h3 class="panel-title">Please Sign In</h3>
                     </div>
                     <div class="panel-body">
-                        <form role="form">
+                        <form method="post">
                             <fieldset>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="E-mail" name="email" type="email" autofocus>
+                                    <input class="form-control" placeholder="Username" name="LoginData.Username" type="text" autofocus>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Password" name="password" type="password" value="">
+                                    <input class="form-control" placeholder="Password" name="LoginData.password" type="password" value="">
                                 </div>
                                 <div class="checkbox">
                                     <label>
-                                        <input name="remember" type="checkbox" value="Remember Me">Remember Me
+                                        <input name="LoginData.remember" type="checkbox" value="Remember Me">Remember Me
                                     </label>
                                 </div>
+                                <input type="text" id="LoginData.HiddenUsername" name="LoginData.HiddenUsername" value="" runat="server" hidden>
                                 <!-- Change this to a button or input when using this as a form -->
-                                <a href="index.html" class="btn btn-lg btn-success btn-block">Login</a>
+                                <!--<button id="Login" class="btn btn-lg btn-success btn-block">Login</button>-->
+                                <button class="btn btn-lg btn-success btn-block" id="Login" type="submit">Login</button>
+                                <br />
+                                <div asp-validation-summary="All" class="text-danger"></div>
+                                @Html.AntiForgeryToken()
                             </fieldset>
                         </form>
                     </div>
@@ -67,3 +78,11 @@
     <script src="../dist/js/sb-admin-2.js"></script>
 </body>
 
+<script type="text/javascript" language="JavaScript">
+        $("#Login").click(function () {
+
+             document.getElementById("LoginData.HiddenUsername").value ="abcddd";
+
+        });
+
+</script>
