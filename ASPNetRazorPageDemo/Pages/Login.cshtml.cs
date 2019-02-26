@@ -31,6 +31,7 @@ namespace ASPNetRazorPageDemo.Pages
                 var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, loginData.Username));
                 identity.AddClaim(new Claim(ClaimTypes.Name, loginData.Username));
+                identity.AddClaim(new Claim(ClaimTypes.Role, loginData.Cpty));
                 // Authenticate using the identity
                 var principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties { IsPersistent = loginData.RememberMe });
@@ -54,6 +55,8 @@ namespace ASPNetRazorPageDemo.Pages
             public bool RememberMe { get; set; }
 
             public string HiddenUsername { get; set; }
+
+            public string Cpty { get; set; }
         }
 
     }

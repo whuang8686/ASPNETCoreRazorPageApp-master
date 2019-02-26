@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims;
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -55,12 +57,13 @@
             </div>
             <!-- /.navbar-header -->
             <ul class="nav navbar-top-links navbar-right">
+                <li>UserName: @Context.User.Identity.Name / </li>
+                <li>Cpty: @User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value</li>
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li></li>
                         <li>
                             <a asp-page="/Login">Loginout</a>
                         </li>
@@ -166,15 +169,15 @@
         </nav>
         <div id="page-wrapper">
             @{
-            if (ViewData.ContainsKey("Title"))
-            {
-                <div class="row">
-                    <div class="col-lg-12">
-                        <h3 class="page-header">外匯/擔保品系統 - @ViewData["Title"]</h3>
+                if (ViewData.ContainsKey("Title"))
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h3 class="page-header">外匯/擔保品系統 - @ViewData["Title"]</h3>
+                        </div>
+                        <!-- /.col-lg-12 -->
                     </div>
-                    <!-- /.col-lg-12 -->
-                </div>
-        }
+                }
             }
 
             <div class="row">
