@@ -21,7 +21,8 @@ namespace ASPNetRazorPageDemo.Pages
         {
             if (ModelState.IsValid)
             {
-                var isValid = (loginData.Username == loginData.HiddenUsername && loginData.Password == "password"); // TODO Validate the username and the password with your own logic
+                //var isValid = (loginData.Username == loginData.HiddenUsername && loginData.Password == "password"); // TODO Validate the username and the password with your own logic
+                var isValid = true;
                 if (!isValid)
                 {
                     ModelState.AddModelError("", "Username or Password is invalid");

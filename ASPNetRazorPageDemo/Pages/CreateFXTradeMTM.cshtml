@@ -61,10 +61,12 @@
             //$('#txday').val(today);
 
             $("#create").click(function () {
+
+                $("#create").prop('disabled',true);
                 // 使用 ajax() 來呼叫 REST API Step1：刪除當日資料
                 $.ajax({
                     type: "POST",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=deleteCptyM&args=%5B%22MTM" + $("#txday").val() + "%22%5D",
+                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=deleteFXTradeMTM&args=%5B%22MTM" + $("#txday").val() + "%22%5D",
                     contentType: "application/json; charset=utf-8",
                     complete: function (data, textStatus, jqXHR) {
                         console.log(textStatus);
@@ -152,6 +154,7 @@
                                          icon: "success",
                                          button: "確定",
                                     });
+                                    $("#create").prop('disabled',false);
                                 }
                          },
                          error: function (jqXHR) {

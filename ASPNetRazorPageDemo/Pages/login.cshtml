@@ -45,25 +45,33 @@
                         <form method="post">
                             <fieldset>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Username" name="LoginData.Username" type="text" autofocus>
+                                    <label for="Cpty">Cpty：</label>
+                                    <select id="Cpty" name="LoginData.Cpty">
+                                        <option value="Manager">Manager</option>
+                                        <option value="CptyA">CptyA</option>
+                                        <option value="CptyB">CptyB</option>
+                                        <option value="CptyC">CptyC</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Password" name="LoginData.password" type="password" value="">
-                                </div>
-                                <div class="checkbox">
-                                    <label>
-                                        <input name="LoginData.remember" type="checkbox" value="Remember Me">Remember Me
-                                    </label>
-                                </div>
-                                <input type="text" id="LoginData.HiddenUsername" name="LoginData.HiddenUsername" value="" runat="server" hidden>
-                                <input type="text" id="LoginData.Cpty" name="LoginData.Cpty" value="" runat="server" hidden>
-                                <!-- Change this to a button or input when using this as a form -->
-                                <!--<button id="Login" class="btn btn-lg btn-success btn-block">Login</button>-->
-                                <button class="btn btn-lg btn-success btn-block" id="Login" type="submit">Login</button>
-                                <br />
-                                <div asp-validation-summary="All" class="text-danger"></div>
-                                @Html.AntiForgeryToken()
-                            </fieldset>
+                                        <input class="form-control" placeholder="Username" name="LoginData.Username" type="text" autofocus>
+                                    </div>
+                                    <div class="form-group">
+                                        <input class="form-control" placeholder="Password" name="LoginData.password" type="password" value="">
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input name="LoginData.remember" type="checkbox" value="Remember Me">Remember Me
+                                        </label>
+                                    </div>
+                                    <input type="text" id="LoginData.HiddenUsername" name="LoginData.HiddenUsername" value="" runat="server" hidden>
+                                    <!-- Change this to a button or input when using this as a form -->
+                                    <!--<button id="Login" class="btn btn-lg btn-success btn-block">Login</button>-->
+                                    <button class="btn btn-lg btn-success btn-block" id="Login" type="submit">Login</button>
+                                    <br />
+                                    <div asp-validation-summary="All" class="text-danger"></div>
+                                    @Html.AntiForgeryToken()
+</fieldset>
                         </form>
                     </div>
                 </div>
@@ -84,7 +92,6 @@
         $("#Login").click(function () {
 
              document.getElementById("LoginData.HiddenUsername").value ="abcddd";
-             document.getElementById("LoginData.Cpty").value ="CptyAAA";
 
         });
 

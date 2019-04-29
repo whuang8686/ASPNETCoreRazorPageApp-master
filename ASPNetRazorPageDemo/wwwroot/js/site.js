@@ -3,7 +3,7 @@
 //var gSite = "http://192.168.0.111" + ":4000"
 //var gSite = "http://172.20.10.5" + ":4000"
 //var gSite = "http://192.168.0.104" + ":4000"
-var gSite = "http://172.20.10.13" + ":4000"
+var gSite = "http://192.168.50.196" + ":4000"
 var gWebSite = "172.20.10.14"
 
 var finished = '<span class="label label-primary">Finished</span>'
@@ -15,34 +15,6 @@ var fontRed = ' style="color:red"'
 var fontDefault = ' style=""'
 var PaidInterestDate="";
 
-function formatCpty(cptyid) {
-        var status_label="";
-        if (cptyid=="0001") {
-            status_label="CptyA"
-        }
-        if (cptyid=="0002") {
-            status_label="CptyB"
-        }
-        if (cptyid=="0003") {
-            status_label="CptyC"
-        }
-        if (cptyid=="0004") {
-            status_label="CptyD"
-        }
-        if (cptyid=="0005") {
-            status_label="CptyE"
-        }
-        if (cptyid=="0006") {
-            status_label="CptyF"
-        }
-        if (cptyid=="0007") {
-            status_label="CptyG"
-        }
-        if (cptyid=="0008") {
-            status_label="CptyH"
-        }
-        return status_label; 
-}
 
 function formatTXStatus(status) {
         var status_label="";

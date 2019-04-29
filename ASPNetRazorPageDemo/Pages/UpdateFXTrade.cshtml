@@ -22,22 +22,18 @@
     <div class="form-group">
         <label for="OwnCpty" class="col-sm-2">Cpty：</label>
         <select id="OwnCpty">
-            <option value="0001">CptyA</option>
-            <option value="0002">CptyB</option>
-            <option value="0003">CptyC</option>
-            <option value="0004">CptyD</option>
-            <option value="0005">CptyE</option>
+            <option value="BANK1">BANK1</option>
+            <option value="BANK2">BANK2</option>
+            <option value="BANK3">BANK3</option>
         </select>
         <br />
     </div>
     <div class="form-group">
         <label for="Cpty" class="col-sm-2">交易對手：</label>
         <select id="Cpty">
-            <option value="0001">CptyA</option>
-            <option value="0002">CptyB</option>
-            <option value="0003">CptyC</option>
-            <option value="0004">CptyD</option>
-            <option value="0005">CptyE</option>
+            <option value="BANK1">BANK1</option>
+            <option value="BANK2">BANK2</option>
+            <option value="BANK3">BANK3</option>
         </select>
         <br />
     </div>
@@ -118,483 +114,481 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<script type="text/javascript" language="JavaScript">
-    $(document).ready(function () {
-            var site = gSite;
+<script type="text/javascript" language="JavaScript">$(document).ready(function () {
+        var site = gSite;
 
+        $.ajax({
+            type: "POST",
+            url: site + "/users",
+            dataType: "json",
+            data: {
+                username: "Jim",
+                orgName: "Org1"
+            },
+            success: function (data) {
+                if (data.success) {
+                    //$("#dvPostResult").html(data.message);
+                    $("#token").val(data.token);
+                } else {
+                    $("#dvPostResult").html(data.message);
+                }
+            },
+            error: function (jqXHR) {
+                alert("發生錯誤: " + jqXHR.status);
+            }
+        })
+
+        $('#datetimepicker1').datetimepicker({
+            format: 'yyyy/mm/dd',
+            autoclose: true,
+            todayBtn: true,
+            minView: 2,
+            viewSelect: 'year',
+            startView: 2,
+            autoclose: true,
+            bootcssVer: 3,
+            keepOpen: false,
+            defaultDate: new Date()
+        });
+
+        $('#datetimepicker2').datetimepicker({
+            format: 'yyyy/mm/dd',
+            autoclose: true,
+            todayBtn: true,
+            minView: 2,
+            viewSelect: 'year',
+            startView: 2,
+            autoclose: true,
+            bootcssVer: 3,
+            keepOpen: false,
+            defaultDate: new Date()
+        });
+
+
+        //peer chaincode invoke -n mycc -c '{"Args":["CorrectFXTradeTransfer", "B","BANK1","BANK2","2018/09/01","2018/11/30","USD/TWD","USD","1000000","ZAR","1000000","30","true","BANK1B20180906123212"]}' -C myc
+        $("#update").click(function () {
+            var TXType;
+            if ($("#Contract").val().substring(0, 3) == $("#BuyCurr").val()) {
+                TXType = "B";
+                Curr1 = $("#BuyCurr").val();
+                Amount1 = $("#BuyCurrAmt").val();
+                Curr2 = $("#SellCurr").val();
+                Amount2 = $("#SellCurrAmt").val();
+            }
+            else {
+                TXType = "S";
+                Curr1 = $("#SellCurr").val();
+                Amount1 = $("#SellCurrAmt").val();
+                Curr2 = $("#BuyCurr").val();
+                Amount2 = $("#BuyCurrAmt").val();
+            }
+            data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "CorrectFXTradeTransfer","args": ["' + TXType + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + Curr1 + '","' + Amount1 + '","' + Curr2 + '","' + Amount2 + '","' + $("#NetPrice").val() + '" , "true","' + $("#txid").val() + '"]}'
+            //alert(data);
+            var MatchedTXID = ""
+            var TXHcode = ""
+            // 使用 ajax() 來呼叫 REST API
             $.ajax({
+                url: site + "/channels/mychannel/chaincodes/mycc",
                 type: "POST",
-                url: site + "/users",
-                dataType: "json",
-                data: {
-                    username: "Jim",
-                    orgName: "Org1"
+                data: data,
+                contentType: "application/json; charset=utf-8",
+                complete: function (data, textStatus, jqXHR) {
+                    console.log(textStatus);
                 },
+                success: function (data, textStatus, jqXHR) {
+                    console.log(data);
+                    $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
+
+                    swal({
+                        title: "交易成功!",
+                        text: "",
+                        icon: "success",
+                        button: "確定",
+                    });
+
+                    $.ajax({
+                        type: "GET",
+                        url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + $("#txid").val() + "%22%5D",
+                        dataType: "html",
+                        success: function (data) {
+                            var data1 = data.replace(' now has', '');
+                            var data2 = data1.replace(' after the move', '');
+                            var datas = [];
+
+                            $('#reportTable').html("");
+                            $('#reportTable').bootstrapTable('destroy');
+
+                            var json = JSON.parse(data2);
+                            TXDAY = $('#txday').val()
+                            TXID = json.TXID
+                            TXHcode = json.TXHcode
+                            console.log(json);
+                            $("#dvPostResult").html(json.docType + " loaded successfully.");
+
+                            if (json.TXType == "B") {
+                                BuyCurr = json.Curr1
+                                BuyAmount = json.Amount1
+                                SellCurr = json.Curr2
+                                SellAmount = json.Amount2
+                            }
+                            if (json.TXType == "S") {
+                                SellCurr = json.Curr1
+                                SellAmount = json.Amount1
+                                BuyCurr = json.Curr2
+                                BuyAmount = json.Amount2
+                            }
+
+                            datas[0] = {
+                                "TXID": json.TXID,
+                                "OwnCptyID": json.OwnCptyID,
+                                "CptyID": json.CptyID,
+                                "TradeDate": json.TradeDate,
+                                "MaturityDate": json.MaturityDate,
+                                "Contract": json.Contract,
+                                "TXType": json.TXType,
+                                "TXKinds": json.TXKinds,
+                                "BuyCurr": BuyCurr,
+                                "BuyAmount": BuyAmount,
+                                "SellCurr": SellCurr,
+                                "SellAmount": SellAmount,
+                                "NetPrice": json.NetPrice,
+                                "TXStatus": formatTXStatus(json.TXStatus),
+                                "TXMemo": json.TXMemo,
+                                "TXHcode": json.TXHcode,
+                                "MatchedTXID": json.MatchedTXID,
+                                "createTime": json.CreateTime,
+                                "updateTime": json.UpdateTime
+                            }
+
+                            $('#reportTable').bootstrapTable({
+                                method: 'get',
+                                cache: false,
+                                striped: true,
+                                pagination: true,
+                                pageSize: 5,
+                                pageNumber: 1,
+                                pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
+                                search: true,
+                                showColumns: true,
+                                showRefresh: false,
+                                showExport: false,
+                                exportTypes: ['csv', 'txt', 'xml'],
+                                search: true,
+                                clickToSelect: true,
+                                columns:
+                                    [
+                                        { field: "TXID", title: "交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "OwnCptyID", title: "OwnCptyID<br/>", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "CptyID", title: "交易對手 <br/>", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "TradeDate", title: "交易日<br/>", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "TXKinds", title: "TXKinds", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "SellAmount", title: "SellAmount", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "NetPrice", title: "NetPrice", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "MatchedTXID", title: "比對<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
+                                        { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
+                                    ],
+                                data: datas,
+                            });
+
+
+                            data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "updateQueuedTransactionHcode","args": ["' + TXDAY + '","' + TXID + '","' + TXHcode + '"]}'
+                            //alert(data)
+                            // 使用 ajax() 來呼叫 REST API
+                            $.ajax({
+                                url: site + "/channels/mychannel/chaincodes/mycc",
+                                type: "POST",
+                                data: data,
+                                contentType: "application/json; charset=utf-8",
+                                complete: function (data, textStatus, jqXHR) {
+                                    console.log(textStatus);
+                                },
+                                success: function (data, textStatus, jqXHR) {
+                                    console.log(data);
+                                    $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
+                                    if (TXHcode != "") {
+                                        $.ajax({
+                                            type: "GET",
+                                            url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + TXHcode + "%22%5D",
+                                            dataType: "html",
+                                            success: function (data) {
+                                                var data1 = data.replace(' now has', '');
+                                                var data2 = data1.replace(' after the move', '');
+                                                //$('#bank').html("")
+                                                $('#reportTable').bootstrapTable('destroy');
+
+                                                var json = JSON.parse(data2);
+                                                console.log(json);
+                                                $("#dvPostResult").html(json.docType + " loaded successfully.");
+
+                                                if (json.TXType == "B") {
+                                                    BuyCurr = json.Curr1
+                                                    BuyAmount = json.Amount1
+                                                    SellCurr = json.Curr2
+                                                    SellAmount = json.Amount2
+                                                }
+                                                if (json.TXType == "S") {
+                                                    SellCurr = json.Curr1
+                                                    SellAmount = json.Amount1
+                                                    BuyCurr = json.Curr2
+                                                    BuyAmount = json.Amount2
+                                                }
+
+
+                                                if (json.TXID != "") {
+                                                    //$('#bank').append(htmlCode);
+                                                    datas[1] = {
+                                                        "TXID": json.TXID,
+                                                        "OwnCptyID": json.OwnCptyID,
+                                                        "CptyID": json.CptyID,
+                                                        "TradeDate": json.TradeDate,
+                                                        "MaturityDate": json.MaturityDate,
+                                                        "Contract": json.Contract,
+                                                        "TXType": json.TXType,
+                                                        "TXKinds": json.TXKinds,
+                                                        "BuyCurr": BuyCurr,
+                                                        "BuyAmount": BuyAmount,
+                                                        "SellCurr": SellCurr,
+                                                        "SellAmount": SellAmount,
+                                                        "NetPrice": json.NetPrice,
+                                                        "TXStatus": formatTXStatus(json.TXStatus),
+                                                        "TXMemo": json.TXMemo,
+                                                        "TXHcode": json.TXHcode,
+                                                        "MatchedTXID": json.MatchedTXID,
+                                                        "createTime": json.CreateTime,
+                                                        "updateTime": json.UpdateTime
+                                                    }
+
+                                                    $('#reportTable').bootstrapTable({
+                                                        method: 'get',
+                                                        cache: false,
+                                                        striped: true,
+                                                        pagination: true,
+                                                        pageSize: 5,
+                                                        pageNumber: 1,
+                                                        pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
+                                                        search: true,
+                                                        showColumns: true,
+                                                        showRefresh: false,
+                                                        showExport: false,
+                                                        exportTypes: ['csv', 'txt', 'xml'],
+                                                        search: true,
+                                                        clickToSelect: true,
+                                                        columns:
+                                                            [
+                                                                { field: "OwnCptyID", title: "OwnCptyID<br/>", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "CptyID", title: "交易對手 <br/>", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "TradeDate", title: "交易日<br/>", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "TXKinds", title: "TXKinds", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "SellAmount", title: "SellAmount", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "NetPrice", title: "NetPrice", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "MatchedTXID", title: "比對<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
+                                                                { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
+
+                                                            ],
+                                                        data: datas,
+                                                    });
+
+                                                }
+                                                if (json.MatchedTXID != "") {
+                                                    $.ajax({
+                                                        type: "GET",
+                                                        url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + MatchedTXID + "%22%5D",
+                                                        dataType: "html",
+                                                        success: function (data) {
+                                                            var data1 = data.replace(' now has', '');
+                                                            var data2 = data1.replace(' after the move', '');
+                                                            //$('#bank').html("")
+                                                            $('#reportTable').bootstrapTable('destroy');
+
+                                                            var json = JSON.parse(data2);
+                                                            console.log(json);
+                                                            $("#dvPostResult").html(json.docType + " loaded successfully.");
+
+                                                            if (json.TXType == "B") {
+                                                                BuyCurr = json.Curr1
+                                                                BuyAmount = json.Amount1
+                                                                SellCurr = json.Curr2
+                                                                SellAmount = json.Amount2
+                                                            }
+                                                            if (json.TXType == "S") {
+                                                                SellCurr = json.Curr1
+                                                                SellAmount = json.Amount1
+                                                                BuyCurr = json.Curr2
+                                                                BuyAmount = json.Amount2
+                                                            }
+                                                            if (json.TXID != "") {
+                                                                //$('#bank').append(htmlCode);
+                                                                datas[2] = {
+                                                                    "TXID": json.TXID,
+                                                                    "OwnCptyID": json.OwnCptyID,
+                                                                    "CptyID": json.CptyID,
+                                                                    "TradeDate": json.TradeDate,
+                                                                    "MaturityDate": json.MaturityDate,
+                                                                    "Contract": json.Contract,
+                                                                    "TXType": json.TXType,
+                                                                    "TXKinds": json.TXKinds,
+                                                                    "BuyCurr": BuyCurr,
+                                                                    "BuyAmount": BuyAmount,
+                                                                    "SellCurr": SellCurr,
+                                                                    "SellAmount": SellAmount,
+                                                                    "NetPrice": json.NetPrice,
+                                                                    "TXStatus": formatTXStatus(json.TXStatus),
+                                                                    "TXMemo": json.TXMemo,
+                                                                    "TXHcode": json.TXHcode,
+                                                                    "MatchedTXID": json.MatchedTXID,
+                                                                    "createTime": json.CreateTime,
+                                                                    "updateTime": json.UpdateTime
+                                                                }
+
+                                                                $('#reportTable').bootstrapTable({
+                                                                    method: 'get',
+                                                                    cache: false,
+                                                                    striped: true,
+                                                                    pagination: true,
+                                                                    pageSize: 5,
+                                                                    pageNumber: 1,
+                                                                    pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
+                                                                    search: true,
+                                                                    showColumns: true,
+                                                                    showRefresh: false,
+                                                                    showExport: false,
+                                                                    exportTypes: ['csv', 'txt', 'xml'],
+                                                                    search: true,
+                                                                    clickToSelect: true,
+                                                                    columns:
+                                                                        [
+                                                                            { field: "OwnCptyID", title: "OwnCptyID<br/>", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "CptyID", title: "交易對手 <br/>", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "TradeDate", title: "交易日<br/>", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "TXKinds", title: "TXKinds", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "SellAmount", title: "SellAmount", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "NetPrice", title: "NetPrice", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "MatchedTXID", title: "比對<br/>序號", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
+                                                                            { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
+
+                                                                        ],
+                                                                    data: datas,
+                                                                });
+
+                                                            }
+
+
+
+                                                        },
+                                                        error: function (jqXHR) {
+                                                            alert("發生錯誤: " + jqXHR.status);
+                                                            console.log(jqXHR);
+                                                        },
+                                                        //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                                        beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                                                    })
+
+                                                }
+
+
+
+                                            },
+                                            error: function (jqXHR) {
+                                                alert("發生錯誤: " + jqXHR.status);
+                                                console.log(jqXHR);
+                                            },
+                                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                            beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                                        })
+
+                                    }
+
+
+                                },
+                                error: function (jqXHR) {
+                                    alert("發生錯誤: " + jqXHR.status);
+                                    console.log(jqXHR);
+                                },
+                                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                                beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                            });
+
+                        },
+                        error: function (jqXHR) {
+                            alert("發生錯誤: " + jqXHR.status);
+                            console.log(jqXHR);
+                        },
+                        //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                        beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+                    })
+
+
+                },
+                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
+            });
+        })
+
+        $("#search").click(function () {
+            //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + $("#txid").val() + "%22%5D")
+            $.ajax({
+                type: "GET",
+                url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + $("#txid").val() + "%22%5D",
+                dataType: "html",
                 success: function (data) {
-                    if (data.success) {
-                        //$("#dvPostResult").html(data.message);
-                        $("#token").val(data.token);
-                    } else {
-                        $("#dvPostResult").html(data.message);
-                    }
+                    console.log(data)
+                    var data1 = data.replace(' now has', '');
+                    var data2 = data1.replace(' after the move', '');
+                    //$('#bank').html("")
+                    var json = JSON.parse(data2);
+                    console.log(json);
+                    $("#dvPostResult").html(json.docType + " loaded successfully.");
+
+                    $("#txday").val(json.TXID.substr(5, 8));
+                    $("#OwnCpty").val(json.OwnCptyID);
+                    $("#Cpty").val(json.CptyID);
+                    $("#TradeDate").val(json.TradeDate);
+                    $("#MaturityDate").val(json.MaturityDate);
+                    $("#TXKinds").val(json.TXKinds);
+                    $("#Contract").val(json.Contract);
+                    $("#BuyCurr").val(json.Curr1);
+                    $("#BuyCurrAmt").val(json.Amount1);
+                    $("#SellCurr").val(json.Curr2);
+                    $("#SellCurrAmt").val(json.Amount2);
+                    $("#NetPrice").val(json.NetPrice);
                 },
                 error: function (jqXHR) {
                     alert("發生錯誤: " + jqXHR.status);
-                }
+                    console.log(jqXHR);
+                },
+                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
             })
-
-            $('#datetimepicker1').datetimepicker({
-                format: 'yyyy/mm/dd',
-                autoclose: true,
-                todayBtn: true,
-                minView: 2,
-                viewSelect: 'year',
-                startView: 2,
-                autoclose: true,
-                bootcssVer: 3,
-                keepOpen: false,
-                defaultDate:new Date()
-            });
-
-            $('#datetimepicker2').datetimepicker({
-                format: 'yyyy/mm/dd',
-                autoclose: true,
-                todayBtn: true,
-                minView: 2,
-                viewSelect: 'year',
-                startView: 2,
-                autoclose: true,
-                bootcssVer: 3,
-                keepOpen: false,
-                defaultDate:new Date()
-            });
-
-
-            //peer chaincode invoke -n mycc -c '{"Args":["CorrectFXTradeTransfer", "B","0001","0002","2018/09/01","2018/11/30","USD/TWD","USD","1000000","ZAR","1000000","30","true","0001B20180906123212"]}' -C myc
-            $("#update").click(function () {
-                var TXType;
-                if ($("#Contract").val().substring(0,3) == $("#BuyCurr").val()) {
-                    TXType = "B";
-                    Curr1 = $("#BuyCurr").val();
-                    Amount1 = $("#BuyCurrAmt").val();
-                    Curr2 = $("#SellCurr").val();
-                    Amount2 = $("#SellCurrAmt").val();
-                }
-                else {
-                    TXType = "S";
-                    Curr1 = $("#SellCurr").val();
-                    Amount1 = $("#SellCurrAmt").val();
-                    Curr2 = $("#BuyCurr").val();
-                    Amount2 = $("#BuyCurrAmt").val();
-                }
-                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "CorrectFXTradeTransfer","args": ["' + TXType + '","' + $("#OwnCpty").val() + '","' + $("#Cpty").val() + '","' + $("#TradeDate").val() + '","' + $("#MaturityDate").val() + '","' + $("#Contract").val() + '","' + Curr1 + '","' + Amount1 + '","' + Curr2 + '","' + Amount2 + '","' + $("#NetPrice").val() + '" , "true","' + $("#txid").val() + '"]}'
-                //alert(data);
-                var MatchedTXID = ""
-                var TXHcode = ""
-                // 使用 ajax() 來呼叫 REST API
-                $.ajax({
-                    url: site + "/channels/mychannel/chaincodes/mycc",
-                    type: "POST",
-                    data: data,
-                    contentType: "application/json; charset=utf-8",
-                    complete: function (data, textStatus, jqXHR) {
-                        console.log(textStatus);
-                    },
-                    success: function (data, textStatus, jqXHR) {
-                        console.log(data);
-                        $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
-
-                        swal({
-                            title: "交易成功!",
-                            text: "",
-                            icon: "success",
-                            button: "確定",
-                        });
-
-                        $.ajax({
-                            type: "GET",
-                            url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + $("#txid").val() + "%22%5D",
-                            dataType: "html",
-                            success: function (data) {
-                                var data1 = data.replace(' now has', '');
-                                var data2 = data1.replace(' after the move', '');
-                                var datas = [];
-
-                                $('#reportTable').html("");
-                                $('#reportTable').bootstrapTable('destroy');
-
-                                var json = JSON.parse(data2);
-                                TXDAY = $('#txday').val()
-                                TXID = json.TXID
-                                TXHcode = json.TXHcode
-                                console.log(json);
-                                $("#dvPostResult").html(json.docType + " loaded successfully.");
-
-                                if (json.TXType == "B") {
-                                    BuyCurr = json.Curr1
-                                    BuyAmount = json.Amount1
-                                    SellCurr = json.Curr2
-                                    SellAmount = json.Amount2
-                                }
-                                if (json.TXType == "S") {
-                                    SellCurr = json.Curr1
-                                    SellAmount = json.Amount1
-                                    BuyCurr = json.Curr2
-                                    BuyAmount = json.Amount2
-                                }
-
-                                datas[0] = {
-                                    "TXID": json.TXID,
-                                    "OwnCptyID": json.OwnCptyID,
-                                    "CptyID": json.CptyID,
-                                    "TradeDate": json.TradeDate,
-                                    "MaturityDate": json.MaturityDate,
-                                    "Contract": json.Contract,
-                                    "TXType": json.TXType,
-                                    "TXKinds": json.TXKinds,
-                                    "BuyCurr": BuyCurr,
-                                    "BuyAmount": BuyAmount,
-                                    "SellCurr": SellCurr,
-                                    "SellAmount": SellAmount,
-                                    "NetPrice": json.NetPrice,
-                                    "TXStatus": formatTXStatus(json.TXStatus),
-                                    "TXMemo": json.TXMemo,
-                                    "TXHcode": json.TXHcode,
-                                    "MatchedTXID": json.MatchedTXID,
-                                    "createTime": json.CreateTime,
-                                    "updateTime": json.UpdateTime
-                                }
-
-                                $('#reportTable').bootstrapTable({
-                                    method: 'get',
-                                    cache: false,
-                                    striped: true,
-                                    pagination: true,
-                                    pageSize: 5,
-                                    pageNumber: 1,
-                                    pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
-                                    search: true,
-                                    showColumns: true,
-                                    showRefresh: false,
-                                    showExport: false,
-                                    exportTypes: ['csv', 'txt', 'xml'],
-                                    search: true,
-                                    clickToSelect: true,
-                                    columns:
-                                        [
-                                            { field: "TXID", title: "交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "OwnCptyID", title: "OwnCptyID<br/>", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "CptyID", title: "交易對手 <br/>", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "TradeDate", title: "交易日<br/>", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "TXKinds", title: "TXKinds", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "SellAmount", title: "SellAmount", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "NetPrice", title: "NetPrice", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "MatchedTXID", title: "比對<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
-                                            { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
-                                        ],
-                                    data: datas,
-                                });
-
-
-                                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "updateQueuedTransactionHcode","args": ["' + TXDAY + '","' + TXID + '","' + TXHcode + '"]}'
-                                //alert(data)
-                                // 使用 ajax() 來呼叫 REST API
-                                $.ajax({
-                                    url: site + "/channels/mychannel/chaincodes/mycc",
-                                    type: "POST",
-                                    data: data,
-                                    contentType: "application/json; charset=utf-8",
-                                    complete: function (data, textStatus, jqXHR) {
-                                        console.log(textStatus);
-                                    },
-                                    success: function (data, textStatus, jqXHR) {
-                                        console.log(data);
-                                        $("#dvPostResult").html('交易TXID:<br/><b>' + data + '</b>');
-                                        if (TXHcode != "") {
-                                            $.ajax({
-                                                type: "GET",
-                                                url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + TXHcode + "%22%5D",
-                                                dataType: "html",
-                                                success: function (data) {
-                                                    var data1 = data.replace(' now has', '');
-                                                    var data2 = data1.replace(' after the move', '');
-                                                    //$('#bank').html("")
-                                                    $('#reportTable').bootstrapTable('destroy');
-
-                                                    var json = JSON.parse(data2);
-                                                    console.log(json);
-                                                    $("#dvPostResult").html(json.docType + " loaded successfully.");
-
-                                                    if (json.TXType == "B") {
-                                                        BuyCurr = json.Curr1
-                                                        BuyAmount = json.Amount1
-                                                        SellCurr = json.Curr2
-                                                        SellAmount = json.Amount2
-                                                    }
-                                                    if (json.TXType == "S") {
-                                                        SellCurr = json.Curr1
-                                                        SellAmount = json.Amount1
-                                                        BuyCurr = json.Curr2
-                                                        BuyAmount = json.Amount2
-                                                    }
-
-
-                                                    if (json.TXID != "") {
-                                                        //$('#bank').append(htmlCode);
-                                                        datas[1] = {
-                                                           "TXID": json.TXID,
-                                                           "OwnCptyID": json.OwnCptyID,
-                                                           "CptyID": json.CptyID,
-                                                           "TradeDate": json.TradeDate,
-                                                           "MaturityDate": json.MaturityDate,
-                                                           "Contract": json.Contract,
-                                                           "TXType": json.TXType,
-                                                           "TXKinds": json.TXKinds,
-                                                           "BuyCurr": BuyCurr,
-                                                           "BuyAmount": BuyAmount,
-                                                           "SellCurr": SellCurr,
-                                                           "SellAmount": SellAmount,
-                                                           "NetPrice": json.NetPrice,
-                                                           "TXStatus": formatTXStatus(json.TXStatus),
-                                                           "TXMemo": json.TXMemo,
-                                                           "TXHcode": json.TXHcode,
-                                                           "MatchedTXID": json.MatchedTXID,
-                                                           "createTime": json.CreateTime,
-                                                           "updateTime": json.UpdateTime
-                                                        }
-
-                                                        $('#reportTable').bootstrapTable({
-                                                            method: 'get',
-                                                            cache: false,
-                                                            striped: true,
-                                                            pagination: true,
-                                                            pageSize: 5,
-                                                            pageNumber: 1,
-                                                            pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
-                                                            search: true,
-                                                            showColumns: true,
-                                                            showRefresh: false,
-                                                            showExport: false,
-                                                            exportTypes: ['csv', 'txt', 'xml'],
-                                                            search: true,
-                                                            clickToSelect: true,
-                                                            columns:
-                                                                [
-                                                                    { field: "OwnCptyID", title: "OwnCptyID<br/>", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "CptyID", title: "交易對手 <br/>", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "TradeDate", title: "交易日<br/>", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "TXKinds", title: "TXKinds", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "SellAmount", title: "SellAmount", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "NetPrice", title: "NetPrice", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "MatchedTXID", title: "比對<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
-                                                                    { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
-
-                                                                ],
-                                                            data: datas,
-                                                        });
-
-                                                    }
-                                                    if (json.MatchedTXID != "") {
-                                                        $.ajax({
-                                                            type: "GET",
-                                                            url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + MatchedTXID + "%22%5D",
-                                                            dataType: "html",
-                                                            success: function (data) {
-                                                                var data1 = data.replace(' now has', '');
-                                                                var data2 = data1.replace(' after the move', '');
-                                                                //$('#bank').html("")
-                                                                $('#reportTable').bootstrapTable('destroy');
-
-                                                                var json = JSON.parse(data2);
-                                                                console.log(json);
-                                                                $("#dvPostResult").html(json.docType + " loaded successfully.");
-
-                                                                if (json.TXType == "B") {
-                                                                    BuyCurr = json.Curr1
-                                                                    BuyAmount = json.Amount1
-                                                                    SellCurr = json.Curr2
-                                                                    SellAmount = json.Amount2
-                                                                }
-                                                                if (json.TXType == "S") {
-                                                                    SellCurr = json.Curr1
-                                                                    SellAmount = json.Amount1
-                                                                   BuyCurr = json.Curr2
-                                                                    BuyAmount = json.Amount2
-                                                                }
-                                                                if (json.TXID != "") {
-                                                                    //$('#bank').append(htmlCode);
-                                                                    datas[2] = {
-                                                                        "TXID": json.TXID,
-                                                                        "OwnCptyID": json.OwnCptyID,
-                                                                        "CptyID": json.CptyID,
-                                                                        "TradeDate": json.TradeDate,
-                                                                        "MaturityDate": json.MaturityDate,
-                                                                        "Contract": json.Contract,
-                                                                        "TXType": json.TXType,
-                                                                        "TXKinds": json.TXKinds,
-                                                                        "BuyCurr": BuyCurr,
-                                                                        "BuyAmount": BuyAmount,
-                                                                        "SellCurr": SellCurr,
-                                                                        "SellAmount": SellAmount,
-                                                                        "NetPrice": json.NetPrice,
-                                                                        "TXStatus": formatTXStatus(json.TXStatus),
-                                                                        "TXMemo": json.TXMemo,
-                                                                        "TXHcode": json.TXHcode,
-                                                                        "MatchedTXID": json.MatchedTXID,
-                                                                        "createTime": json.CreateTime,
-                                                                        "updateTime": json.UpdateTime
-                                                                    }
-
-                                                                    $('#reportTable').bootstrapTable({
-                                                                        method: 'get',
-                                                                        cache: false,
-                                                                        striped: true,
-                                                                        pagination: true,
-                                                                        pageSize: 5,
-                                                                        pageNumber: 1,
-                                                                        pageList: [5, 10, 20, 50, 100, 200, 500], sidePagination: 'client',
-                                                                        search: true,
-                                                                        showColumns: true,
-                                                                        showRefresh: false,
-                                                                        showExport: false,
-                                                                        exportTypes: ['csv', 'txt', 'xml'],
-                                                                        search: true,
-                                                                        clickToSelect: true,
-                                                                        columns:
-                                                                            [
-                                                                                { field: "OwnCptyID", title: "OwnCptyID<br/>", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "CptyID", title: "交易對手 <br/>", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "TradeDate", title: "交易日<br/>", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "MaturityDate", title: "到期日<br/>", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "Contract", title: "Contract", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "TXType", title: "B/S", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "TXKinds", title: "TXKinds", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "BuyCurr", title: "BuyCurr", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "BuyAmount", title: "BuyAmount", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "SellCurr", title: "SellCurr", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "SellAmount", title: "SellAmount", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "NetPrice", title: "NetPrice", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "TXStatus", title: "交易<br/>狀態", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "TXMemo", title: "交易說明", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "TXHcode", title: "原交易<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "MatchedTXID", title: "比對<br/>序號", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "createTime", title: "建立<br/>時間", align: "left", valign: "middle", sortable: "true" },
-                                                                                { field: "updateTime", title: "修改<br/>時間", align: "left", valign: "middle", sortable: "true" },
-
-                                                                            ],
-                                                                        data: datas,
-                                                                    });
-
-                                                                }
-
-
-
-                                                            },
-                                                            error: function (jqXHR) {
-                                                                alert("發生錯誤: " + jqXHR.status);
-                                                                console.log(jqXHR);
-                                                            },
-                                                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                                                            beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
-                                                        })
-
-                                                    }
-
-
-
-                                                },
-                                                error: function (jqXHR) {
-                                                    alert("發生錯誤: " + jqXHR.status);
-                                                    console.log(jqXHR);
-                                                },
-                                                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                                                beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
-                                            })
-
-                                        }
-
-
-                                    },
-                                    error: function (jqXHR) {
-                                        alert("發生錯誤: " + jqXHR.status);
-                                        console.log(jqXHR);
-                                    },
-                                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
-                                });
-
-                            },
-                            error: function (jqXHR) {
-                                alert("發生錯誤: " + jqXHR.status);
-                                console.log(jqXHR);
-                            },
-                            //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                            beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
-                        })
-
-
-                    },
-                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
-                });
-            })
-
-     $("#search").click(function () {
-                //alert(site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + $("#txid").val() + "%22%5D")
-                $.ajax({
-                    type: "GET",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryTXIDTransactions&args=%5B%22" + $("#txid").val() + "%22%5D",
-                    dataType: "html",
-                    success: function (data) {
-                        console.log(data)
-                        var data1 = data.replace(' now has', '');
-                        var data2 = data1.replace(' after the move', '');
-                        //$('#bank').html("")
-                        var json = JSON.parse(data2);
-                        console.log(json);
-                        $("#dvPostResult").html(json.docType + " loaded successfully.");
-
-                        $("#txday").val(json.TXID.substr(5, 8));
-                        $("#OwnCpty").val(json.OwnCptyID);
-                        $("#Cpty").val(json.CptyID);
-                        $("#TradeDate").val(json.TradeDate);
-                        $("#MaturityDate").val(json.MaturityDate);
-                        $("#TXKinds").val(json.TXKinds);
-                        $("#Contract").val(json.Contract);
-                        $("#BuyCurr").val(json.Curr1);
-                        $("#BuyCurrAmt").val(json.Amount1);
-                        $("#SellCurr").val(json.Curr2);
-                        $("#SellCurrAmt").val(json.Amount2);
-                        $("#NetPrice").val(json.NetPrice);
-                        },
-                    error: function (jqXHR) {
-                        alert("發生錯誤: " + jqXHR.status);
-                        console.log(jqXHR);
-                    },
-                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                    beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
-                })
-            })
-        });
-</script>
+        })
+    });</script>
 }

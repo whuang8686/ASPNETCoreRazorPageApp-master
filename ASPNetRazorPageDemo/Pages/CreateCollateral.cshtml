@@ -28,143 +28,144 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<script>
+<script>$(document).ready(function () {
+        var site = gSite;
+        var datas = [];
+        var Cptyarr = [];
+        $.ajax({
+            type: "POST",
+            url: site + "/users",
+            dataType: "json",
+            data: {
+                username: "Jim",
+                orgName: "Org1"
+            },
+            success: function (data) {
+                if (data.success) {
+                    //$("#dvPostResult").html(data.message);
+                    $("#token").val(data.token);
+                } else {
+                    $("#dvPostResult").html(data.message);
+                }
+            },
+            error: function (jqXHR) {
+                alert("發生錯誤: " + jqXHR.status);
+            }
+        })
 
-        $(document).ready(function () {
-            var site = gSite;
-            var datas = [];
-            var Cptyarr = [];
+
+        //var now = new Date();
+        //var today = now.getFullYear() + '/' + ((now.getMonth() + 1)<10 ? '0' : '')+((now.getMonth() + 1)) + '/' +  (now.getDate()<10 ? '0' : '')+now.getDate();
+        //$('#txday').val(today);
+
+        $("#create").click(function () {
+
+            $("#create").prop('disabled', true);
+            // 使用 ajax() 來呼叫 REST API Step1：刪除當日資料
             $.ajax({
                 type: "POST",
-                url: site + "/users",
-                dataType: "json",
-                data: {
-                    username: "Jim",
-                    orgName: "Org1"
+                //url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=deleteCptyM&args=%5B%22MTM" + $("#txday").val() + "%22%5D",
+                url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=deleteFXTradeMTM&args=%5B%22MTM" + $("#txday").val() + "%22%5D",
+                contentType: "application/json; charset=utf-8",
+                complete: function (data, textStatus, jqXHR) {
+                    console.log(textStatus);
                 },
-                success: function (data) {
-                    if (data.success) {
-                        //$("#dvPostResult").html(data.message);
-                        $("#token").val(data.token);
-                    } else {
-                        $("#dvPostResult").html(data.message);
+                success: function (data, textStatus, jqXHR) {
+                    console.log(data);
+
+
+                    $("#dvPostResult").html("1.Delete Transactions loaded successfully.");
+
+                    // 使用 ajax() 來呼叫 REST API Step2：取得要計算MTM交易單號
+                    $.ajax({
+                        type: "GET",
+                        url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryCpty&args=%5B%22All%22%5D",
+                        dataType: "html",
+                        success: function (data2) {
+                            console.log(data2);
+                            var data1 = data2.replace(' now has', '');
+                            var data2 = data2.replace(' after the move', '');
+                            var json = JSON.parse(data2);
+                            var recordnum = 0;
+                            console.log(json);
+
+                            $("#dvPostResult").html("2.Transactions loaded successfully.");
+
+                            for (i = 0; i < json.length; i++) {
+                                Cptyarr.push(json[i].Record.CptyName);
+                            }
+
+                            each(0);
+
+                        },
+                        error: function (jqXHR) {
+                            alert("發生錯誤: " + jqXHR.status);
+                            console.log(jqXHR);
+                        },
+                        //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                        beforeSend: function (xhr, settings) {
+                            xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                        }
+                    });
+
+                },
+                error: function (jqXHR) {
+                    alert("發生錯誤: " + jqXHR.status);
+                    console.log(jqXHR);
+                },
+                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                }
+            });
+
+
+        })
+
+        //計算每筆Cpty
+        function each(recordnum) {
+
+            data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeCollateral","args": ["' + $("#txday").val() + '","' + Cptyarr[recordnum] + '"]}'
+            //alert(dataMTM);
+            // 使用 ajax() 來呼叫 REST API
+
+            $.ajax({
+                url: site + "/channels/mychannel/chaincodes/mycc",
+                type: "POST",
+                data: data,
+                contentType: "application/json; charset=utf-8",
+                complete: function (data3, textStatus, jqXHR) {
+                    console.log(textStatus);
+                },
+
+                success: function (data3, textStatus, jqXHR) {
+                    console.log(data3);
+
+                    if (recordnum < Cptyarr.length) each(recordnum + 1);
+
+                    if (recordnum < Cptyarr.length) $("#dvPostResult").html("3.Insert Transactions " + (recordnum + 1) + "/" + Cptyarr.length + " loaded successfully.");
+
+                    if (recordnum == Cptyarr.length - 1) {
+                        swal({
+                            title: "交易成功!",
+                            text: "",
+                            icon: "success",
+                            button: "確定",
+                        });
+                        $("#create").prop('disabled', false);
                     }
                 },
                 error: function (jqXHR) {
                     alert("發生錯誤: " + jqXHR.status);
+                    console.log(jqXHR);
+                },
+                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
                 }
-            })
+            });
 
+        } //function
 
-            //var now = new Date();
-            //var today = now.getFullYear() + '/' + ((now.getMonth() + 1)<10 ? '0' : '')+((now.getMonth() + 1)) + '/' +  (now.getDate()<10 ? '0' : '')+now.getDate();
-            //$('#txday').val(today);
-
-            $("#create").click(function () {
-                // 使用 ajax() 來呼叫 REST API Step1：刪除當日資料
-                $.ajax({
-                    type: "POST",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=deleteCptyM&args=%5B%22MTM" + $("#txday").val() + "%22%5D",
-                    contentType: "application/json; charset=utf-8",
-                    complete: function (data, textStatus, jqXHR) {
-                        console.log(textStatus);
-                    },
-                    success: function (data, textStatus, jqXHR) {
-                         console.log(data);
-
-
-                        $("#dvPostResult").html("1.Delete Transactions loaded successfully.");
-
-                        // 使用 ajax() 來呼叫 REST API Step2：取得要計算MTM交易單號
-                        $.ajax({
-                                type: "GET",
-                                url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=queryAllCpty&args=%5B%220001%22%2C%229999%22%5D",
-                                dataType: "html",
-                                success: function (data2) {
-                                    console.log(data2);
-                                    var data1 = data2.replace(' now has', '');
-                                    var data2 = data2.replace(' after the move', '');
-                                    var json = JSON.parse(data2);
-                                    var recordnum = 0;
-                                    console.log(json);
-
-                                    $("#dvPostResult").html("2.Transactions loaded successfully.");
-
-                                    for (i = 0; i < json.length; i++) {
-                                       Cptyarr.push(json[i].Key);
-                                    }
-
-                                    each(0);
-
-                                },
-                                error: function (jqXHR) {
-                                    alert("發生錯誤: " + jqXHR.status);
-                                    console.log(jqXHR);
-                                },
-                                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                                    beforeSend: function (xhr, settings) {
-                                    xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
-                                }
-                        });
-
-                    },
-                    error: function (jqXHR) {
-                        alert("發生錯誤: " + jqXHR.status);
-                        console.log(jqXHR);
-                    },
-                    //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                    beforeSend: function (xhr, settings) {
-                        xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
-                    }
-                });
-
-
-            })
-
-            //計算每筆Cpty
-            function each(recordnum){
-
-                    data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "FXTradeCollateral","args": ["' + $("#txday").val() + '","' + Cptyarr[recordnum] + '"]}'
-                    //alert(dataMTM);
-                    // 使用 ajax() 來呼叫 REST API
-
-                    $.ajax({
-                           url: site + "/channels/mychannel/chaincodes/mycc",
-                           type: "POST",
-                           data: data,
-                           contentType: "application/json; charset=utf-8",
-                           complete: function (data3, textStatus, jqXHR) {
-                                   console.log(textStatus);
-                           },
-
-                           success: function (data3, textStatus, jqXHR) {
-                                 console.log(data3);
-
-                                 if (recordnum < Cptyarr.length) each(recordnum+1);
-
-                                 if (recordnum < Cptyarr.length) $("#dvPostResult").html("3.Insert Transactions " + (recordnum+1) + "/" + Cptyarr.length +" loaded successfully.");
-
-                                 if (recordnum == Cptyarr.length-1) {
-                                    swal({
-                                         title: "交易成功!",
-                                         text: "",
-                                         icon: "success",
-                                         button: "確定",
-                                    });
-                                }
-                         },
-                         error: function (jqXHR) {
-                               alert("發生錯誤: " + jqXHR.status);
-                               console.log(jqXHR);
-                         },
-                         //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                         beforeSend: function (xhr, settings) {
-                                  xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
-                         }
-                      });
-
-            } //function
-
-        }); //document
-</script>
+    }); //document</script>
 }

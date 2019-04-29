@@ -57,7 +57,7 @@
             </div>
             <!-- /.navbar-header -->
             <ul class="nav navbar-top-links navbar-right">
-                <li>UserName: @Context.User.Identity.Name / </li>
+                <li>User: @Context.User.Identity.Name | </li>
                 <li>Cpty: @User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value</li>
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -137,9 +137,9 @@
                             <!-- /.nav-second-level -->
                         </li>
                         <li>
-                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 報價查詢<span class="fa arrow"></span></a>
+                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 報價功能<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
-                                <li><a asp-page="/CreateMTM">報價資料匯入</a></li>
+                                <li><a asp-page="/CreateMTM">當天報價資料匯入</a></li>
                                 <li><a asp-page="/QuerySpotRate">匯率資料查詢</a></li>
                                 <li><a asp-page="/QueryBondPrice">債券百元報價查詢</a></li>
                             </ul>
