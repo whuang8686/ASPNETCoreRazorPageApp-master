@@ -21,13 +21,19 @@ namespace ASPNetRazorPageDemo.Pages
         {
             if (ModelState.IsValid)
             {
-                //var isValid = (loginData.Username == loginData.HiddenUsername && loginData.Password == "password"); // TODO Validate the username and the password with your own logic
-                var isValid = true;
+                var isValid = (loginData.Username == loginData.HiddenUsername && loginData.Password == loginData.HiddenPassword); // TODO Validate the username and the password with your own logic
+                //var isValid = true
                 if (!isValid)
                 {
                     ModelState.AddModelError("", "Username or Password is invalid");
                     return Page();
                 }
+                if (loginData.HiddenUserStatus == "Disable")
+                {
+                    ModelState.AddModelError("", "User is Disable");
+                    return Page();
+                }
+
                 // Create the identity from the user info
                 var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, loginData.Username));
@@ -40,7 +46,7 @@ namespace ASPNetRazorPageDemo.Pages
             }
             else
             {
-                ModelState.AddModelError("", "username or password is blank");
+                ModelState.AddModelError("", "username or password is invalid");
                 return Page();
             }
         }
@@ -49,15 +55,19 @@ namespace ASPNetRazorPageDemo.Pages
         {
             [Required]
             public string Username { get; set; }
-
-            [Required, DataType(DataType.Password)]
+            public string Cpty { get; set; }
             public string Password { get; set; }
+
+            public string HiddenPassword { get; set; }
 
             public bool RememberMe { get; set; }
 
             public string HiddenUsername { get; set; }
 
-            public string Cpty { get; set; }
+            public string HiddenCpty { get; set; }
+
+            public string HiddenUserStatus { get; set; }
+
         }
 
     }
