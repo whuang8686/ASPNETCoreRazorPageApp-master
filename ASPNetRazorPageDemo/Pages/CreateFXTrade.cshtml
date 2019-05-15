@@ -123,8 +123,6 @@
                 <Option value="SGD">SGD</Option>
                 <Option value="THB">THB</Option>
                 <Option value="TWD">TWD</Option>
-
-
                 <Option value="USD">USD</Option>
                 <Option value="ZAR">ZAR</Option>
             </select>
@@ -408,7 +406,7 @@
                 if (value.indexOf('M') >= 0) {
                     $('#SellCurrAmt').val(value.substring(0, value.indexOf('M')) + '000000');
                 }
-                $('#BuyCurrAmt').val(Math.round($('#SellCurrAmt').val() / $("#NetPrice").val() * 100) / 100);
+                $('#BuyCurrAmt').val(Math.round($('#SellCurrAmt').val() * $("#NetPrice").val() * 100) / 100);
             });
 
             $('#datetimepicker1').datetimepicker({

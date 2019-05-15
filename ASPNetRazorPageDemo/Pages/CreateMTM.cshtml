@@ -8,10 +8,16 @@
     <input type="hidden" id="token" value="">
 </div>
 <div id="divReadBankTX">
-    <div class="form-group">
+    <div class=col-md-12>
         <label for="txday">交易日期：</label>
         <input type="text" id="txday" size="10" value='@ViewData["TODAY"]' placeholder="交易日">
-        <button id="create">計算MTM</button>
+        <label for="datasource">資訊源：</label>
+        <select id="datasource">
+            <Option value="172.20.10.13">172.20.10.13</Option>
+            <Option value="192.168.50.196">192.168.50.196</Option>
+            <Option value="192.168.0.30">192.168.0.30</Option>
+        </select>
+        <button id="create">MTM資料匯入</button>
     </div>
     <br />
     <br />
@@ -28,41 +34,82 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<script>
-        $(document).ready(function () {
-            var site = gSite;
+<script>$(document).ready(function () {
+        var site = gSite;
 
-            $("#create").click(function () {
-                // 使用 ajax() 來呼叫 REST API
-                data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createMTMPrice","args": ["' + gWebSite + '","' + $("#txday").val() + '"]}'
-                alert(data)
-                $.ajax({
-                    type: "POST",
-                    url: site + "/channels/mychannel/chaincodes/mycc?peer=peer0.org1.example.com&fcn=createMTMPrice&args=%5B%22" + gWebSite + "%22%2C%22" + $("#txday").val() + "%22%5D",
-                    contentType: "application/json; charset=utf-8",
-                    complete: function (data, textStatus, jqXHR) {
-                        console.log(textStatus);
-                    },
-                    success: function (data, textStatus, jqXHR) {
-                         console.log(data);
+        $.ajax({
+            type: "POST",
+            url: site + "/users",
+            dataType: "json",
+            data: {
+                username: "Jim",
+                orgName: "Org1"
+            },
+            success: function (data) {
+                if (data.success) {
+                    //$("#dvPostResult").html(data.message);
+                    $("#token").val(data.token);
+                } else {
+                    $("#dvPostResult").html(data.message);
+                }
+            },
+            error: function (jqXHR) {
+                alert("發生錯誤: " + jqXHR.status);
+            }
+        })
 
-                         swal({
+        $("#create").click(function () {
+            // 使用 ajax() 來呼叫 REST API
+            data = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createMTMPrice","args": ["' + $("#datasource").val() + '","' + $("#txday").val() + '"]}'
+            //alert(data)
+            $.ajax({
+                url: site + "/channels/mychannel/chaincodes/mycc",
+                type: "POST",
+                data: data,
+                contentType: "application/json; charset=utf-8",
+                complete: function (data, textStatus, jqXHR) {
+                    console.log(textStatus);
+                },
+                success: function (data, textStatus, jqXHR) {
+                    console.log(data);
+
+                    data2 = '{"peers": ["peer0.org1.example.com", "peer1.org1.example.com"],"fcn": "createBondPrice","args": ["' + $("#datasource").val() + '","' + $("#txday").val() + '"]}'
+                    $.ajax({
+                        url: site + "/channels/mychannel/chaincodes/mycc",
+                        type: "POST",
+                        data: data2,
+                        contentType: "application/json; charset=utf-8",
+                        complete: function (data, textStatus, jqXHR) {
+                            console.log(textStatus);
+                        },
+                        success: function (data, textStatus, jqXHR) {
+                            console.log(data);
+
+                            swal({
                                 title: "交易成功!",
                                 text: "",
                                 icon: "success",
                                 button: "確定",
                             });
-                     },
-                     error: function (jqXHR) {
-                         console.log('Error in Operation');
-                     },
-                     //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
-                     beforeSend: function (xhr, settings) {
-                          xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
-                     }
-                });
+                        },
+                        error: function (jqXHR) {
+                            console.log('Error in Operation');
+                        },
+                        //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                        beforeSend: function (xhr, settings) {
+                            xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                        }
+                    });
+                },
+                error: function (jqXHR) {
+                    console.log('Error in Operation');
+                },
+                //beforeSend: function(xhr, settings) { xhr.setRequestHeader('Authorization','Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY2NjcwMDMsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE1MTY2MzEwMDN9.TTXLF5Z4dv5FdWD5qJ_W19jXb6H1WdIzGJ6QnDJ_qBE"); }
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val());
+                }
+            });
 
-            })
-        });
-</script>
+        })
+    });</script>
 }
