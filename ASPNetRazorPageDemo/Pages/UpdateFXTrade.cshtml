@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Security.Claims;
 @model ASPNetRazorPageDemo.Pages.UpdateFXTradeModel
 @{
     ViewData["Title"] = "修改FX交易";
@@ -14,7 +15,7 @@
     </div>
     <div class="form-group">
         <label for="txday">交易日期：</label>
-        <input type="text" id="txday" size="16" placeholder="YYYYMMDD"/>
+        <input type="text" id="txday" size="16" placeholder="YYYYMMDD" />
         <button id="search">交易查詢</button>
         <br />
     </div>
@@ -133,7 +134,7 @@
             <Option value="THB">THB</Option>
             <Option value="TWD">TWD</Option>
             <Option value="USD">USD</Option>
-            <Option value="ZAR">ZAR</Option>
+            <Option value="ZAR">ZAR</Option>           
         </select>
         <input type="text" id="BuyCurrAmt" value="" size="10" placeholder="BuyCurrAmt">
         <br />
@@ -147,6 +148,7 @@
             <Option value="CHF">CHF</Option>
             <Option value="CNY">CNY</Option>
             <Option value="GBP">GBP</Option>
+            <Option value="EUR">EUR</Option>
             <Option value="HKD" selected>HKD</Option>
             <Option value="INR">INR</Option>
             <Option value="JPY">JPY</Option>
@@ -186,7 +188,8 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<script type="text/javascript" language="JavaScript">$(document).ready(function () {
+    <script type="text/javascript" language="JavaScript">
+$(document).ready(function () {
         var site = gSite;
 
         $.ajax({
@@ -209,6 +212,9 @@
                 alert("發生錯誤: " + jqXHR.status);
             }
         })
+
+        $('select#OwnCpty option:contains(@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value)').prop('selected',true);
+        document.getElementById("OwnCpty").disabled=true;
 
         $('#datetimepicker1').datetimepicker({
             format: 'yyyy/mm/dd',
@@ -648,10 +654,18 @@
                     $("#MaturityDate").val(json.MaturityDate);
                     $("#TXKinds").val(json.TXKinds);
                     $("#Contract").val(json.Contract);
-                    $("#BuyCurr").val(json.Curr1);
-                    $("#BuyCurrAmt").val(json.Amount1);
-                    $("#SellCurr").val(json.Curr2);
-                    $("#SellCurrAmt").val(json.Amount2);
+                    if (json.TXType == "B") {
+                        $("#BuyCurr").val(json.Curr1);
+                        $("#BuyCurrAmt").val(json.Amount1);
+                        $("#SellCurr").val(json.Curr2);
+                        $("#SellCurrAmt").val(json.Amount2);
+                    } else {
+                        $("#BuyCurr").val(json.Curr2);
+                        $("#BuyCurrAmt").val(json.Amount2);
+                        $("#SellCurr").val(json.Curr1);
+                        $("#SellCurrAmt").val(json.Amount1);
+                    }
+
                     $("#NetPrice").val(json.NetPrice);
                 },
                 error: function (jqXHR) {

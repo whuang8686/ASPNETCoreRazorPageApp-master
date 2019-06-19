@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Security.Claims;
 @model ASPNetRazorPageDemo.Pages.QueryFXTradeModel
 @{
     ViewData["Title"] = "查詢FX交易";
@@ -18,16 +19,15 @@
             <option value="All">All</option>
             <option value="Pending">Pending</option>
             <option value="Matched">Matched</option>
-            <option value="PaymentError">PaymentError</option>
             <option value="Cancelled">Cancelled</option>
             <option value="Finished">Finished</option>
         </select>
         <label for="bankid">Cpty：</label>
         <select id="bankid">
             <option value="All">All</option>
-            <option value="Bank1">Bank1</option>
-            <option value="Bank2">Bank2</option>
-            <option value="Bank3">Bank3</option>
+            <option value="BANK1">BANK1</option>
+            <option value="BANK2">BANK2</option>
+            <option value="BANK3">BANK3</option>
         </select>
         <button id="search">查詢交易明細</button>
     </div>
@@ -50,7 +50,7 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
 <script>
-        $(document).ready(function () {
+$(document).ready(function () {
             var site = gSite;
 
             $.ajax({
@@ -73,8 +73,12 @@
                     alert("發生錯誤: " + jqXHR.status);
                 }
             })
-
-
+            
+            if ("@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value" != "MANAGER")
+            {
+                $('select#bankid option:contains(@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value)').prop('selected',true);
+                document.getElementById("bankid").disabled=true;
+            }
 
             $("#search").click(function () {
                 //alert($('#txday').val());
@@ -190,6 +194,5 @@
                 })
             })
 
-        });
-</script>
+        });</script>
 }

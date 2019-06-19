@@ -90,6 +90,11 @@
                         <li>
                             <a asp-page="/Index"><i class="fa fa-dashboard fa-fw"></i> Home</a>
                         </li>
+
+                @{
+                    if (@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value != "MANAGER")
+                    {
+                        //Cpty
                         <li>
                             <a href="#"><i class="fa fa-bank"></i> Cpty功能<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
@@ -115,18 +120,75 @@
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
-
                         <li>
                             <a href="#"><i class="fa fa-edit fa-fw"></i> FX交易功能<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li><a asp-page="/CreateFXTrade">新增交易</a></li>
                                 <li><a asp-page="/UpdateFXTrade">修改交易</a></li>
+                                <li><a asp-page="/QueryFXTrade">查詢交易</a></li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-table fa-fw"></i> MTM市值功能<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li><a asp-page="/QueryFXTradeMTM">交易MTM市值查詢</a></li>
+
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 報價功能<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li><a asp-page="/QuerySpotRate">匯率資料查詢</a></li>
+                                <li><a asp-page="/QueryBondPrice">債券百元報價查詢</a></li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-sitemap fa-fw"></i> 擔保品功能<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li><a asp-page="/QueryMarginCall">MarginCall查詢</a></li>
+                                <li><a asp-page="/PaymentCollateral">擔保品支付</a></li>
+                                <li><a asp-page="/QueryCollateral">擔保品查詢</a></li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                    } else {
+                        //Manager
+                        <li>
+                            <a href="#"><i class="fa fa-bank"></i> Cpty功能<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <!--<li><a asp-page="/CreateCptyISDA">新增CptyISDA</a></li>-->
+                                <li><a asp-page="/QueryCpty">查詢Cpty</a></li>
+                                <li><a asp-page="/QueryCptyUser">查詢CptyUser</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-files-o fa-fwfa-wrench fa-fw"></i> CptyISDA合約功能<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <!--<li><a asp-page="/CreateCptyISDA">新增CptyISDA</a></li>-->
+                                <li><a asp-page="/UpdateCptyISDA">修改CptyISDA</a></li>
+                                <li><a asp-page="/QueryCptyISDA">查詢CptyISDA合約</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-wrench fa-fw"></i> Cpty資產功能<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li><a asp-page="/UpdateCptyAsset">修改Cpty資產</a></li>
+                                <li><a asp-page="/QueryCptyAsset">查詢Cpty資產</a></li>
+                                <li><a asp-page="/QueryCashFlow">查詢CashFlow</a></li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-edit fa-fw"></i> FX交易功能<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
                                 <li><a asp-page="/SettlmentFXTrade">交易交割</a></li>
                                 <li><a asp-page="/QueryFXTrade">查詢交易</a></li>
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
-
                         <li>
                             <a href="#"><i class="fa fa-table fa-fw"></i> MTM市值功能<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
@@ -145,18 +207,21 @@
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
-
                         <li>
                             <a href="#"><i class="fa fa-sitemap fa-fw"></i> 擔保品功能<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li><a asp-page="/CreateCollateral">計算MarginCall</a></li>
                                 <li><a asp-page="/QueryMarginCall">MarginCall查詢</a></li>
-                                <li><a asp-page="/PaymentCollateral">擔保品支付</a></li>
                                 <li><a asp-page="/QueryCollateral">擔保品查詢</a></li>
                                 <li><a asp-page="/UpdateCollateral">日終更新狀態</a></li>
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
+                    }
+
+                           
+                }
+
 
                         <li>
                             <a asp-page="/About"><i class="fa fa-info fa-fw"></i> About</a>

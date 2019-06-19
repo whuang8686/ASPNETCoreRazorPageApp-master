@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Security.Claims;
 @model ASPNetRazorPageDemo.Pages.CreateFXTradeModel
 @{
     ViewData["Title"] = "新增FX交易";
@@ -16,6 +17,7 @@
             <option value="BANK1">BANK1</option>
             <option value="BANK2">BANK2</option>
             <option value="BANK3">BANK3</option>
+
         </select>
         <br />
     </div>
@@ -105,73 +107,74 @@
         </select>
         <br />
     </div>
-        <div class="form-group">
-            <label for="BuyCurr" class="col-sm-2">Buy：</label>
-            <select id="BuyCurr">
-                <Option value="AUD">AUD</Option>
-                <Option value="CAD">CAD</Option>
-                <Option value="CHF">CHF</Option>
-                <Option value="CNY">CNY</Option>
-                <Option value="EUR">EUR</Option>
-                <Option value="GBP">GBP</Option>
-                <Option value="HKD">HKD</Option>
-                <Option value="JPY">JPY</Option>
-                <Option value="MYR">MYR</Option>
-                <Option value="NZD">NZD</Option>
-                <Option value="PHP">PHP</Option>
-                <Option value="SEK">SEK</Option>
-                <Option value="SGD">SGD</Option>
-                <Option value="THB">THB</Option>
-                <Option value="TWD">TWD</Option>
-                <Option value="USD">USD</Option>
-                <Option value="ZAR">ZAR</Option>
-            </select>
-            <input type="text" id="BuyCurrAmt" value="" size="10" placeholder="BuyCurrAmt">
-            <br />
-        </div>
-        <div class="form-group">
-            <label for="SellCurr" class="col-sm-2">Sell：</label>
-            <select id="SellCurr">
-                <Option value="AUD">AUD</Option>
-                <Option value="BRL">BRL</Option>
-                <Option value="CAD">CAD</Option>
-                <Option value="CHF">CHF</Option>
-                <Option value="CNY">CNY</Option>
-                <Option value="GBP">GBP</Option>
-                <Option value="HKD" selected>HKD</Option>
-                <Option value="INR">INR</Option>
-                <Option value="JPY">JPY</Option>
-                <Option value="KRW">KRW</Option>
-                <Option value="MOP">MOP</Option>
-                <Option value="MYR">MYR</Option>
-                <Option value="PHP">PHP</Option>
-                <Option value="SEK">SEK</Option>
-                <Option value="SGD">SGD</Option>
-                <Option value="THB">THB</Option>
-                <Option value="TWD">TWD</Option>
-                <Option value="USD">USD</Option>
-                <Option value="ZAR">ZAR</Option>
-            </select>
-            <input type="text" id="SellCurrAmt" value="" size="10" placeholder="SellCurrAmt">
-            <br />
-        </div>
-        <div class="form-group">
-            <label for="NetPrice" class="col-sm-2">NetPrice：</label>
-            <input type="text" id="NetPrice" value="" size="10" placeholder="合約價">
-            <button id="sure">確定</button>
-            <br />
-        </div>
+    <div class="form-group">
+        <label for="BuyCurr" class="col-sm-2">Buy：</label>
+        <select id="BuyCurr">
+            <Option value="AUD">AUD</Option>
+            <Option value="CAD">CAD</Option>
+            <Option value="CHF">CHF</Option>
+            <Option value="CNY">CNY</Option>
+            <Option value="EUR">EUR</Option>
+            <Option value="GBP">GBP</Option>
+            <Option value="HKD">HKD</Option>
+            <Option value="JPY">JPY</Option>
+            <Option value="MYR">MYR</Option>
+            <Option value="NZD">NZD</Option>
+            <Option value="PHP">PHP</Option>
+            <Option value="SEK">SEK</Option>
+            <Option value="SGD">SGD</Option>
+            <Option value="THB">THB</Option>
+            <Option value="TWD">TWD</Option>
+            <Option value="USD">USD</Option>
+            <Option value="ZAR">ZAR</Option>
+        </select>
+        <input type="text" id="BuyCurrAmt" value="" size="10" placeholder="BuyCurrAmt">
+        <br />
+    </div>
+    <div class="form-group">
+        <label for="SellCurr" class="col-sm-2">Sell：</label>
+        <select id="SellCurr">
+            <Option value="AUD">AUD</Option>
+            <Option value="BRL">BRL</Option>
+            <Option value="CAD">CAD</Option>
+            <Option value="CHF">CHF</Option>
+            <Option value="CNY">CNY</Option>
+            <Option value="GBP">GBP</Option>
+            <Option value="HKD" selected>HKD</Option>
+            <Option value="INR">INR</Option>
+            <Option value="JPY">JPY</Option>
+            <Option value="KRW">KRW</Option>
+            <Option value="MOP">MOP</Option>
+            <Option value="MYR">MYR</Option>
+            <Option value="PHP">PHP</Option>
+            <Option value="SEK">SEK</Option>
+            <Option value="SGD">SGD</Option>
+            <Option value="THB">THB</Option>
+            <Option value="TWD">TWD</Option>
+            <Option value="USD">USD</Option>
+            <Option value="ZAR">ZAR</Option>
+        </select>
+        <input type="text" id="SellCurrAmt" value="" size="10" placeholder="SellCurrAmt">
+        <br />
+    </div>
+    <div class="form-group">
+        <label for="NetPrice" class="col-sm-2">NetPrice：</label>
+        <input type="text" id="NetPrice" value="" size="10" placeholder="合約價">
+        <button id="sure">確定</button>
         <br />
     </div>
     <br />
-    @Html.AntiForgeryToken()
-    <h2 style="color:brown;">執行結果</h2>
-    <div id="dvPostResult" style="font-size:16pt"></div>
-    <h5>@Model.Message</h5>
+</div>
+<br />
+@Html.AntiForgeryToken()
+<h2 style="color:brown;">執行結果</h2>
+<div id="dvPostResult" style="font-size:16pt"></div>
+<h5>@Model.Message</h5>
 
-    @section Scripts {
-        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>$(document).ready(function () {
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+$(document).ready(function () {
             var site = gSite;
 
             $.ajax({
@@ -194,6 +197,9 @@
                     alert("發生錯誤: " + jqXHR.status);
                 }
             })
+
+            $('select#OwnCpty option:contains(@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value)').prop('selected',true);
+            document.getElementById("OwnCpty").disabled=true;
 
             var selectmenu = document.getElementById("Contract")
             selectmenu.onchange = function () {
@@ -516,4 +522,4 @@
                 });
             })
         });</script>
-    }
+}

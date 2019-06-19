@@ -3,7 +3,7 @@
 //var gSite = "http://192.168.0.111" + ":4000"
 //var gSite = "http://172.20.10.5" + ":4000"
 //var gSite = "http://192.168.0.104" + ":4000"
-var gSite = "http://192.168.50.196" + ":4000"
+var gSite = "http://192.168.0.30" + ":4000"
 var gWebSite = "172.20.10.14"
 
 var finished = '<span class="label label-primary">Finished</span>'
