@@ -3,7 +3,7 @@
 //var gSite = "http://192.168.0.111" + ":4000"
 //var gSite = "http://172.20.10.5" + ":4000"
 //var gSite = "http://192.168.0.104" + ":4000"
-var gSite = "http://192.168.0.30" + ":4000"
+var gSite = "http://10.232.225.5" + ":4000"
 var gWebSite = "172.20.10.14"
 
 var finished = '<span class="label label-primary">Finished</span>'
@@ -33,6 +33,25 @@ function formatTXStatus(status) {
         }
 
          return status_label;
+}
+
+function formatMTXStatus(status) {
+        var status_label="";
+
+        if (status=="Pending") {
+            status_label=pending
+        }
+        if (status=="Matched") {
+            status_label=matched
+        }
+        if (status=="Cancelled") {
+            status_label=cancelled
+        }
+        if (status=="Finished") {
+            status_label=finished
+        }
+
+        return status_label;
 }
 
 function formatApproveFlag(flag) {

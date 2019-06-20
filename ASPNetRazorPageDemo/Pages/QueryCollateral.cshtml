@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Security.Claims;
 @model ASPNetRazorPageDemo.Pages.QueryCollateralModel
 @{
     ViewData["Title"] = "擔保品查詢";
@@ -42,7 +43,7 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
 <script>
-        $(document).ready(function () {
+$(document).ready(function () {
             var site = gSite;
 
             $.ajax({
@@ -66,6 +67,12 @@
                 }
             })
 
+            if ("@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value" != "MANAGER")
+            {
+                $('select#bankid option:contains(@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value)').prop('selected',true);
+                document.getElementById("bankid").disabled=true;
+            }
+
             $("#search").click(function () {
                 //alert($('#txday').val());
 
@@ -85,19 +92,19 @@
                         $("#dvPostResult").html("Transactions loaded successfully.");
                         for (i = 0; i < json.length; i++) {
 
-                                datas[i] = {
-                                    "TXID": json[i].Key,
-                                    "OwnCptyID": json[i].Record.OwnCptyID,
-                                    "CptyID": json[i].Record.CptyID,
-                                    "Curr": json[i].Record.Curr,
-                                    "CollateralType": json[i].Record.CollateralType,
-                                    "CollateralDetail": json[i].Record.CollateralDetail,
-                                    "Amount": json[i].Record.Amount,
-                                    "Discount": json[i].Record.Discount,
-                                    "DiscountAmount": json[i].Record.DiscountAmount,
-                                    "FXTXID": json[i].Record.FXTXID,
-                                    "createTime": json[i].Record.createTime,
-                                }
+                            datas[i] = {
+                                "TXID": json[i].Key,
+                                "OwnCptyID": json[i].Record.OwnCptyID,
+                                "CptyID": json[i].Record.CptyID,
+                                "Curr": json[i].Record.Curr,
+                                "CollateralType": json[i].Record.CollateralType,
+                                "CollateralDetail": json[i].Record.CollateralDetail,
+                                "Amount": json[i].Record.Amount,
+                                "Discount": json[i].Record.Discount,
+                                "DiscountAmount": json[i].Record.DiscountAmount,
+                                "FXTXID": json[i].Record.FXTXID,
+                                "createTime": json[i].Record.createTime,
+                            }
 
                         }
                         $('#reportTable').html("");
@@ -146,6 +153,5 @@
                 })
             })
 
-        });
-</script>
+        });</script>
 }

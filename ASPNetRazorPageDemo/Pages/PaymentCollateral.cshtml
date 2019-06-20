@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Security.Claims;
 @model ASPNetRazorPageDemo.Pages.PaymentCollateralModel
 @{
     ViewData["Title"] = "擔保品支付";
@@ -34,7 +35,7 @@
         <label for="MarginCall" class="col-sm-2">MarginCall金額：</label>
         <input class="col-sm-2" type="text" id="MarginCall" value="" size="10" placeholder="MarginCall">
         <label for="UnderMarginCall" class="col-sm-2">尚欠MarginCall：</label>
-        <input class="col-sm-2" type="text" id="UnderMarginCall" value="" size="10"  readonly>
+        <input class="col-sm-2" type="text" id="UnderMarginCall" value="" size="10" readonly>
         <br />
     </div>
     <br />
@@ -100,13 +101,13 @@
     <br />
     <br />
     <!-- Editable table -->
-            <div class="col-sm">
-                <button id="update">支付</button>
-                <br />
-            </div>
-            <div id="reportTableDiv">
-                <table id="reportTable"></table>
-            </div>
+    <div class="col-sm">
+        <button id="update">支付</button>
+        <br />
+    </div>
+    <div id="reportTableDiv">
+        <table id="reportTable"></table>
+    </div>
 </div>
 <br />
 @Html.AntiForgeryToken()
@@ -118,7 +119,7 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<script type="text/javascript" language="JavaScript">
+    <script type="text/javascript" language="JavaScript">
     $(document).ready(function () {
             var site = gSite;
             var USDCashPCT=1, TWDCashPCT=2, USDBondPCT=3, TWDBondPCT=4;
@@ -147,6 +148,9 @@
                 }
               });
             });
+
+            $('select#OwnCpty option:contains(@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value)').prop('selected',true);
+            document.getElementById("OwnCpty").disabled=true;
 
             $remove.click(function () {
                 //var ids = $.map($table.bootstrapTable('getSelections'), function (row) {
@@ -532,5 +536,5 @@
 
 
 
-</script>
+    </script>
 }

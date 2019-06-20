@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Security.Claims;
 @model ASPNetRazorPageDemo.Pages.QueryCptyISDAModel
 @{
     ViewData["Title"] = "查詢CptyISDA合約";
@@ -40,7 +41,7 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
 <script>
-        $(document).ready(function () {
+$(document).ready(function () {
             var site = gSite;
 
             $.ajax({
@@ -64,6 +65,12 @@
                 }
             })
 
+            if ("@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value" != "MANAGER")
+            {
+                $('select#bankid option:contains(@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value)').prop('selected',true);
+                document.getElementById("bankid").disabled=true;
+            }
+
             $("#search").click(function () {
                 //alert($('#txday').val());
 
@@ -84,26 +91,26 @@
                         for (i = 0; i < json.length; i++) {
 
 
-                               datas[i] = {
-                                    "CptyISDAID": json[i].Record.CptyISDAID,
-                                    "OwnCptyID": json[i].Record.OwnCptyID,
-                                    "CptyID": json[i].Record.CptyID,
-                                    "CptyIndependAmt": json[i].Record.CptyIndependAmt,
-                                    "OwnIndependAmt": json[i].Record.OwnIndependAmt,
-                                    "CptyThreshold": json[i].Record.CptyThreshold,
-                                    "OwnThreshold": json[i].Record.OwnThreshold,
-                                    "CptyMTA": json[i].Record.CptyMTA,
-                                    "OwnMTA": json[i].Record.OwnMTA,
-                                    "Rounding": json[i].Record.Rounding,
-                                    "StartDate": json[i].Record.StartDate,
-                                    "EndDate": json[i].Record.EndDate,
-                                    "USDCashPCT": json[i].Record.USDCashPCT,
-                                    "TWDCashPCT": json[i].Record.TWDCashPCT,
-                                    "USDBondPCT": json[i].Record.USDBondPCT,
-                                    "TWDBondPCT": json[i].Record.TWDBondPCT,
-                                    "createTime": json[i].Record.CreateTime,
-                                    "updateTime": json[i].Record.UpdateTime
-                                }
+                            datas[i] = {
+                                "CptyISDAID": json[i].Record.CptyISDAID,
+                                "OwnCptyID": json[i].Record.OwnCptyID,
+                                "CptyID": json[i].Record.CptyID,
+                                "CptyIndependAmt": json[i].Record.CptyIndependAmt,
+                                "OwnIndependAmt": json[i].Record.OwnIndependAmt,
+                                "CptyThreshold": json[i].Record.CptyThreshold,
+                                "OwnThreshold": json[i].Record.OwnThreshold,
+                                "CptyMTA": json[i].Record.CptyMTA,
+                                "OwnMTA": json[i].Record.OwnMTA,
+                                "Rounding": json[i].Record.Rounding,
+                                "StartDate": json[i].Record.StartDate,
+                                "EndDate": json[i].Record.EndDate,
+                                "USDCashPCT": json[i].Record.USDCashPCT,
+                                "TWDCashPCT": json[i].Record.TWDCashPCT,
+                                "USDBondPCT": json[i].Record.USDBondPCT,
+                                "TWDBondPCT": json[i].Record.TWDBondPCT,
+                                "createTime": json[i].Record.CreateTime,
+                                "updateTime": json[i].Record.UpdateTime
+                            }
 
                         }
                         $('#reportTable').html("");
@@ -273,6 +280,5 @@
                     beforeSend: function (xhr, settings) { xhr.setRequestHeader('Authorization', 'Bearer ' + $("#token").val()); }
                 })
             })
-        });
-</script>
+        });</script>
 }
